@@ -42,3 +42,9 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# NPM/Yarn lock súbor (odporúča sa necommitovať, ak používate npm)
+package-lock.json
+
+# Konfigurácia pre JavaScript (nepotrebné commitovať, ak to nie je zámer)
+jsconfig.json
