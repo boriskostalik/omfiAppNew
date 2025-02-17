@@ -4,11 +4,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicationController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\AboutController;
 
 
-Route::get('/', [PublicationController::class, 'index'])->name('home');
-Route::get('/year/{year}/issue/{issue}', [PublicationController::class, 'showIssue'])->name('issue.show');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/year/{year}/issue/{issue}', [HomeController::class, 'showIssue'])->name('issue.show');
 //Route::get('/', function () {
     //return Inertia::render('HomePage', [
         //'canLogin' => Route::has('login'),
@@ -18,6 +21,13 @@ Route::get('/year/{year}/issue/{issue}', [PublicationController::class, 'showIss
 
     //]);
 //});
+Route::get('/publications', [PublicationController::class, 'index']);
+
+// Stránka autorov
+Route::get('/authors', [AuthorController::class, 'index']);
+
+// Stránka "O Časopise"
+Route::get('/about', [AboutController::class, 'index']);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

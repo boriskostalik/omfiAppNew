@@ -2,9 +2,15 @@
 import { ref, watch } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 
+import Button from 'primevue/button';  // Import PrimeVue Button komponentu
+import Dialog from 'primevue/dialog';  // Import PrimeVue Dialog komponentu
+import HomeLayout from '@/Layouts/HomeLayout.vue';
 const searchQuery = ref('')
 const results = ref(usePage().props.results || [])
 const years = usePage().props.years || []
+
+// Reaktívna premenná pre zobrazenie dialogu
+const showDialog = ref(false);
 
 // Sledujeme zmeny vo vyhľadávaní a posielame AJAX request
 watch(searchQuery, (value) => {
@@ -17,10 +23,25 @@ watch(searchQuery, (value) => {
         }
     })
 })
+
+defineOptions({
+    layout: HomeLayout
+})
 </script>
 
 <template>
+
     <div class="max-w-4xl mx-auto p-4">
+        <div class="text-center">
+            <!-- Tlačidlo z PrimeVue -->
+            <Button label="Klikni ma!" class="p-button p-button-success" @click="showDialog = true" />
+            
+            <!-- Dialog z PrimeVue -->
+            <Dialog v-model:visible="showDialog" header="Testovací dialog" :style="{ width: '50vw' }">
+                <p>Obsah dialogu</p>
+            </Dialog>
+        </div>
+
         <h1 class="text-2xl font-bold mb-4">Publikácie podľa rokov</h1>
 
         <!-- Vyhľadávacie pole -->
@@ -53,4 +74,5 @@ watch(searchQuery, (value) => {
             </ul>
         </div>
     </div>
+    
 </template>
