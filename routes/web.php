@@ -11,7 +11,7 @@ use App\Http\Controllers\AboutController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/year/{year}/issue/{issue}', [HomeController::class, 'showIssue'])->name('issue.show');
+//Route::get('/year/{year}/issue/{issue}', [HomeController::class, 'showIssue'])->name('issue.show');
 //Route::get('/', function () {
     //return Inertia::render('HomePage', [
         //'canLogin' => Route::has('login'),
@@ -28,6 +28,16 @@ Route::get('/authors', [AuthorController::class, 'index']);
 
 // Stránka "O Časopise"
 Route::get('/about', [AboutController::class, 'index']);
+
+Route::get('/year/{year}', [HomeController::class, 'showYear']);
+
+
+Route::get('/year/{year}/{number}', [HomeController::class, 'showIssue']);
+
+
+
+
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

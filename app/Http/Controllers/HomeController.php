@@ -12,62 +12,76 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Získanie dostupných rokov
         $years = Publication::whereNotNull('year')
-            ->where('year', '!=', '0000') 
-            ->selectRaw('CAST(year AS UNSIGNED) as year') // Prevedie string na číslo
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
+        ->where('year', '!=', '0000')
+        ->selectRaw('CAST(year AS UNSIGNED) as year')
+        ->groupBy('year') 
+        ->orderByDesc('year')
+        ->paginate(16); 
 
-        // Spracovanie vyhľadávacieho dotazu
-        $query = $request->query('query');
-        $results = [];
-
-        if ($query) {
-            // Hľadanie autorov podľa spojenej hodnoty meno + priezvisko
-            $authors = Author::select(
-                    'id',
-                    DB::raw("CONCAT(firstname, ' ', surname) as full_name")
-                )
-                ->where(DB::raw("CONCAT(firstname, ' ', surname)"), 'LIKE', "%{$query}%")
-                ->get();
-
-            // Hľadanie publikácií podľa názvu
-            $publications = Publication::where('title', 'LIKE', "%{$query}%")
-                ->get(['id', 'title']);
-
-            // Spojenie výsledkov do jedného poľa
-            $results = collect($authors)->map(fn ($author) => [
-                'id' => $author->id,
-                'name' => $author->full_name,
-                'type' => 'Autor'
-            ])->merge(
-                $publications->map(fn ($pub) => [
-                    'id' => $pub->id,
-                    'name' => $pub->title,
-                    'type' => 'Publikácia'
-                ])
-            );
-        }
+       
 
         return Inertia::render('HomePage', [
             'years' => $years,
-            'results' => $results,
+            
         ]);
     }
 
-    public function showIssue($year, $issue)
+ 
+    public function showYear($year)
     {
-        $publications = Publication::whereYear('year', $year)
-            ->where('issue', $issue)
-            ->with('authors')
+        $issues = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year]) 
+            ->selectRaw('DISTINCT CAST(number AS UNSIGNED) as number') 
+            ->orderByRaw('CAST(number AS UNSIGNED)') 
             ->get();
-
+    
+        // Získanie všetkých publikácií pre daný rok
+        $publications = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year])
+            ->select('*') // Môžeš tu dať konkrétne stĺpce, ak nepotrebuješ všetky
+            ->orderByRaw('CAST(number AS UNSIGNED)') // Triedenie podľa čísla vydania
+            ->orderBy('title') // Sekundárne triedenie podľa názvu
+            ->get();
+    
+        return Inertia::render('YearPage', [
+            'year' => $year,
+            'issues' => $issues,
+            'publications' => $publications,
+        ]);
+    }
+    
+    public function showIssue($year, $number)
+    {
+        $publications = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year])
+            ->whereRaw('CAST(number AS UNSIGNED) = ?', [$number])
+            ->with(['authors' => function ($query) {
+                $query->select('authors.id', 'authors.firstname', 'authors.surname')
+                      ->withPivot('is_editor', 'rank');
+            }])
+            ->orderBy('title')
+            ->get()
+            ->map(function ($publication) {
+                return [
+                    'id' => $publication->id,
+                    'title' => $publication->title,
+                    'authors' => $publication->authors->map(fn($author) => [
+                        'id' => $author->id,
+                        'name' => $author->firstname . ' ' . $author->surname, // Zložené meno
+                        'is_editor' => $author->pivot->is_editor ?? 'N', // Default 'N'
+                    ])
+                ];
+            });
+    
         return Inertia::render('IssuePage', [
             'year' => $year,
-            'issue' => $issue,
+            'number' => $number,
             'publications' => $publications
         ]);
     }
+    
+    
+    
+    
+    
+    
+
 }

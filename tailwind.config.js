@@ -20,7 +20,7 @@ export default {
     },
 
     plugins: [
-        forms,      // Táto časť pridáva podporu pre formuláre
-        primeui,    // Pridávame plugin tailwindcss-primeui
+        forms,      
+        primeui,    
     ],
 };

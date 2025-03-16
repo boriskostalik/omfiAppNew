@@ -4,30 +4,30 @@
 </template>
 
 <script setup>
-import { router } from '@inertiajs/vue3';  // Importujeme router z Inertia.js
-import Menubar from 'primevue/menubar';    // Importujeme Menubar komponentu
+import { router } from '@inertiajs/vue3';  
+import Menubar from 'primevue/menubar';   
 
-// Definovanie položiek menu
+
 const items = [
   {
     label: 'Domov',
     icon: 'pi pi-home',
-    command: () => router.get('/')  // Navigácia na domovskú stránku
+    command: () => router.get('/')  
   },
   {
     label: 'Publikácie',
     icon: 'pi pi-book',
-    command: () => router.get('/publications')  // Navigácia na stránku publikácií
+    command: () => router.get('/publications') 
   },
   {
     label: 'Autori',
     icon: 'pi pi-user',
-    command: () => router.get('/authors')  // Navigácia na stránku autorov
+    command: () => router.get('/authors')  
   },
   {
     label: 'O Časopise',
     icon: 'pi pi-info-circle',
-    command: () => router.get('/about')  // Navigácia na stránku O Časopise
+    command: () => router.get('/about')  
   }
 ];
 </script>
@@ -38,26 +38,26 @@ const items = [
   .custom-menubar {
     display: flex;
     justify-content: center;
-    height: 90px; /* Zvýšenie výšky navbaru */
+    height: 90px; 
     align-items: center;
   }
 
-  /* Zvýšenie výšky samotných položiek v navbar */
+
   :deep(.p-menubar-root-list) {
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 30px; /* Medzera medzi položkami */
+    gap: 30px; 
   }
 
-  /* Väčší padding pre lepšie vycentrovanie textu */
+
   :deep(.p-menuitem) {
-    padding: 20px 30px; /* Väčšie medzery medzi položkami */
-    font-size: 10 rem; /* Väčšie písmo */
-    font-weight: 600; /* Tučnejší text */
+    padding: 20px 30px;
+    font-size: 10 rem;
+    font-weight: 600; 
   }
 
-  /* Zvýšenie veľkosti ikon v menu */
+ 
   :deep(.p-menuitem-icon) {
     font-size: 1.4rem;
   }

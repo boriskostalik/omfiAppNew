@@ -1,78 +1,119 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
+import Card from 'primevue/card'
+import Paginator from 'primevue/paginator'
+import HomeLayout from '@/Layouts/HomeLayout.vue'
 
-import Button from 'primevue/button';  // Import PrimeVue Button komponentu
-import Dialog from 'primevue/dialog';  // Import PrimeVue Dialog komponentu
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-const searchQuery = ref('')
-const results = ref(usePage().props.results || [])
-const years = usePage().props.years || []
+// Prijatie rokov ako prop
+const props = defineProps({
+  years: Object, // Očakávame stránkovaný objekt rokov
+});
 
-// Reaktívna premenná pre zobrazenie dialogu
-const showDialog = ref(false);
+// Navigácia na stránku konkrétneho roka
+const goToYear = (year) => {
+  router.get(`/year/${year}`);
+};
 
-// Sledujeme zmeny vo vyhľadávaní a posielame AJAX request
-watch(searchQuery, (value) => {
-    router.get(route('home'), { query: value }, {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['results'],
-        onSuccess: (page) => {
-            results.value = page.props.results
-        }
-    })
-})
+// Zmena stránky pri stránkovaní
+const changePage = (event) => {
+  router.get(`/?page=${event.page + 1}`);
+};
 
+// Nastavenie layoutu
 defineOptions({
-    layout: HomeLayout
-})
+  layout: HomeLayout
+});
+
+// ✅ Opravený console.log
+
+console.log("YEARS DATA:", props.years);
 </script>
 
 <template>
+  <div class="max-w-6xl mx-auto p-6">
+    <!-- Nadpis -->
+    <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+      Dostupné vydania podľa rokov
+    </h1>
 
-    <div class="max-w-4xl mx-auto p-4">
-        <div class="text-center">
-            <!-- Tlačidlo z PrimeVue -->
-            <Button label="Klikni ma!" class="p-button p-button-success" @click="showDialog = true" />
-            
-            <!-- Dialog z PrimeVue -->
-            <Dialog v-model:visible="showDialog" header="Testovací dialog" :style="{ width: '50vw' }">
-                <p>Obsah dialogu</p>
-            </Dialog>
-        </div>
-
-        <h1 class="text-2xl font-bold mb-4">Publikácie podľa rokov</h1>
-
-        <!-- Vyhľadávacie pole -->
-        <div class="mb-4">
-            <input 
-                type="text" 
-                v-model="searchQuery" 
-                placeholder="Hľadať autora alebo publikáciu..."
-                class="w-full p-2 border rounded-md shadow-sm"
-            />
-        </div>
-
-        <!-- Výsledky vyhľadávania -->
-        <div v-if="results.length" class="mt-4 bg-white p-4 shadow rounded">
-            <h2 class="text-lg font-semibold">Výsledky</h2>
-            <ul>
-                <li v-for="result in results" :key="result.id" class="border-b py-2">
-                    <span class="font-bold">{{ result.name }}</span> - {{ result.type }}
-                </li>
-            </ul>
-        </div>
-
-        <!-- Zoznam dostupných rokov -->
-        <div class="mt-6">
-            <h2 class="text-xl font-semibold">Dostupné roky</h2>
-            <ul>
-                <li v-for="year in years" :key="year" class="mt-2 p-2 bg-gray-100 rounded">
-                    {{ year }}
-                </li>
-            </ul>
-        </div>
+    <!-- Grid pre roky -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <Card 
+        v-for="yearObj in props.years.data" 
+        :key="yearObj.year" 
+        class="custom-card p-6 text-center cursor-pointer transition-all hover:shadow-xl"
+        @click="goToYear(yearObj.year)"
+      >
+        <template #title>
+          <h2 class="text-2xl font-semibold text-gray-900">
+            {{ yearObj.year }}
+          </h2>
+        </template>
+      </Card>
     </div>
-    
+
+    <!-- Paginácia -->
+    <div v-if="props.years.total > 16" class="pagination-container mt-8">
+      <Paginator 
+        :rows="16" 
+        :totalRecords="props.years.total" 
+        @page="changePage"
+      />
+    </div>
+
+    <p class="text-gray-600 text-center mt-4">Počet záznamov na tejto stránke: {{ props.years.data.length }}</p>
+    <p class="text-gray-600 text-center">Celkový počet záznamov: {{ props.years.total }}</p>
+  </div>
+
 </template>
+
+
+
+<style>
+/* Minimalistický štýl kariet so zvýrazneným efektom */
+.custom-card {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Výraznejší tieň pri hoveri */
+  transform: translateY(-4px); /* Mierne zdvihnutie dlaždice */
+}
+
+/* Minimalistická pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+}
+
+.pagination-container .paginator {
+  display: flex;
+  gap: 6px;
+}
+
+.pagination-container .paginator button {
+  background: white;
+  color: #4a5568;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination-container .paginator button:hover {
+  background: #f3f4f6;
+}
+
+.pagination-container .paginator button:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+</style>
