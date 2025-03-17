@@ -17,8 +17,7 @@ storage/
 storage/oauth-private.key
 storage/oauth-public.key
 
-# Laravel cache
-bootstrap/cache/
+
 
 # Vendor dependencies
 /vendor
