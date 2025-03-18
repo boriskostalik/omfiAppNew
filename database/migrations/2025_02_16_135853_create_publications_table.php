@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('lastpage', 10)->default('0');
             $table->string('journal', 255)->default('');
             $table->string('booktitle', 255)->default('');
-            $table->string('number', 255)->default('');
+            $table->string('number', 255)->default('1');
             $table->string('institution', 255)->default('');
             $table->string('address', 255)->default('');
             $table->string('chapter', 10)->default('0');

@@ -21,18 +21,18 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
     //]);
 //});
-Route::get('/publications', [PublicationController::class, 'index']);
+Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 
+Route::get('/publications/{year}', [HomeController::class, 'showYear']);
+
+Route::get('/publications/{year}/{number}', [HomeController::class, 'showIssue']);
 // Stránka autorov
 Route::get('/authors', [AuthorController::class, 'index']);
 
 // Stránka "O Časopise"
 Route::get('/about', [AboutController::class, 'index']);
 
-Route::get('/year/{year}', [HomeController::class, 'showYear']);
 
-
-Route::get('/year/{year}/{number}', [HomeController::class, 'showIssue']);
 
 
 

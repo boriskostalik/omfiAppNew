@@ -12,7 +12,7 @@ const props = defineProps({
 
 // Navigácia na stránku konkrétneho roka
 const goToYear = (year) => {
-  router.get(`/year/${year}`);
+  router.get(`/publications/${year}`);
 };
 
 // Zmena stránky pri stránkovaní

@@ -1,6 +1,6 @@
 <template>
   <!-- PrimeVue Menubar -->
-  <Menubar :model="items" class="bg-gray-800 text-white custom-menubar" />
+  <Menubar :model="items" class="bg-gray-800 text-white custom-menubar rounded-t-none" />
 </template>
 
 <script setup>
