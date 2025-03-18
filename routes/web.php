@@ -22,12 +22,13 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
     //]);
 //});
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
-
 Route::get('/publications/{year}', [HomeController::class, 'showYear']);
-
 Route::get('/publications/{year}/{number}', [HomeController::class, 'showIssue']);
+
 // Stránka autorov
-Route::get('/authors', [AuthorController::class, 'index']);
+Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
+Route::get('/authors/{id}', [AuthorController::class, 'detail'])->name('authors.detail');
+
 
 // Stránka "O Časopise"
 Route::get('/about', [AboutController::class, 'index']);

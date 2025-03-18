@@ -31,7 +31,6 @@ console.log("YEARS DATA:", props.years);
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto p-6">
     <!-- Nadpis -->
     <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
       Dostupné vydania podľa rokov
@@ -64,7 +63,6 @@ console.log("YEARS DATA:", props.years);
 
     <p class="text-gray-600 text-center mt-4">Počet záznamov na tejto stránke: {{ props.years.data.length }}</p>
     <p class="text-gray-600 text-center">Celkový počet záznamov: {{ props.years.total }}</p>
-  </div>
 
 </template>
 

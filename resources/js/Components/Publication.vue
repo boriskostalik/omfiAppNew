@@ -1,6 +1,5 @@
 <script setup>
 const props = defineProps(['publication', 'withAuthors']);
-console.log(props.publication);
 </script>
 
 <template>

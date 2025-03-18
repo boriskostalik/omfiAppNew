@@ -23,7 +23,7 @@ const props = defineProps({
     },
 })
 
-const searchQuery = ref(props.search || '');
+const searchQuery = ref(window.location.search.split('search=')[1] || '');
 
 
 </script>

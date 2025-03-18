@@ -1,5 +1,4 @@
 <template>
-  <div class="max-w-6xl mx-auto">
     <Header title="Publikácie" hasSearch @search="query => submitSearch(query)"/>
       <Publication 
         v-for="publication in publications.data" 
@@ -16,7 +15,6 @@
         @page="changePage"
       />
     </div>
-  </div>
 </template>
 
 <script setup>
