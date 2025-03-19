@@ -9,7 +9,7 @@ use App\Models\Institution;
 use App\Models\Author;
 use App\Models\Publication;
 use App\Models\Topic;
-
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => Hash::make('testtest'),
         ]);
     }
 }

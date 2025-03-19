@@ -37,18 +37,18 @@ class AuthorController extends Controller
         $author = Author::with(['publications' => function ($query) {
             $query->orderBy('year', 'desc');
         }])->findOrFail($id);
-    
-        $publicationsByYear = $author->publications->groupBy('year');
-    
-        $sortedPublications = $publicationsByYear->sortKeysDesc();
-    
-        $publicationsByYearFormatted = $sortedPublications->map(function ($publications, $year) {
+
+        // Ensure grouping by value to avoid issues with numeric keys
+        $publicationsByYear = $author->publications->groupBy('year', true);
+
+        // Sort and reformat the structure
+        $publicationsByYearFormatted = $publicationsByYear->sortKeysDesc()->map(function ($publications, $year) {
             return [
                 'year' => $year,
                 'publications' => $publications,
             ];
-        });
-    
+        })->values(); // Ensure array indexing
+
         return Inertia::render('AuthorDetailPage', [
             'author' => $author,
             'publicationsByYear' => $publicationsByYearFormatted,

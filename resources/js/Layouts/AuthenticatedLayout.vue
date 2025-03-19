@@ -22,10 +22,8 @@ const showingNavigationDropdown = ref(false);
                         <div class="flex">
                             <!-- Logo -->
                             <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
+                                <Link :href="route('home')">
+                                   home
                                 </Link>
                             </div>
 
@@ -38,6 +36,26 @@ const showingNavigationDropdown = ref(false);
                                     :active="route().current('dashboard')"
                                 >
                                     Dashboard
+                                </NavLink>
+                            </div>
+                            <div
+                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                            >
+                                <NavLink
+                                    :href="route('publications.dashboard')"
+                                    :active="route().current('publications.dashboard')"
+                                >
+                                    Publikácie
+                                </NavLink>
+                            </div>
+                            <div
+                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                            >
+                                <NavLink
+                                    :href="route('authors.dashboard')"
+                                    :active="route().current('authors.dashboard')"
+                                >
+                                    Autori
                                 </NavLink>
                             </div>
                         </div>
