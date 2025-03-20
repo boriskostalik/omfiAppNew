@@ -37,7 +37,9 @@
   
         <Button type="submit" label="Submit" class="mt-4" />
       </form> -->
-    <Header title="Publikácie" has-search @search="query => submitSearch(query)"/>
+      <div class="max-w-6xl mx-auto p-6">
+        <Header title="Publikácie" has-search @search="query => submitSearch(query)"/>
+      </div>
     <DataTable
       v-model:filters="filters"
       :value="publications.data"
