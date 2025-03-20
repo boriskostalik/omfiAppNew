@@ -52,9 +52,10 @@ class PublicationController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('year', 'like', "%{$search}%") // Move this line out of orWhereHas
                   ->orWhereHas('authors', function ($q) use ($search) {
                       $q->where('firstname', 'like', "%{$search}%")
-                        ->orWhere('lastname', 'like', "%{$search}%");
+                        ->orWhere('surname', 'like', "%{$search}%");
                   });
             });
         }
@@ -82,7 +83,7 @@ class PublicationController extends Controller
             'sortOrder' => $sortOrder,
         ]);
     }
-    
+
     public function store(PublicationRequest $request)
     {   
         

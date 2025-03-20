@@ -43,10 +43,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/publications/{publication}', [PublicationController::class, 'update'])->name('publications.update');
     Route::delete('/dashboard/publications/{publication}', [PublicationController::class, 'destroy'])->name('publications.destroy');
 
-    Route::get('/dashboard/authors', [PublicationController::class, 'indexDashboard'])->name('authors.dashboard');
-    Route::post('/dashboard/authors', [PublicationController::class, 'store'])->name('authors.store');
-    Route::put('/dashboard/authors/{author}', [PublicationController::class, 'update'])->name('authors.update');
-    Route::delete('/dashboard/authors/{author}', [PublicationController::class, 'destroy'])->name('authors.destroy');
+    Route::get('/dashboard/authors', [AuthorController::class, 'indexDashboard'])->name('authors.dashboard');
+    Route::post('/dashboard/authors', [AuthorController::class, 'store'])->name('authors.store');
+    Route::put('/dashboard/authors/{author}', [AuthorController::class, 'update'])->name('authors.update');
+    Route::delete('/dashboard/authors/{author}', [AuthorController::class, 'destroy'])->name('authors.destroy');
 });
 
 

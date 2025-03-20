@@ -54,4 +54,79 @@ class AuthorController extends Controller
             'publicationsByYear' => $publicationsByYearFormatted,
         ]);
     }
+    public function indexDashboard(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+        $sortField = $request->input('sortField', 'firstname');
+        $sortOrder = $request->input('sortOrder', 'asc');
+
+        $filters = $request->only(['firstname', 'surname']);
+
+        $query = Author::query();
+
+        // Apply search filters
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('firstname', 'like', "%{$search}%")
+                  ->orWhere('surname', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply specific filters
+        foreach ($filters as $field => $value) {
+            if ($value) {
+                $query->where($field, 'like', "%{$value}%");
+            }
+        }
+
+        // Apply sorting
+        if (in_array($sortField, ['firstname', 'surname'])) {
+            $query->orderBy($sortField, $sortOrder);
+        }
+
+        $authors = $query->paginate($perPage);
+
+        return Inertia::render('Dashboard/Authors', [
+            'authors' => $authors,
+            'per_page' => $perPage,
+            'search' => $search,
+            'filters' => $filters,
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'firstname' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'year' => 'nullable|integer',
+        ]);
+
+        Author::create($request->only(['firstname', 'surname', 'year']));
+
+        return redirect()->route('authors.dashboard');
+    }
+
+    public function update(Request $request, Author $author)
+    {
+        $request->validate([
+            'firstname' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'year' => 'nullable|integer',
+        ]);
+
+        $author->update($request->only(['firstname', 'surname', 'year']));
+
+        return redirect()->route('authors.dashboard');
+    }
+
+    public function destroy(Author $author)
+    {
+        $author->delete();
+
+        return redirect()->route('authors.dashboard');
+    }
 }

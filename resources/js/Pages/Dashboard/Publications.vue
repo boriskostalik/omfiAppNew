@@ -1,7 +1,5 @@
 <template>
     <div>
-      <h1 class="text-2xl font-bold mb-4">New Publication</h1>
-  
       <!-- <form @submit.prevent="submit">
         <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
           <Dropdown v-model="form.type" :options="types" placeholder="Type of publication" class="w-full" />
@@ -39,7 +37,7 @@
   
         <Button type="submit" label="Submit" class="mt-4" />
       </form> -->
-
+    <Header title="Publikácie" has-search @search="query => submitSearch(query)"/>
     <DataTable
       v-model:filters="filters"
       :value="publications.data"
@@ -51,16 +49,6 @@
       tableStyle="min-width: 60rem"
       @sort="onSort"
     >
-
-    <!-- Header with Global Search -->
-    <template #header>
-      <IconField>
-        <InputIcon>
-          <i class="pi pi-search" />
-        </InputIcon>
-        <InputText v-model="filters['global'].value" placeholder="Global Search" @input="onFilter" />
-      </IconField>
-    </template>
 
     <!-- Title -->
     <Column field="title" header="Title" sortable style="width: 30%">
@@ -84,7 +72,7 @@
     </Column>
 
     <!-- Journal -->
-    <Column field="journal" header="Journal" sortable style="width: 20%">
+    <Column field="journal" header="Journal"  style="width: 20%">
       <template #body="{ data }">
         {{ data.journal }}
       </template>
@@ -133,6 +121,7 @@
 import { reactive, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { InputText, Textarea, Dropdown, Button, DataTable, Column, Tag, IconField, InputIcon, Paginator } from 'primevue';
+import Header from '@/Components/Header.vue';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 defineOptions({
@@ -151,8 +140,6 @@ const filters = ref({
   title: { value: props.filters?.title || null },
   type: { value: props.filters?.type || null },
   year: { value: props.filters?.year || null },
-  journal: { value: props.filters?.journal || null },
-  global: { value: null },
 });
 
 const currentPage = ref(props.publications.current_page || 1);
@@ -170,39 +157,47 @@ const changePage = (val) => {
   });
 };
 
-
-const onFilter = (val) => {
-    console.log(val);
-  router.get(route('publications.dashboard'), {
-    // search: filters.value.global?.value,
-    title: filters.value.title?.value,
-    type: filters.value.type?.value,
-    year: filters.value.year?.value,
-    journal: filters.value.journal?.value
-  });
-
+const cleanParams = (params) => {
+  return Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value != null && value !== '')
+  );
 };
 
-const onSort = (event) => {
-  sortField.value = sortField.value;
-  sortOrder.value =  sortOrder.value;
-  
+const submitSearch = (query) => {
   router.get(route('publications.dashboard'), {
+    page: 1,
+    search: query,
+  });
+};
+
+const syncParams = () => {
+  return cleanParams({
     page: currentPage.value,
     per_page: perPage.value,
-    sortField: event.sortField,
-    sortOrder: event.sortOrder === 1 ? 'asc' : 'desc',
+    sortField: sortField.value,
+    sortOrder: sortOrder.value === 1 ? 'asc' : 'desc',
     title: filters.value.title?.value,
     type: filters.value.type?.value,
     year: filters.value.year?.value,
     journal: filters.value.journal?.value,
   });
-  console.log(filters.value);
 };
 
-const onGlobalSearch = () => {
-  onFilter();
+
+// Handle sorting and preserve pagination and filters
+const onSort = (event) => {
+  sortField.value = event.sortField;
+  sortOrder.value = event.sortOrder;
+
+  router.get(route('publications.dashboard'), syncParams());
 };
+
+// Handle filter changes and preserve pagination and sorting
+const onFilter = () => {
+  currentPage.value = 1; // Reset to first page on filter change
+  router.get(route('publications.dashboard'), syncParams());
+};
+
     const form = reactive({
     type: '',
     title: '',
