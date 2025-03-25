@@ -37,6 +37,20 @@ class PublicationController extends Controller
             'search' => $search,
         ]);
     }
+
+    public function detail($id)
+    {
+        // Retrieve the publication with its authors, ordered by title in descending order
+        $publication = Publication::with(['authors' => function ($query) {
+            $query->orderBy('firstname', 'desc');
+        }])->findOrFail($id);
+
+        // Return view with the publication data
+        return Inertia::render('PublicationDetailPage', [
+            'publication' => $publication,
+        ]);
+    }
+
     public function indexDashboard(Request $request)
     {
         $perPage = $request->input('per_page', 10);
@@ -77,10 +91,20 @@ class PublicationController extends Controller
             'publications' => $publications,
             'per_page' => $perPage,
             'search' => $search,
-            'user' => Auth::user(),
             'filters' => $filters, // Pass the filters back
             'sortField' => $sortField,
             'sortOrder' => $sortOrder,
+        ]);
+    }
+
+    public function showForm(Publication $id) {
+        $publication = Publication::with(['authors' => function ($query) {
+            $query->orderBy('title', 'desc');
+        }])->findOrFail($id);
+    
+        return Inertia::render('Dashboard/PublicationForm', [
+            'publication' => $publication,
+            'author' => $publication->author,
         ]);
     }
 

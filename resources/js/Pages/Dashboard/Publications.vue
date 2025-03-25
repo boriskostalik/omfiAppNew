@@ -45,11 +45,19 @@
       :value="publications.data"
       :sortField="sortField"
       :sortOrder="sortOrder"
-      filterDisplay="menu"
-      selectionMode="single"
       dataKey="id"
       tableStyle="min-width: 60rem"
+      editMode="row"
+      @row-edit-save="onRowEditSave()"
       @sort="onSort"
+      :pt="{
+        table: { style: 'min-width: 50rem' },
+        column: {
+            bodycell: ({ state }) => ({
+                style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+            })
+        }
+    }"
     >
 
     <!-- Title -->
@@ -100,6 +108,14 @@
         <span v-if="data.authors.length">{{ data.authors.map(a => `${a.firstname} ${a.lastname}`).join(', ') }}</span>
         <span v-else>No authors</span>
       </template>
+    </Column>
+    <Column class="w-24 !text-end">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded></Button>
+            <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="secondary" rounded></Button>
+          </div>
+        </template>
     </Column>
 
     <!-- Empty State -->
@@ -194,63 +210,9 @@ const onSort = (event) => {
   router.get(route('publications.dashboard'), syncParams());
 };
 
-// Handle filter changes and preserve pagination and sorting
-const onFilter = () => {
-  currentPage.value = 1; // Reset to first page on filter change
-  router.get(route('publications.dashboard'), syncParams());
+const onRowEdit = (id) => {
+    router.get(route('publications.dashboard.edit', id));
 };
-
-    const form = reactive({
-    type: '',
-    title: '',
-    title_eng: '',
-    mesc: '',
-    bibtex_id: '',
-    year: '',
-    actualyear: '',
-    journal: 'Obzory matematiky, fyziky a informatiky',
-    volume: '',
-    number: '',
-    month: '',
-    firstpage: '',
-    lastpage: '',
-    issn: '',
-    isbn: '',
-    url: '',
-    doi: '',
-    crossref: '',
-    namekey: '',
-    keywords: '',
-    abstract: '',
-    entered_by: props.user.id.toString(),
-    });
-
-    const types = [
-        'Article', 'Book', 'Booklet', 'Inbook', 'Incollection', 'Inproceedings', 'Manual',
-        'Mastersthesis', 'Misc', 'Phdthesis', 'Proceedings', 'Techreport', 'Unpublished'
-    ];
-
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-        'September', 'October', 'November', 'December', 'not known'
-    ];
-
-    const submit = () => {
-        router.post('/dashboard/publications', form, {
-        onError: (err) => {
-            console.log(err);
-        },
-  });
-    };
-    const edit = (publication) => {
-    Object.assign(form, publication);
-    };
-
-    const destroy = (id) => {
-        if (confirm('Are you sure?')) {
-            router.delete(`/dashboard/publications/${id}`);
-        }
-    };
 </script>
 
 <style scoped>

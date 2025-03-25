@@ -1,10 +1,14 @@
 <template>
     <Header title="Publikácie" hasSearch @search="query => submitSearch(query)"/>
-      <Publication 
+      <div  
         v-for="publication in publications.data" 
         :key="publication.id" 
-        :publication="publication" 
-      />
+        class="mb-4">
+        <Publication 
+         
+          :publication="publication" 
+        />
+      </div>
 
     <div class="flex justify-center w-full">
       <Paginator

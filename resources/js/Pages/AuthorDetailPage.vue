@@ -20,17 +20,17 @@
     <!-- TODO: pridat nenajdene publikacie -->
     <div class="mt-4">
         <h2 class="text-lg font-semibold">Publikácie</h2>
-           
+        <div v-if="!publicationsByYear.length">Nenašli sa žiadne publikácie od autora</div>   
         <div v-for="group in publicationsByYear" :key="group.year">
         <h2>{{ group.year }}</h2>
-            <Publication 
-                v-for="publication in group.publications"
-                :key="publication.id" 
-                :publication="publication" 
-            />
-            <hr>
-        </div>
+        <Publication 
+            v-for="publication in group.publications"
+            :key="publication.id" 
+            :publication="publication" 
+        />
+        <hr>
     </div>
+</div>
 </div>
 </template>
 <script setup>

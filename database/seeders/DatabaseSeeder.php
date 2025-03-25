@@ -20,8 +20,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
             Institution::factory()->count(5)->create();
-            Author::factory()->count(10)->create();
-            Publication::factory()->count(20)->create();
+            // Author::factory()->count(10)->create();
+            // Publication::factory()->count(20)->create();
+            $this->call([
+                AuthorSeeder::class,
+                PublicationSeeder::class,
+                PublicationAuthorSeeder::class,
+            ]);
             Topic::factory()->count(10)->create();
             User::factory()->create([
             'name' => 'Test User',
