@@ -51,26 +51,10 @@ class HomeController extends Controller
     
     public function showIssue($year, $number)
     {
-        $publications = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year])
-            ->whereRaw('CAST(number AS UNSIGNED) = ?', [$number])
-            ->with(['authors' => function ($query) {
-                $query->select('authors.id', 'authors.firstname', 'authors.surname')
-                      ->withPivot('is_editor', 'rank');
-            }])
-            ->orderBy('title')
-            ->get()
-            ->map(function ($publication) {
-                return [
-                    'id' => $publication->id,
-                    'title' => $publication->title,
-                    'authors' => $publication->authors->map(fn($author) => [
-                        'id' => $author->id,
-                        'name' => $author->firstname . ' ' . $author->surname, // Zložené meno
-                        'is_editor' => $author->pivot->is_editor ?? 'N', // Default 'N'
-                    ])
-                ];
-            });
-    
+        $publications = Publication::where('year', $year)
+        ->where('number', $number)
+        ->with('authors')
+        ->get();
         return Inertia::render('IssuePage', [
             'year' => $year,
             'number' => $number,

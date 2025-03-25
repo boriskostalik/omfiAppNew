@@ -26,12 +26,9 @@ defineOptions({
     </h1>
 
     <div v-if="publications.length">
-      <ul class="divide-y divide-gray-300">
-        <li v-for="publication in publications" :key="publication.id" class="p-4">
-          <Publication :publication="publication" />
-          
-        </li>
-      </ul>
+        <div v-for="publication in publications" :key="publication.id" class="mb-4">
+          <Publication :publication="publication" withAuthors/>
+        </div>
     </div>
 
     <p v-else class="text-center text-gray-500">Žiadne publikácie v tomto vydaní.</p>
