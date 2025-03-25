@@ -1,11 +1,15 @@
 <script setup>
+import { router } from '@inertiajs/vue3';
 const props = defineProps({
   author: Object,
 });
+const goToAuthor = (id) => {
+    router.get(route('authors.detail', id));
+}
 </script>
 
 <template>
-  <div class="border p-4 rounded-lg shadow-md mb-4 cursor-pointer">
+  <div class="border p-4 rounded-lg shadow-md mb-4 cursor-pointer" @click="goToAuthor(author.id)">
     <h2 class="text-xl font-semibold">{{ author.firstname }} {{ author.surname }}</h2>
 
     <div class="mt-2">
