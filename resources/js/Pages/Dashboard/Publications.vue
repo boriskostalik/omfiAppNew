@@ -1,45 +1,8 @@
 <template>
-    <div>
-      <!-- <form @submit.prevent="submit">
-        <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
-          <Dropdown v-model="form.type" :options="types" placeholder="Type of publication" class="w-full" />
-  
-          <InputText v-model="form.title" placeholder="Title" class="p-2" required />
-          <InputText v-model="form.title_eng" placeholder="English Title" class="p-2" />
-  
-          <InputText v-model="form.mesc" placeholder="MESC" class="p-2" />
-          <InputText v-model="form.bibtex_id" placeholder="BibTeX ID" class="p-2" />
-  
-          <InputText v-model="form.year" placeholder="Year" class="p-2" required />
-          <InputText v-model="form.actualyear" placeholder="Actual Year" class="p-2" />
-  
-          <InputText v-model="form.journal" placeholder="Journal" class="p-2" />
-          <InputText v-model="form.volume" placeholder="Volume" class="p-2" />
-  
-          <InputText v-model="form.number" placeholder="Number" class="p-2" />
-          <Dropdown v-model="form.month" :options="months" placeholder="Month" class="w-full" />
-  
-          <InputText v-model="form.firstpage" placeholder="First Page" class="p-2" />
-          <InputText v-model="form.lastpage" placeholder="Last Page" class="p-2" />
-  
-          <InputText v-model="form.issn" placeholder="ISSN" class="p-2" />
-          <InputText v-model="form.isbn" placeholder="ISBN" class="p-2" />
-  
-          <InputText v-model="form.url" placeholder="URL" class="p-2" />
-          <InputText v-model="form.doi" placeholder="DOI" class="p-2" />
-  
-          <InputText v-model="form.crossref" placeholder="Crossref" class="p-2" />
-          <InputText v-model="form.namekey" placeholder="Key" class="p-2" />
-  
-          <InputText v-model="form.keywords" placeholder="Keywords" class="p-2" />
-          <Textarea v-model="form.abstract" placeholder="Abstract" rows="5" class="p-2" />
-        </div>
-  
-        <Button type="submit" label="Submit" class="mt-4" />
-      </form> -->
-      <div class="max-w-6xl mx-auto p-6">
-        <Header title="Publikácie" has-search @search="query => submitSearch(query)"/>
-      </div>
+  <div>
+    <div class="max-w-6xl mx-auto p-6">
+      <Header title="Publikácie" has-search @search="query => submitSearch(query)"/>
+    </div>
     <DataTable
       v-model:filters="filters"
       :value="publications.data"
@@ -48,7 +11,6 @@
       dataKey="id"
       tableStyle="min-width: 60rem"
       editMode="row"
-      @row-edit-save="onRowEditSave()"
       @sort="onSort"
       :pt="{
         table: { style: 'min-width: 50rem' },
@@ -105,11 +67,14 @@
     <!-- Authors -->
     <Column header="Authors" style="width: 25%">
       <template #body="{ data }">
-        <span v-if="data.authors.length">{{ data.authors.map(a => `${a.firstname} ${a.lastname}`).join(', ') }}</span>
+        <span v-if="data.authors.length">{{ data.authors.map(a => `${a.cleanname}`).join(', ') }}</span>
         <span v-else>No authors</span>
       </template>
     </Column>
     <Column class="w-24 !text-end">
+      <template #header>
+        <Button @click="isModalVisible = true">Pridať</Button>
+      </template>
         <template #body="{ data }">
           <div class="flex gap-2">
             <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded></Button>
@@ -125,21 +90,29 @@
 
   </DataTable>
   <Paginator
-        :rows="perPage"
-        :totalRecords="publications.total"
-        :rowsPerPageOptions="[10, 20, 30]"
-        :first="(currentPage - 1) * perPage"
-        @page="changePage"
-      />
-      {{ sortOrder, sortField }}
-    </div>
-  </template>
+      :rows="perPage"
+      :totalRecords="publications.total"
+      :rowsPerPageOptions="[10, 20, 30]"
+      :first="(currentPage - 1) * perPage"
+      @page="changePage"
+    />
+    {{ sortOrder, sortField }}
+  </div>
+  <PublicationForm 
+  :publication="publicationToEdit" 
+  :visible="isModalVisible" 
+  :entered_by="entered_by" 
+  :authors="authors"
+  @close="closeModal()"
+  />
+</template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { InputText, Textarea, Dropdown, Button, DataTable, Column, Tag, IconField, InputIcon, Paginator } from 'primevue';
+import { Button, DataTable, Column, Tag, Paginator } from 'primevue';
 import Header from '@/Components/Header.vue';
+import PublicationForm from '@/Pages/Dashboard/PublicationForm.vue';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 defineOptions({
@@ -148,11 +121,13 @@ defineOptions({
 
 const props = defineProps({
   publications: Object,
-  user: Object,
+  entered_by: Number,
+  authors: Array,
   filters: Object, // Add filters from backend
   sortField: String,
   sortOrder: String,
 });
+console.log(props)
 
 const filters = ref({
   title: { value: props.filters?.title || null },
@@ -164,6 +139,14 @@ const currentPage = ref(props.publications.current_page || 1);
 const perPage = ref(Number(props.publications.per_page) || 10);
 const sortField = ref(props.sortField || 'title');
 const sortOrder = ref(props.sortOrder === 'desc' ? -1 : 1);
+
+const isModalVisible = ref(false);
+const publicationToEdit = ref(null);
+
+const closeModal = () => {
+  isModalVisible.value = false;
+  publicationToEdit.value = null;
+};
 
 const changePage = (val) => {
   currentPage.value = val.page + 1;
@@ -188,6 +171,12 @@ const submitSearch = (query) => {
   });
 };
 
+const onRowDelete = (id) => {
+        if (confirm('Are you sure?')) {
+            router.delete(`/dashboard/publications/${id}`);
+        }
+    };
+
 const syncParams = () => {
   return cleanParams({
     page: currentPage.value,
@@ -211,7 +200,8 @@ const onSort = (event) => {
 };
 
 const onRowEdit = (id) => {
-    router.get(route('publications.dashboard.edit', id));
+    isModalVisible.value = true;
+    publicationToEdit.value = props.publications.data.find((p) => p.id === id);
 };
 </script>
 

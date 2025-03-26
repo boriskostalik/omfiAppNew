@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('publications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('entered_by')->default(0);
+            $table->integer('entered_by')->nullable();
             $table->string('year', 12)->default('0000');
             $table->string('actualyear', 12)->default('0000');
             $table->text('title');

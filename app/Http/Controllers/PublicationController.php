@@ -6,7 +6,9 @@ use Inertia\Inertia;
 use App\Models\Publication;
 use Illuminate\Http\Request;
 use App\Http\Requests\PublicationRequest;
+use App\Models\Author;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PublicationController extends Controller
 {
@@ -61,6 +63,7 @@ class PublicationController extends Controller
         $filters = $request->only(['title', 'type', 'year', 'journal']);
     
         $query = Publication::query()->with('authors');
+        $authors = Author::query();
     
         // Apply search filters
         if ($search) {
@@ -94,36 +97,66 @@ class PublicationController extends Controller
             'filters' => $filters, // Pass the filters back
             'sortField' => $sortField,
             'sortOrder' => $sortOrder,
+            'entered_by' => Auth::user()->id,
+            'authors' => $authors->get(),
         ]);
     }
 
-    public function showForm(Publication $id) {
-        $publication = Publication::with(['authors' => function ($query) {
-            $query->orderBy('title', 'desc');
-        }])->findOrFail($id);
-    
-        return Inertia::render('Dashboard/PublicationForm', [
-            'publication' => $publication,
-            'author' => $publication->author,
-        ]);
-    }
 
     public function store(PublicationRequest $request)
     {   
-        
-        $data = array_merge(
-            $request->validated(),
-        );
-        Publication::create($data);
+        $data = $request->validated();
+
+        // Create the publication
+        $publication = Publication::create($data);
+
+        // Ensure authors exist in the request
+        if ($request->has('authors') && is_array($request->authors)) {
+            $authorsData = [];
+
+            foreach ($request->authors as $index => $author) {
+                // Check if it's an array/object or a simple ID
+                $authorId = is_array($author) ? $author['id'] : $author; 
+
+                $authorsData[$authorId] = [
+                    'rank' => $index + 1,
+                    'is_editor' => 'N'
+                ];
+            }
+
+            // Attach authors using the pivot table
+            $publication->authors()->attach($authorsData);
+        }
 
         return redirect()->route('publications.dashboard');
     }
 
     public function update(PublicationRequest $request, Publication $publication)
-    {
-        $publication->update($request->validated());
-
-        return redirect()->route('publications.index');
+    {   
+        $data = $request->validated();
+    
+        // Update the publication
+        $publication->update($data);
+    
+        // Ensure authors exist in the request
+        if ($request->has('authors') && is_array($request->authors)) {
+            $authorsData = [];
+    
+            foreach ($request->authors as $index => $author) {
+                // Handle both object format and simple ID format
+                $authorId = is_array($author) ? $author['id'] : $author;
+    
+                $authorsData[$authorId] = [
+                    'rank' => $index + 1,
+                    'is_editor' => 'N'
+                ];
+            }
+    
+            // Sync authors (removes old ones, adds new ones)
+            $publication->authors()->sync($authorsData);
+        }
+    
+        return redirect()->route('publications.dashboard');
     }
 
     public function destroy(Publication $publication)

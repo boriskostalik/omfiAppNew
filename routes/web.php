@@ -41,8 +41,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/publications', [PublicationController::class, 'indexDashboard'])->name('publications.dashboard');
-    Route::get('/dashboard/publications/create', [PublicationController::class, 'showForm'])->name('publications.dashboard.create');
-    Route::get('/dashboard/publications/{publication}', [PublicationController::class, 'showForm'])->name('publications.dashboard.edit');
+    
     Route::post('/dashboard/publications', [PublicationController::class, 'store'])->name('publications.store');
     Route::put('/dashboard/publications/{publication}', [PublicationController::class, 'update'])->name('publications.update');
     Route::delete('/dashboard/publications/{publication}', [PublicationController::class, 'destroy'])->name('publications.destroy');
