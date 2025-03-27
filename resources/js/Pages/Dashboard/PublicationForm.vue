@@ -1,5 +1,8 @@
 <template>
-    <Dialog v-model:visible="isVisible" modal :header="publication ? 'Úprava publikácie' : 'Pridanie publikácie'" :style="{ width: '90vw' }" :closable="false">
+    <Dialog v-model:visible="isVisible" modal :header="publication ? 'Úprava publikácie' : 'Pridanie publikácie'" :style="{ width: '90vw' }">
+        <template #closebutton>
+            <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
+        </template>
         <form @submit.prevent="submit">
             <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
                 <Dropdown v-model="form.type" :options="types" placeholder="Type of publication" class="w-full" />
@@ -8,7 +11,7 @@
                 <InputText v-model="form.title_eng" placeholder="English Title" class="p-2" />
 
                 <InputText v-model="form.mesc" placeholder="MESC" class="p-2" />
-                <InputText v-model="form.bibtex_id" placeholder="BibTeX ID" class="p-2" required />
+                <InputText v-model="form.bibtex_id" placeholder="BibTeX ID" class="p-2" />
 
                 <InputText v-model="form.year" placeholder="Year" class="p-2" required />
                 <InputText v-model="form.actualyear" placeholder="Actual Year" class="p-2" />
@@ -39,11 +42,10 @@
             </div>
 
             <div class="flex items-center gap-4 mt-4">
-                <Button label="Cancel" @click="$emit('close')" text class="!p-4 w-full !text-primary-50 !border !border-white/30 hover:!bg-white/10"></Button>
-                <Button type="submit" label="Submit" class="p-4 w-full" />
+                <Button label="Cancel" @click="$emit('close')" text class="!p-4 w-full"></Button>
+                <Button type="submit" label="Submit" text class="!p-4 w-full !bg-primary !text-white" />
         </div>
         </form>
-        {{ form.authors }}
     </Dialog>
 </template>
 

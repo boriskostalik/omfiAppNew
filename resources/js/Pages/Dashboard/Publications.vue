@@ -90,12 +90,13 @@
 
   </DataTable>
   <Paginator
-      :rows="perPage"
-      :totalRecords="publications.total"
-      :rowsPerPageOptions="[10, 20, 30]"
-      :first="(currentPage - 1) * perPage"
-      @page="changePage"
-    />
+    v-if="publications.next_page_url || publications.prev_page_url"
+    :rows="perPage"
+    :totalRecords="publications.total"
+    :rowsPerPageOptions="[10, 20, 30]"
+    :first="(currentPage - 1) * perPage"
+    @page="changePage"
+  />
     {{ sortOrder, sortField }}
   </div>
   <PublicationForm 

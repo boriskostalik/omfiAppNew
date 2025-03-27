@@ -41,7 +41,7 @@ console.log("YEARS DATA:", props.years);
       <Card 
         v-for="yearObj in props.years.data" 
         :key="yearObj.year" 
-        class="custom-card p-6 text-center cursor-pointer transition-all hover:shadow-xl"
+        class="custom-card p-6 text-center cursor-pointer transition-all hover:shadow-xl !bg-slate-100"
         @click="goToYear(yearObj.year)"
       >
         <template #title>

@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('authors', function (Blueprint $table) {
             $table->id('id');
             $table->string('surname');
-            $table->string('von')->default('');
+            $table->string('von')->nullable();
             $table->string('firstname');
             $table->string('email');
-            $table->string('url')->default('');
+            $table->string('url')->nullable();
             $table->string('institute');
-            $table->enum('specialchars', ['FALSE', 'TRUE'])->default('FALSE');
+            $table->boolean('specialchars')->default('0');
             $table->string('cleanname')->default('');
             $table->timestamps();
         });

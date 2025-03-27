@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthorRequest;
 use Inertia\Inertia;
 use App\Models\Author;
 use Illuminate\Http\Request;
@@ -97,29 +98,23 @@ class AuthorController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'firstname' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'year' => 'nullable|integer',
-        ]);
+    public function store(AuthorRequest $request)
+    {   
+        $data = $request->validated();
 
-        Author::create($request->only(['firstname', 'surname', 'year']));
+        // Create the author
+        $author = Author::create($data);
 
         return redirect()->route('authors.dashboard');
     }
 
-    public function update(Request $request, Author $author)
-    {
-        $request->validate([
-            'firstname' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'year' => 'nullable|integer',
-        ]);
-
-        $author->update($request->only(['firstname', 'surname', 'year']));
-
+    public function update(AuthorRequest $request, Author $author)
+    {   
+        $data = $request->validated();
+    
+        // Update the author
+        $author->update($data);
+    
         return redirect()->route('authors.dashboard');
     }
 
@@ -129,4 +124,5 @@ class AuthorController extends Controller
 
         return redirect()->route('authors.dashboard');
     }
+
 }

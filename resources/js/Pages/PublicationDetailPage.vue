@@ -4,6 +4,9 @@
 
     <div class="mt-2">
         <p class="text-gray-700">
+            <strong>English title:</strong> {{ publication.title_eng }}
+        </p>
+        <p class="text-gray-700">
             <strong>Journal:</strong> {{ publication.journal }}
         </p>
         <p class="text-gray-700">
@@ -14,6 +17,15 @@
         </p>
         <p class="text-gray-700">
             <strong>Pages:</strong> {{ publication.firstpage }} - {{ publication.lastpage }}
+        </p>
+        <p class="text-gray-700">
+            <strong>Bibtex Cite ID:</strong> {{ publication.bibtex_id }}
+        </p>
+        <p @click="isBibtexVisible = true" class="text-blue-600 hover:underline cursor-pointer">
+            <strong>Bibtex</strong>
+        </p>
+        <p @click="isRISVisible = true" class="text-blue-600 hover:underline cursor-pointer">
+            <strong>RIS</strong>
         </p>
         <p v-if="publication.doi" class="text-gray-700">
             <strong>DOI:</strong> 
@@ -35,16 +47,25 @@
         </div>
     </div>
     <!-- TODO add BIBTEX and RIS -->
+     <Bibtex :publication="publication" :visible="isBibtexVisible" @close="isBibtexVisible = false" />
+     <RIS :publication="publication" :visible="isRISVisible" @close="isRISVisible = false" />
 </template>
 
 <script setup>
 import Author from '@/Components/Author.vue';
 import Header from '@/Components/Header.vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
+
+import { defineProps, defineOptions, ref } from 'vue';
+import Bibtex from '@/Components/Bibtex.vue';   
+import RIS from '@/Components/RIS.vue';
 const props = defineProps({
     publication: Object,
 });
 defineOptions({
     layout: HomeLayout,
 })
+
+const isBibtexVisible = ref(false);
+const isRISVisible = ref(false);
 </script>

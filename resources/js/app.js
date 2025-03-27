@@ -9,6 +9,8 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PrimeVue from 'primevue/config'; 
 import '../assets/base.css'; 
 
+import Aura from '@primeuix/themes/aura';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -25,10 +27,15 @@ createInertiaApp({
         });
 
         app.use(PrimeVue, {
-            theme: 'none', 
-        });
+            // Default theme configuration
+            theme: {
+                preset: Aura,
+                options: {
+                    darkModeSelector: '.my-app-dark',
+                }
+            }
+         });
 
-      
         app.use(plugin)
            .use(ZiggyVue)
            .mount(el);

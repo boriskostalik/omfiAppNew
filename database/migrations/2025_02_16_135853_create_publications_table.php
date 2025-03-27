@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('title');
             $table->text('title_eng')->nullable();
             $table->string('mesc', 50)->nullable();
-            $table->string('bibtex_id', 255);
+            $table->string('bibtex_id', 255)->nullable();
             $table->string('pub_type', 255)->nullable();
             $table->enum('type', ['Article','Book','Booklet','Inbook','Incollection','Inproceedings','Manual','Mastersthesis','Misc','Phdthesis','Proceedings','Techreport','Unpublished'])->nullable();
             $table->tinyInteger('survey')->default(0);

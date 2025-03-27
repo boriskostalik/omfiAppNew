@@ -37,6 +37,18 @@
             <span v-else>No publications</span>
           </template>
         </Column>
+
+        <Column class="w-24 !text-end">
+          <template #header>
+            <Button @click="isModalVisible = true">Pridať</Button>
+          </template>
+          <template #body="{ data }">
+            <div class="flex gap-2">
+            <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded></Button>
+            <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="secondary" rounded></Button>
+          </div>
+        </template>
+    </Column>
   
         <!-- Empty State -->
         <template #empty>
@@ -44,8 +56,8 @@
         </template>
   
       </DataTable>
-  
       <Paginator
+        v-if="authors.next_page_url || authors.prev_page_url"
         :rows="perPage"
         :totalRecords="authors.total"
         :rowsPerPageOptions="[10, 20, 30]"
@@ -53,14 +65,20 @@
         @page="changePage"
       />
     </div>
+    <PublicationForm 
+      :author="authorToEdit" 
+      :visible="isModalVisible"
+      @close="closeModal()"
+    />
   </template>
   
 <script setup>
 import { reactive, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { DataTable, Column, Paginator } from 'primevue';
+import { DataTable, Column, Paginator, Button } from 'primevue';
 import Header from '@/Components/Header.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PublicationForm from '@/Pages/Dashboard/AuthorForm.vue';
 
 defineOptions({
     layout: AuthenticatedLayout,
@@ -84,6 +102,9 @@ const perPage = ref(Number(props.authors.per_page) || 10);
 const sortField = ref(props.sortField || 'firstname');
 const sortOrder = ref(props.sortOrder === 'desc' ? -1 : 1);
 
+
+const isModalVisible = ref(false);
+const authorToEdit = ref(null);
 
 const cleanParams = (params) => {
     return Object.fromEntries(
@@ -122,6 +143,17 @@ const onSort = (event) => {
     sortOrder.value = event.sortOrder;
     router.get(route('authors.dashboard'), syncParams());
 };
+
+const closeModal = () => {
+  isModalVisible.value = false;
+  authorToEdit.value = null;
+};
+
+const onRowEdit = (id) => {
+    isModalVisible.value = true;
+    authorToEdit.value = props.authors.data.find((p) => p.id === id);
+};
+
 </script>
 
 <style scoped>

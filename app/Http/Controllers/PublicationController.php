@@ -119,7 +119,7 @@ class PublicationController extends Controller
                 $authorId = is_array($author) ? $author['id'] : $author; 
 
                 $authorsData[$authorId] = [
-                    'rank' => $index + 1,
+                    'rank' => 1,
                     'is_editor' => 'N'
                 ];
             }

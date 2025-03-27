@@ -41,7 +41,7 @@ defineOptions({
       <Card 
         v-for="issue in fillMissingIssues" 
         :key="issue.number"
-        class="p-4 text-center shadow-md cursor-pointer hover:shadow-lg transition transform"
+        class="p-4 text-center shadow-md cursor-pointer hover:shadow-lg transition transform !bg-slate-100"
         @click="goToIssue(issue)"
         :class="{ 'opacity-10 cursor-not-allowed': !issue.hasPublication, 'hover:scale-105': issue.hasPublication }"
       >

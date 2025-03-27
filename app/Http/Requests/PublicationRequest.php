@@ -19,14 +19,14 @@ class PublicationRequest extends FormRequest
             'title' => 'required|string',
             'title_eng' => 'nullable|string',
             'mesc' => 'nullable|string|max:50',
-            'bibtex_id' => 'required|string|max:255',
+            'bibtex_id' => 'nullable|string|max:255',
             'pub_type' => 'nullable|string|max:255',
             'type' => 'nullable|in:Article,Book,Booklet,Inbook,Incollection,Inproceedings,Manual,Mastersthesis,Misc,Phdthesis,Proceedings,Techreport,Unpublished',
             'survey' => 'integer|min:0|max:1',
             'mark' => 'integer',
             'journal' => 'nullable|string|max:255',
             'abstract' => 'nullable|string',
-            'url' => 'nullable|url|max:255',
+            'url' => 'nullable|max:255',
         ];
     }
 }
