@@ -11,7 +11,7 @@ const goToAuthor = (id) => {
 <template>
   <div class="border p-4 rounded-lg shadow-md mb-4 cursor-pointer" @click="goToAuthor(author.id)">
     <h2 class="text-xl font-semibold">{{ author.firstname }} {{ author.surname }}</h2>
-
+    <p v-if="author?.pivot?.is_editor === 'Y'" class="text-gray-500 italic">Editor</p>
     <div class="mt-2">
       <p class="text-gray-700">
         <strong>Email:</strong> 

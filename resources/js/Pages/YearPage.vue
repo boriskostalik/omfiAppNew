@@ -20,11 +20,19 @@ const goToIssue = (issue) => {
 const fillMissingIssues = computed(()=>{
         const issues = props.issues.map(issue => {
           return { number: issue.number, hasPublication: true };
+        }); 
+        const arr = Array(4).fill(null).map((_, index) => {
+          return { number: index + 1, hasPublication: false };
         });
-        const arr = Array(4 - issues.length).fill(null).map((_, index) => {
-          return { number: issues[0].number + index + 1, hasPublication: false };
+        const missingIssues = arr.filter(issue => {
+          return !issues.some(existingIssue => existingIssue.number === issue.number);
         });
-        return [...issues, ...arr].sort((a, b) => a.number - b.number);
+        missingIssues.forEach(issue => {
+          issue.hasPublication = false;
+        });
+        issues.push(...missingIssues);
+        issues.sort((a, b) => a.number - b.number);
+        return issues;
 });
 
 defineOptions({

@@ -85,16 +85,16 @@ defineOptions({
 });
 
 const props = defineProps({
-    authors: Object,
-    filters: Object,
-    sortField: String,
-    sortOrder: String,
+  authors: Object,
+  filters: Object,
+  sortField: String,
+  sortOrder: String,
 });
 
 const filters = ref({
-    firstname: { value: props.filters?.firstname || null },
-    lastname: { value: props.filters?.lastname || null },
-    year: { value: props.filters?.year || null },
+  firstname: { value: props.filters?.firstname || null },
+  lastname: { value: props.filters?.lastname || null },
+  year: { value: props.filters?.year || null },
 });
 
 const currentPage = ref(props.authors.current_page || 1);
@@ -107,41 +107,41 @@ const isModalVisible = ref(false);
 const authorToEdit = ref(null);
 
 const cleanParams = (params) => {
-    return Object.fromEntries(
-        Object.entries(params).filter(([_, value]) => value != null && value !== '')
-    );
+  return Object.fromEntries(
+      Object.entries(params).filter(([_, value]) => value != null && value !== '')
+  );
 };
 const changePage = (val) => {
-    currentPage.value = val.page + 1;
-    perPage.value = val.rows;
-    router.get(route('authors.dashboard'), {
-        page: currentPage.value,
-        per_page: perPage.value,
-    });
+  currentPage.value = val.page + 1;
+  perPage.value = val.rows;
+  router.get(route('authors.dashboard'), {
+      page: currentPage.value,
+      per_page: perPage.value,
+  });
 };
 
 const syncParams = () => {
-    return cleanParams({
-        page: currentPage.value,
-        per_page: perPage.value,
-        sortField: sortField.value,
-        sortOrder: sortOrder.value === 1 ? 'asc' : 'desc',
-        firstname: filters.value.firstname?.value,
-        lastname: filters.value.lastname?.value,
-    });
+  return cleanParams({
+      page: currentPage.value,
+      per_page: perPage.value,
+      sortField: sortField.value,
+      sortOrder: sortOrder.value === 1 ? 'asc' : 'desc',
+      firstname: filters.value.firstname?.value,
+      lastname: filters.value.lastname?.value,
+  });
 };
 
 const submitSearch = (query) => {
-    router.get(route('authors.dashboard'), {
-        page: 1,
-        search: query,
-    });
+  router.get(route('authors.dashboard'), {
+      page: 1,
+      search: query,
+  });
 };
 
 const onSort = (event) => {
-    sortField.value = event.sortField;
-    sortOrder.value = event.sortOrder;
-    router.get(route('authors.dashboard'), syncParams());
+  sortField.value = event.sortField;
+  sortOrder.value = event.sortOrder;
+  router.get(route('authors.dashboard'), syncParams());
 };
 
 const closeModal = () => {
@@ -150,8 +150,14 @@ const closeModal = () => {
 };
 
 const onRowEdit = (id) => {
-    isModalVisible.value = true;
-    authorToEdit.value = props.authors.data.find((p) => p.id === id);
+  isModalVisible.value = true;
+  authorToEdit.value = props.authors.data.find((p) => p.id === id);
+};
+
+const onRowDelete = (id) => {
+  if (confirm('Are you sure?')) {
+      router.delete(`/dashboard/authors/${id}`);
+  }
 };
 
 </script>

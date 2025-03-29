@@ -37,7 +37,10 @@
                 <InputText v-model="form.keywords" placeholder="Keywords" class="p-2" />
                 <Textarea v-model="form.abstract" placeholder="Abstract" rows="5" class="p-2" />
 
+                <br>
                 <MultiSelect v-model="form.authors" :options="mappedAuthors" optionLabel="cleanname" filter placeholder="Authors" display="chip"
+                    :maxSelectedLabels="5" class="w-full h-full" />
+                <MultiSelect v-model="form.editors" :options="form.authors" optionLabel="cleanname" filter placeholder="Editors" display="chip"
                     :maxSelectedLabels="5" class="w-full h-full" />
             </div>
 
@@ -98,6 +101,7 @@
         abstract: '',
         entered_by: props.entered_by,
         authors: [],
+        editors: [],
     });
 
     const types = [
@@ -111,16 +115,23 @@
     ];
 
     const submit = () => {
-        form.authors = form.authors.map((author) => author.id);
+        const submitData = {
+        ...form,
+        authors: form.authors.map(author => ({
+            id: author.id,
+            is_editor: form.editors.some(editor => editor.id === author.id) ? 'Y' : 'N'
+            }))
+        };
+    console.log(submitData);
         if(props.publication) {
-            router.put(`/dashboard/publications/${props.publication.id}`, form, {
+            router.put(`/dashboard/publications/${props.publication.id}`, submitData, {
                 onError: (err) => {
                     console.log(err);
                 },
                 onSuccess: () => emit('close'),
             });
         }else{
-            router.post('/dashboard/publications', form, {
+            router.post('/dashboard/publications', submitData, {
                 onError: (err) => {
                     console.log(err);
                 },
@@ -163,6 +174,10 @@
                 id: author.id,
                 cleanname: author.cleanname,
             }));
+           form.editors = publication.authors.filter(author => author.pivot .is_editor === 'Y').map(editor => ({
+                id: editor.id,
+                cleanname: editor.cleanname,
+            }));
         }
         else {
             form.type = '';
@@ -187,6 +202,7 @@
             form.keywords = '';
             form.abstract = '';
             form.authors = [];
+            form.editors = [];
         }
     });
-</script>
+</script>  

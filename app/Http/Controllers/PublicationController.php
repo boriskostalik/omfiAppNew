@@ -104,65 +104,65 @@ class PublicationController extends Controller
 
 
     public function store(PublicationRequest $request)
-    {   
-        $data = $request->validated();
+{   
+    $data = $request->validated();
 
-        // Create the publication
-        $publication = Publication::create($data);
+    // Create the publication
+    $publication = Publication::create($data);
 
-        // Ensure authors exist in the request
-        if ($request->has('authors') && is_array($request->authors)) {
-            $authorsData = [];
+    // Ensure authors_editors exist in the request
+    if ($request->has('authors') && is_array($request->authors)) {
+        $authorsData = [];
 
-            foreach ($request->authors as $index => $author) {
-                // Check if it's an array/object or a simple ID
-                $authorId = is_array($author) ? $author['id'] : $author; 
+        foreach ($request->authors as $author) {
+            // Handle both object format and simple ID format
+            $authorId = is_array($author) ? $author['id'] : $author;
 
-                $authorsData[$authorId] = [
-                    'rank' => 1,
-                    'is_editor' => 'N'
-                ];
-            }
-
-            // Attach authors using the pivot table
-            $publication->authors()->attach($authorsData);
+            $authorsData[$authorId] = [
+                'rank' => 1,
+                'is_editor' => $author['is_editor'] ?? 'N' // Default to 'N' if not set
+            ];
         }
 
-        return redirect()->route('publications.dashboard');
+        // Attach authors using the pivot table
+        $publication->authors()->attach($authorsData);
     }
 
-    public function update(PublicationRequest $request, Publication $publication)
-    {   
-        $data = $request->validated();
-    
-        // Update the publication
-        $publication->update($data);
-    
-        // Ensure authors exist in the request
-        if ($request->has('authors') && is_array($request->authors)) {
-            $authorsData = [];
-    
-            foreach ($request->authors as $index => $author) {
-                // Handle both object format and simple ID format
-                $authorId = is_array($author) ? $author['id'] : $author;
-    
-                $authorsData[$authorId] = [
-                    'rank' => $index + 1,
-                    'is_editor' => 'N'
-                ];
-            }
-    
-            // Sync authors (removes old ones, adds new ones)
-            $publication->authors()->sync($authorsData);
+    return redirect()->route('publications.dashboard');
+}
+
+public function update(PublicationRequest $request, Publication $publication)
+{   
+    $data = $request->validated();
+
+    // Update the publication
+    $publication->update($data);
+
+    // Ensure authors_editors exist in the request
+    if ($request->has('authors') && is_array($request->authors)) {
+        $authorsData = [];
+
+        foreach ($request->authors as $author) {
+            // Handle both object format and simple ID format
+            $authorId = is_array($author) ? $author['id'] : $author;
+
+            $authorsData[$authorId] = [
+                'rank' => 1,
+                'is_editor' => $author['is_editor'] ?? 'N' // Default to 'N' if not set
+            ];
         }
-    
-        return redirect()->route('publications.dashboard');
+
+        // Sync authors (removes old ones, adds new ones)
+        $publication->authors()->sync($authorsData);
     }
+
+    return redirect()->route('publications.dashboard');
+}
 
     public function destroy(Publication $publication)
     {
         $publication->delete();
 
-        return redirect()->route('publications.index');
+        return redirect()->route('publications.dashboard');
     }
 }

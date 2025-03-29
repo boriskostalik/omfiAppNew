@@ -46,7 +46,6 @@
             <p>{{ publication.note }}</p>
         </div>
     </div>
-    <!-- TODO add BIBTEX and RIS -->
      <Bibtex :publication="publication" :visible="isBibtexVisible" @close="isBibtexVisible = false" />
      <RIS :publication="publication" :visible="isRISVisible" @close="isRISVisible = false" />
 </template>

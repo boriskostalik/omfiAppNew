@@ -173,10 +173,10 @@ const submitSearch = (query) => {
 };
 
 const onRowDelete = (id) => {
-        if (confirm('Are you sure?')) {
-            router.delete(`/dashboard/publications/${id}`);
-        }
-    };
+    if (confirm('Are you sure?')) {
+        router.delete(`/dashboard/publications/${id}`);
+    }
+};
 
 const syncParams = () => {
   return cleanParams({
