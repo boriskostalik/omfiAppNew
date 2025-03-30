@@ -126,6 +126,7 @@ const submit = () => {
         });
     } else {
         // Create new author
+        form.cleanname = cleanName.value;
         router.post('/dashboard/authors', form, {
             onError: (err) => {
                 console.log(err);

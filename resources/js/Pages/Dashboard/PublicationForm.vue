@@ -14,7 +14,7 @@
                 <InputText v-model="form.bibtex_id" placeholder="BibTeX ID" class="p-2" />
 
                 <InputText v-model="form.year" placeholder="Year" class="p-2" required />
-                <InputText v-model="form.actualyear" placeholder="Actual Year" class="p-2" />
+                <InputText v-model="form.actualyear" placeholder="Actual Year" class="p-2" required />
 
                 <InputText v-model="form.journal" placeholder="Journal" class="p-2" />
                 <InputText v-model="form.volume" placeholder="Volume" class="p-2" />
