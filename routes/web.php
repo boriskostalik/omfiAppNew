@@ -8,7 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AboutController;
-
+use App\Http\Controllers\UserController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 //Route::get('/year/{year}/issue/{issue}', [HomeController::class, 'showIssue'])->name('issue.show');
@@ -25,7 +25,7 @@ Route::get('/publications', [PublicationController::class, 'index'])->name('publ
 Route::get('publications/detail/{id}', [PublicationController::class, 'detail'])->name('publications.detail');
 
 Route::get('/publications/{year}', [HomeController::class, 'showYear']);
-Route::get('/publications/{year}/{number}', [HomeController::class, 'showIssue']);
+Route::get('/publications/{year}/{number}', [HomeController::class, 'showIssue'])->name('issue.show');
 
 // Stránka autorov
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
@@ -50,8 +50,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/authors', [AuthorController::class, 'store'])->name('authors.store');
     Route::put('/dashboard/authors/{author}', [AuthorController::class, 'update'])->name('authors.update');
     Route::delete('/dashboard/authors/{author}', [AuthorController::class, 'destroy'])->name('authors.destroy');
-});
 
+});
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard/users', [UserController::class, 'indexDashboard'])->name('users.dashboard');
+    Route::post('/dashboard/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/dashboard/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/dashboard/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

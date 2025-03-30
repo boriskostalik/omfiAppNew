@@ -10,7 +10,13 @@
             <strong>Journal:</strong> {{ publication.journal }}
         </p>
         <p class="text-gray-700">
-            <strong>Year:</strong> {{ publication.year }}
+            <strong>Year: </strong> 
+            <Link 
+                :href="route('issue.show', { year: publication.year, number: publication.number })" 
+                class="text-blue-600 hover:underline"
+            >
+                {{ publication.year }} / {{ publication.number }}
+            </Link>
         </p>
         <p class="text-gray-700">
             <strong>Volume:</strong> {{ publication.volume }}
@@ -58,6 +64,7 @@ import HomeLayout from '@/Layouts/HomeLayout.vue';
 import { defineProps, defineOptions, ref } from 'vue';
 import Bibtex from '@/Components/Bibtex.vue';   
 import RIS from '@/Components/RIS.vue';
+import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     publication: Object,
 });

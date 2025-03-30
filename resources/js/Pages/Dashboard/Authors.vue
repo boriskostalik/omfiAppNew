@@ -31,9 +31,9 @@
         <!-- Publications -->
         <Column header="Publications" style="width: 35%">
           <template #body="{ data }">
-            <span v-if="data.authors?.length">
+            <div v-if="data.publications?.length" class="max-h-32 overflow-hidden truncate max-w-96">
               {{ data.publications.map(p => p.title).join(', ') }}
-            </span>
+            </div>
             <span v-else>No publications</span>
           </template>
         </Column>
@@ -65,7 +65,7 @@
         @page="changePage"
       />
     </div>
-    <PublicationForm 
+    <AuthorForm 
       :author="authorToEdit" 
       :visible="isModalVisible"
       @close="closeModal()"
@@ -78,7 +78,7 @@ import { router } from '@inertiajs/vue3';
 import { DataTable, Column, Paginator, Button } from 'primevue';
 import Header from '@/Components/Header.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PublicationForm from '@/Pages/Dashboard/AuthorForm.vue';
+import AuthorForm from '@/Pages/Dashboard/AuthorForm.vue';
 
 defineOptions({
     layout: AuthenticatedLayout,

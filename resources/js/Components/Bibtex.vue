@@ -4,16 +4,16 @@
             <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
         </template>
         <div class="p-4">
-            <div>@{{publication.type.toUpperCase()}} {,</div>
-            <div>title = {{ publication.title }},</div>
-            <div>author = {{ publication.author }},</div>
-            <div>journal = {{ publication.journal }},</div>
-            <div>year = {{ publication.year }},</div>
-            <div>volume = {{ publication.volume }},</div>
-            <div>number = {{ publication.number }},</div>
-            <div>pages = {{ publication.pages }},</div>
-            <div>issn = {{ publication.issn }},</div>
-            <div>abstract = {{ publication.abstract }}</div>
+            <div>@{{publication.type.toUpperCase()}} {</div>
+            <div>title = { {{ publication.title }} },</div>
+            <div>author = { {{ getAuthorsCleanNames() }} },</div>
+            <div>journal = { {{ publication.journal }} },</div>
+            <div>year = { {{ publication.year }} },</div>
+            <div>volume = { {{ publication.volume }} },</div>
+            <div>number = { {{ publication.number }} },</div>;
+            <div>pages = { {{ publication.pages }} },</div>
+            <div>issn = { {{ publication.issn }} },</div>
+            <div>abstract = { {{ publication.abstract }} }</div>
             }
         </div>
     </Dialog>
@@ -34,6 +34,11 @@ const props = defineProps({
 });
 
 const isVisible = computed(() => props.visible);
+const getAuthorsCleanNames = (authors) => {
+    return props.publication.authors.map(author => {
+        return author.cleanname;
+    }).join(',  ');
+};
 </script>
 <style scoped>
 .publication {

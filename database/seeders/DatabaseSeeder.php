@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+            User::factory()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => Hash::make('testtest'),
+                'role' => 'admin',
+            ]);
             Institution::factory()->count(5)->create();
             // Author::factory()->count(10)->create();
             // Publication::factory()->count(20)->create();
@@ -28,10 +34,5 @@ class DatabaseSeeder extends Seeder
                 PublicationAuthorSeeder::class,
             ]);
             Topic::factory()->count(10)->create();
-            User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('testtest'),
-        ]);
     }
 }

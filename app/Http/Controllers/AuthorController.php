@@ -64,7 +64,7 @@ class AuthorController extends Controller
 
         $filters = $request->only(['firstname', 'surname']);
 
-        $query = Author::query();
+        $query = Author::query()->with('publications');
 
         // Apply search filters
         if ($search) {

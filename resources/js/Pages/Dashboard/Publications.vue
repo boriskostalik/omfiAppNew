@@ -57,13 +57,6 @@
       </template>
     </Column>
 
-    <!-- DOI -->
-    <Column field="doi" header="DOI" style="width: 20%">
-      <template #body="{ data }">
-        <a :href="data.doi" target="_blank" class="text-blue-500 hover:underline">{{ data.doi }}</a>
-      </template>
-    </Column>
-
     <!-- Authors -->
     <Column header="Authors" style="width: 25%">
       <template #body="{ data }">
