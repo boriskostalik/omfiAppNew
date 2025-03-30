@@ -40,6 +40,7 @@ class HomeController extends Controller
             ->select('*') // Môžeš tu dať konkrétne stĺpce, ak nepotrebuješ všetky
             ->orderByRaw('CAST(number AS UNSIGNED)') // Triedenie podľa čísla vydania
             ->orderBy('title') // Sekundárne triedenie podľa názvu
+            ->with('authors')
             ->get();
     
         return Inertia::render('YearPage', [

@@ -3,6 +3,7 @@ import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import HomeLayout from '@/Layouts/HomeLayout.vue';
 import Card from 'primevue/card';
+import Publication from '@/Components/Publication.vue'
 
 const props = defineProps({
     year: String, // Rok zostáva ako string
@@ -63,8 +64,7 @@ defineOptions({
     <div v-if="publications.length">
       <ul class="divide-y divide-gray-300">
         <li v-for="publication in publications" :key="publication.id" class="p-4">
-          <h2 class="text-xl font-semibold">{{ publication.title }}</h2>
-          <p class="text-gray-600">Vydanie: {{ publication.number }}</p>
+        <Publication :publication="publication" with-authors/>
         </li>
       </ul>
     </div>
