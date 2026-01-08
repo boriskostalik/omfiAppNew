@@ -1,5 +1,5 @@
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
+
 import { onMounted } from 'vue';
 
 import Publication from '@/Components/Publication.vue';
@@ -15,9 +15,7 @@ onMounted(() => {
     console.log("Dáta z Laravelu:", props.publications);
 });
 
-defineOptions({
-  layout: HomeLayout
-});
+
 </script>
 
 <template>

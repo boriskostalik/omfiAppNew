@@ -1,9 +1,7 @@
 <?php
-
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\AuthorController;
@@ -11,16 +9,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-//Route::get('/year/{year}/issue/{issue}', [HomeController::class, 'showIssue'])->name('issue.show');
-//Route::get('/', function () {
-    //return Inertia::render('HomePage', [
-        //'canLogin' => Route::has('login'),
-        //'canRegister' => Route::has('register'),
-        //'laravelVersion' => Application::VERSION,
-        //'phpVersion' => PHP_VERSION,
 
-    //]);
-//});
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('publications/detail/{id}', [PublicationController::class, 'detail'])->name('publications.detail');
 

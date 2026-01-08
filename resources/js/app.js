@@ -10,16 +10,22 @@ import PrimeVue from 'primevue/config';
 import '../assets/base.css'; 
 
 import Aura from '@primeuix/themes/aura';
+import HomeLayout from './Layouts/HomeLayout.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue')
-        ),
+    resolve: (name) => {
+    return resolvePageComponent(
+        `./Pages/${name}.vue`,
+        import.meta.glob('./Pages/**/*.vue')
+        ).then((module) => {
+        // ✅ nastav default layout, iba ak stránka nemá vlastný
+            module.default.layout ??= HomeLayout
+            return module
+        })
+    },
     setup({ el, App, props, plugin }) {
        
         const app = createApp({

@@ -68,9 +68,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     publication: Object,
 });
-defineOptions({
-    layout: HomeLayout,
-})
+
 
 const isBibtexVisible = ref(false);
 const isRISVisible = ref(false);

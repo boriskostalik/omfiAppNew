@@ -33,9 +33,7 @@ const props = defineProps({
   publications: Object,
 });
 
-defineOptions({
-  layout: HomeLayout,
-});
+
 
 const currentPage = ref(props.publications.current_page || 1);
 const perPage = ref(Number(props.publications.per_page) || 10);

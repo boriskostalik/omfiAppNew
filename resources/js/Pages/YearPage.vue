@@ -36,9 +36,7 @@ const fillMissingIssues = computed(()=>{
         return issues;
 });
 
-defineOptions({
-  layout: HomeLayout
-});
+
 </script>
 
 <template>

@@ -31,9 +31,7 @@ const props = defineProps({
   authors: Object,
 });
 
-defineOptions({
-  layout: HomeLayout,
-});
+
 
 const currentPage = ref(props.authors.current_page || 1);
 const perPage = ref(Number(props.authors.per_page) || 10);

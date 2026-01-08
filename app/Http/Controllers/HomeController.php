@@ -19,11 +19,27 @@ class HomeController extends Controller
         ->orderByDesc('year')
         ->paginate(16); 
 
-       
+         $publicationsCount = Publication::count();
+
+    // ✅ Počet autorov (počet záznamov)
+         $authorsCount = Author::count();
+        
+         $issuesCount = Publication::query()
+            ->whereNotNull('year')
+            ->whereNotNull('number')
+            ->where('year', '!=', '0000')
+            ->where('number', '!=', '')
+            ->selectRaw("COUNT(DISTINCT CONCAT(year,'/',number)) as cnt")
+            ->value('cnt');
+
 
         return Inertia::render('HomePage', [
             'years' => $years,
-            
+            'stats' => [
+                'publications' => $publicationsCount,
+                'authors' => $authorsCount,
+                'issues' => $issuesCount,
+            ],
         ]);
     }
 
