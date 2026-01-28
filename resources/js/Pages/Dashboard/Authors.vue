@@ -14,21 +14,18 @@
         tableStyle="min-width: 60rem"
         @sort="onSort"
       >
-        <!-- First Name -->
         <Column field="firstname" header="First Name" sortable style="width: 25%">
           <template #body="{ data }">
             {{ data.firstname }}
           </template>
         </Column>
   
-        <!-- Last Name -->
         <Column field="surname" header="Last Name" sortable style="width: 25%">
           <template #body="{ data }">
             {{ data.surname }}
           </template>
         </Column>
   
-        <!-- Publications -->
         <Column header="Publications" style="width: 35%">
           <template #body="{ data }">
             <div v-if="data.publications?.length" class="max-h-32 overflow-hidden truncate max-w-96">
@@ -50,7 +47,6 @@
         </template>
     </Column>
   
-        <!-- Empty State -->
         <template #empty>
           No authors found.
         </template>

@@ -17,7 +17,6 @@
         <a :href="author.url" target="_blank" class="text-blue-600 hover:underline">{{ author.url }}</a>
     </p>
     <p v-else class="text-gray-500 italic">No website available</p>
-    <!-- TODO: pridat nenajdene publikacie -->
     <div class="mt-4">
         <h2 class="text-lg font-semibold">Publikácie</h2>
         <div v-if="!publicationsByYear.length">Nenašli sa žiadne publikácie od autora</div>   

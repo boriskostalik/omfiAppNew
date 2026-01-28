@@ -10,7 +10,6 @@ const props = defineProps({
     publications: Array
 });
 
-// Debugging: Vypíše dáta do konzoly, aby sme videli, čo Vue dostáva
 onMounted(() => {
     console.log("Dáta z Laravelu:", props.publications);
 });

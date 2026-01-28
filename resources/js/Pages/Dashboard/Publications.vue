@@ -22,42 +22,36 @@
     }"
     >
 
-    <!-- Title -->
     <Column field="title" header="Title" sortable style="width: 30%">
       <template #body="{ data }">
         {{ data.title }}
       </template>
     </Column>
 
-    <!-- Type -->
     <Column field="type" header="Type" sortable style="width: 15%">
       <template #body="{ data }">
         <Tag :value="data.type" />
       </template>
     </Column>
 
-    <!-- Year -->
     <Column field="year" header="Year" sortable style="width: 10%">
       <template #body="{ data }">
         {{ data.year }}
       </template>
     </Column>
 
-    <!-- Journal -->
     <Column field="journal" header="Journal"  style="width: 20%">
       <template #body="{ data }">
         {{ data.journal }}
       </template>
     </Column>
 
-    <!-- Volume & Number -->
     <Column header="Number" style="width: 15%">
       <template #body="{ data }">
         {{ data.year }} / {{ data.number }}
       </template>
     </Column>
 
-    <!-- Authors -->
     <Column header="Authors" style="width: 25%">
       <template #body="{ data }">
         <span v-if="data.authors.length">{{ data.authors.map(a => `${a.cleanname}`).join(', ') }}</span>
@@ -76,7 +70,6 @@
         </template>
     </Column>
 
-    <!-- Empty State -->
     <template #empty>
       No publications found.
     </template>
@@ -117,7 +110,7 @@ const props = defineProps({
   publications: Object,
   entered_by: Number,
   authors: Array,
-  filters: Object, // Add filters from backend
+  filters: Object, 
   sortField: String,
   sortOrder: String,
 });
@@ -185,7 +178,6 @@ const syncParams = () => {
 };
 
 
-// Handle sorting and preserve pagination and filters
 const onSort = (event) => {
   sortField.value = event.sortField;
   sortOrder.value = event.sortOrder;

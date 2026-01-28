@@ -11,14 +11,12 @@
         tableStyle="min-width: 60rem;"
         class="max-w-6xl mx-auto px-6"
       >
-        <!-- First Name -->
         <Column field="name" header="Name" style="width: 25%">
           <template #body="{ data }" :class="{'bg-red': $page.props.auth.user.role === data.name}">
             {{ data.name }}
           </template>
         </Column>
   
-        <!-- Last Name -->
         <Column field="email" header="Email" style="width: 25%">
           <template #body="{ data }">
             {{ data.email }}
@@ -39,7 +37,6 @@
         </template>
     </Column>
   
-        <!-- Empty State -->
         <template #empty>
           No Users found.
         </template>

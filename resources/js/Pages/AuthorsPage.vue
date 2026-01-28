@@ -60,7 +60,6 @@ const submitSearch = (query) => {
 </script>
 
 <style scoped>
-/* Ensure paginator styles are applied */
 .p-paginator .p-component {
   background-color: white !important;
 }

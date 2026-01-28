@@ -56,7 +56,6 @@
     import { computed, reactive, watch, defineEmits } from 'vue';
     import { InputText, Textarea, Dropdown, Button, Dialog, MultiSelect } from 'primevue';
     import { router } from '@inertiajs/vue3';
-    // import { router } from '@inertiajs/inertia-vue3';
     const props = defineProps({
         publication: {
             type: Object,

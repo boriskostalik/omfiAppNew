@@ -18,10 +18,9 @@ class UserController extends Controller
 {
     public function indexDashboard(Request $request)
     {
-        // Get the authenticated user
+       
         $users = User::all();
 
-        // Return the Inertia view with the user data
         return Inertia::render('Dashboard/Users', [
             'users' => $users,
         ]);
@@ -32,7 +31,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required',
-            'role' => 'required|string|in:admin,editor,user', // Adjust roles as needed
+            'role' => 'required|string|in:admin,editor,user', 
         ]);
 
         $user = User::create([
@@ -59,9 +58,7 @@ class UserController extends Controller
         return Redirect::route('users.dashboard');
     }
 
-    /**
-     * Delete the user's account.
-     */
+   
     public function destroy(User $user): RedirectResponse
     {
         $user->delete();

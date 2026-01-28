@@ -58,7 +58,6 @@ const form = reactive({
     specialchars: 0
 });
 
-// Computed property to convert between boolean and 0/1
 const specialcharsValue = computed({
     get() {
         return form.specialchars === 1;
@@ -72,15 +71,11 @@ const cleanName = computed({
     get() {
         let name = '';
         
-        // Add von if exists
         if (form.von) {
             name += form.von + ' ';
         }
+            name += form.surname;
         
-        // Add surname
-        name += form.surname;
-        
-        // Add firstname
         if (form.firstname) {
             name += ', ' + form.firstname;
         }
@@ -88,17 +83,13 @@ const cleanName = computed({
         return name.trim();
     },
     set(value) {
-        // Split the value into parts
         const parts = value.split(',').map(part => part.trim());
         
-        // Handle surname and firstname
         if (parts.length > 1) {
-            // If there's a comma, assume first part is surname/von, second is firstname
             const surnameParts = parts[0].split(' ');
             form.firstname = parts[1];
             
             if (surnameParts.length > 1) {
-                // If surname has multiple parts, last part is surname, others are von
                 form.surname = surnameParts[surnameParts.length - 1];
                 form.von = surnameParts.slice(0, -1).join(' ');
             } else {
@@ -106,7 +97,6 @@ const cleanName = computed({
                 form.von = '';
             }
         } else {
-            // If no comma, assume last word is surname, first words are firstname
             const nameParts = parts[0].split(' ');
             form.surname = nameParts[nameParts.length - 1];
             form.firstname = nameParts.slice(0, -1).join(' ');
@@ -116,7 +106,6 @@ const cleanName = computed({
 
 const submit = () => {
     if (props.author) {
-        // Update existing author
         form.cleanname = cleanName.value;
         router.put(`/dashboard/authors/${props.author.id}`, form, {
             onError: (err) => {
@@ -125,7 +114,6 @@ const submit = () => {
             onSuccess: () => emit('close')
         });
     } else {
-        // Create new author
         form.cleanname = cleanName.value;
         router.post('/dashboard/authors', form, {
             onError: (err) => {
@@ -136,7 +124,6 @@ const submit = () => {
     }
 };
 
-// Watch for changes in author prop to populate form
 watch(() => props.author, (author) => {
     if (author) {
         form.surname = author.surname || '';

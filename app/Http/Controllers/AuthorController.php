@@ -39,17 +39,13 @@ class AuthorController extends Controller
             $query->orderBy('year', 'desc');
         }])->findOrFail($id);
 
-        // Ensure grouping by value to avoid issues with numeric keys
         $publicationsByYear = $author->publications->groupBy('year', true);
-
-        // Sort and reformat the structure
         $publicationsByYearFormatted = $publicationsByYear->sortKeysDesc()->map(function ($publications, $year) {
             return [
                 'year' => $year,
                 'publications' => $publications,
             ];
-        })->values(); // Ensure array indexing
-
+        })->values();
         return Inertia::render('AuthorDetailPage', [
             'author' => $author,
             'publicationsByYear' => $publicationsByYearFormatted,
@@ -66,7 +62,7 @@ class AuthorController extends Controller
 
         $query = Author::query()->with('publications');
 
-        // Apply search filters
+  
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('firstname', 'like', "%{$search}%")
@@ -74,14 +70,14 @@ class AuthorController extends Controller
             });
         }
 
-        // Apply specific filters
+        
         foreach ($filters as $field => $value) {
             if ($value) {
                 $query->where($field, 'like', "%{$value}%");
             }
         }
 
-        // Apply sorting
+
         if (in_array($sortField, ['firstname', 'surname'])) {
             $query->orderBy($sortField, $sortOrder);
         }
@@ -102,7 +98,7 @@ class AuthorController extends Controller
     {   
         $data = $request->validated();
 
-        // Create the author
+ 
         $author = Author::create($data);
 
         return redirect()->route('authors.dashboard');
@@ -112,7 +108,6 @@ class AuthorController extends Controller
     {   
         $data = $request->validated();
     
-        // Update the author
         $author->update($data);
     
         return redirect()->route('authors.dashboard');

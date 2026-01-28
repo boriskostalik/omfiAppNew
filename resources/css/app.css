@@ -4,5 +4,42 @@
 
 @import "tailwindcss/utilities";
 
-/* Testovací štýl - ak funguje, tlačidlo bude červené */
-/* Globálne štýly */
+@layer base {
+  body {
+    @apply bg-[#f3f4f6];
+  }
+}
+
+.p-paginator .p-paginator-page.p-highlight,
+.p-paginator .p-paginator-page.p-paginator-page-selected,
+.p-paginator .p-paginator-page[data-p-highlight="true"],
+.p-paginator [data-pc-section="pagebutton"].p-highlight,
+.p-paginator [data-pc-section="pagebutton"][data-p-highlight="true"] {
+  background: var(--p-primary-color) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  font-weight: 700 !important;
+}
+
+.p-paginator .p-paginator-page:not(.p-highlight):not(.p-paginator-page-selected):hover,
+.p-paginator [data-pc-section="pagebutton"]:not(.p-highlight):not(.p-paginator-page-selected):hover {
+  background: rgba(29, 78, 216, 0.12) !important;
+}
+
+.p-paginator,
+.p-paginator-root,
+[data-pc-name="paginator"] {
+  background: transparent !important;
+  border: 0 !important;
+}
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-last {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+

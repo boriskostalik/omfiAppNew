@@ -1,35 +1,70 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
-const props = defineProps(['publication', 'withAuthors']);
+import { router } from '@inertiajs/vue3'
+import Card from 'primevue/card'
+import Chip from 'primevue/chip'
+import Tag from 'primevue/tag'
+
+const props = defineProps({
+  publication: { type: Object, required: true },
+  withAuthors: { type: Boolean, default: true },
+})
+
 const goToAuthor = (id) => {
-    router.get(route('authors.detail', id));
+  router.get(route('authors.detail', id))
 }
 
 const goToPublication = (id) => {
-    router.get(route('publications.detail', id));
+  router.get(route('publications.detail', id))
 }
-
 </script>
 
 <template>
-    <div class="p-6 bg-white rounded-2xl shadow-lg">
-        <h2 class="text-xl font-semibold text-gray-800">
-            <span class="italic">
-                <span v-for="(author, index) in publication.authors" :key="author.id">
-                    <span class="cursor-pointer" @click="goToAuthor(author.id)">{{ author.cleanname }}</span>
-                    <span v-if="author.is_editor === 'Y'">(Editor)</span>
-                    <span v-if="index < publication.authors.length - 1">, </span>
-                    </span>
-                </span>
-            <span @click="goToPublication(publication.id)" class="cursor-pointer text-blue-600 italic ml-1 hover:text-blue-950">{{ publication.title }}</span>
-        </h2>
-    <p class="text-gray-600 mt-2">
-      in: <span class="font-semibold">{{ publication.journal }}</span>,
-      volume {{ publication.volume }}, number {{ publication.number }}, pages {{ publication.firstpage }}-{{ publication.lastpage }},
-      ISSN {{ publication.issn }}, {{ publication.year }}.
-    </p>
-  </div>
-</template>
-<style lang="scss" scoped>
+  <Card
+    class="mb-4 cursor-pointer hover:shadow-xl transition-shadow"
+    @click="goToPublication(publication.id)"
+  >
+    <template #title>
+      {{ publication.title }}
+    </template>
 
-</style>
+    <template #content>
+      <div v-if="withAuthors" class="flex flex-wrap items-center gap-3 mb-4">
+      
+
+        <template v-if="publication.authors?.length">
+          <Chip
+            v-for="author in publication.authors"
+            :key="author.id"
+            class="cursor-pointer text-base px-3 py-2"
+            @click.stop="goToAuthor(author.id)"
+          >
+            {{ author.cleanname }}
+
+            <Tag
+              v-if="author.is_editor === 'Y'"
+              value="Editor"
+              severity="secondary"
+              class="ml-2"
+            />
+          </Chip>
+        </template>
+
+        <span v-else class="text-gray-500 text-sm">
+          Neznámi autori
+        </span>
+      </div>
+
+      <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+        <span><strong>Rok:</strong> {{ publication.year }}</span>
+
+        <span>
+          <strong>Vydanie:</strong> {{ publication.number }}
+        </span>
+
+        <span v-if="publication.firstpage && publication.lastpage">
+          <strong>Strany:</strong> {{ publication.firstpage }}–{{ publication.lastpage }}
+        </span>
+      </div>
+    </template>
+  </Card>
+</template>
