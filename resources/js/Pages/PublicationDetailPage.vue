@@ -1,75 +1,70 @@
 <template>
-    <Header title="Publication Detail" />
-    <h2 class="text-xl font-semibold">{{ publication.title }}</h2>
+  <div class="w-full max-w-[1000px] mx-auto px-4 mt-16">
+    <PublicationDetailCard
+      :publication="publication"
+      :pdf-url="pdfUrl"
+      :pdf-viewer-src="pdfViewerSrc"
+      @show-bibtex="isBibtexVisible = true"
+      @show-ris="isRISVisible = true"
+    />
 
-    <div class="mt-2">
-        <p class="text-gray-700">
-            <strong>English title:</strong> {{ publication.title_eng }}
-        </p>
-        <p class="text-gray-700">
-            <strong>Journal:</strong> {{ publication.journal }}
-        </p>
-        <p class="text-gray-700">
-            <strong>Year: </strong> 
-            <Link 
-                :href="route('issue.show', { year: publication.year, number: publication.number })" 
-                class="text-blue-600 hover:underline"
-            >
-                {{ publication.year }} / {{ publication.number }}
-            </Link>
-        </p>
-        <p class="text-gray-700">
-            <strong>Volume:</strong> {{ publication.volume }}
-        </p>
-        <p class="text-gray-700">
-            <strong>Pages:</strong> {{ publication.firstpage }} - {{ publication.lastpage }}
-        </p>
-        <p class="text-gray-700">
-            <strong>Bibtex Cite ID:</strong> {{ publication.bibtex_id }}
-        </p>
-        <p @click="isBibtexVisible = true" class="text-blue-600 hover:underline cursor-pointer">
-            <strong>Bibtex</strong>
-        </p>
-        <p @click="isRISVisible = true" class="text-blue-600 hover:underline cursor-pointer">
-            <strong>RIS</strong>
-        </p>
-        <p v-if="publication.doi" class="text-gray-700">
-            <strong>DOI:</strong> 
-            <a :href="'https://doi.org/' + publication.doi" class="text-blue-600 hover:underline">{{ publication.doi }}</a>
-        </p>
+    <Card class="mt-6">
+      <template #title>
+        Autori
+      </template>
 
-        <div class="mt-4">
-            <h2 class="text-lg font-semibold">Authors</h2>
-            <ul v-if="publication.authors.length" class="list-disc ml-6">
-                <div v-for="author in publication.authors" :key="author.id">
-                    <Author :author="author" />
-                </div>
-            </ul>
-            <p v-else class="text-gray-500 italic">No authors available</p>
+      <template #content>
+        <div v-if="publication.authors?.length" class="mt-2">
+          <div v-for="author in publication.authors" :key="author.id">
+            <Author :author="author" />
+          </div>
         </div>
-        <div class="mt-4">
-            <h2 class="text-lg font-semibold">Abstract</h2>
-            <p>{{ publication.note }}</p>
+
+        <div v-else class="text-gray-500 italic">
+          Žiadni autori.
         </div>
-    </div>
-     <Bibtex :publication="publication" :visible="isBibtexVisible" @close="isBibtexVisible = false" />
-     <RIS :publication="publication" :visible="isRISVisible" @close="isRISVisible = false" />
+      </template>
+    </Card>
+
+    <!-- Modaly -->
+    <Bibtex :publication="publication" :visible="isBibtexVisible" @close="isBibtexVisible = false" />
+    <RIS :publication="publication" :visible="isRISVisible" @close="isRISVisible = false" />
+  </div>
 </template>
 
 <script setup>
-import Author from '@/Components/Author.vue';
-import Header from '@/Components/Header.vue';
-import HomeLayout from '@/Layouts/HomeLayout.vue';
+import { computed, ref } from 'vue'
 
-import { defineProps, defineOptions, ref } from 'vue';
-import Bibtex from '@/Components/Bibtex.vue';   
-import RIS from '@/Components/RIS.vue';
-import { Link } from '@inertiajs/vue3';
+import Card from 'primevue/card'
+
+import Author from '@/Components/Author.vue'
+import Bibtex from '@/Components/Bibtex.vue'
+import RIS from '@/Components/RIS.vue'
+import PublicationDetailCard from '@/Components/PublicationDetailCard.vue'
+
 const props = defineProps({
-    publication: Object,
-});
+  publication: { type: Object, required: true },
+})
 
+const isBibtexVisible = ref(false)
+const isRISVisible = ref(false)
 
-const isBibtexVisible = ref(false);
-const isRISVisible = ref(false);
+/**
+ * 🔧 Uprav podľa backendu:
+ * ideálne: publication.pdf_url (plná URL)
+ */
+const pdfUrl = computed(() => {
+  return (
+    props.publication?.pdf_url ||
+    props.publication?.pdfUrl ||
+    props.publication?.pdf ||
+    props.publication?.file_url ||
+    null
+  )
+})
+
+const pdfViewerSrc = computed(() => {
+  if (!pdfUrl.value) return null
+  return `${pdfUrl.value}#page=1&view=FitH`
+})
 </script>

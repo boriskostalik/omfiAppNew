@@ -26,7 +26,6 @@ const goToPublication = (id) => {
     <template #title>
       {{ publication.title }}
     </template>
-
     <template #content>
       <div v-if="withAuthors" class="flex flex-wrap items-center gap-3 mb-4">
       
@@ -35,11 +34,11 @@ const goToPublication = (id) => {
           <Chip
             v-for="author in publication.authors"
             :key="author.id"
-            class="cursor-pointer text-base px-3 py-2"
+            class="cursor-pointer text-base px-3 py-2 hover:shadow-md transition-shadow"
             @click.stop="goToAuthor(author.id)"
+            
           >
-            {{ author.cleanname }}
-
+            {{ author.cleanname.replace(',', '') }}
             <Tag
               v-if="author.is_editor === 'Y'"
               value="Editor"
@@ -48,19 +47,15 @@ const goToPublication = (id) => {
             />
           </Chip>
         </template>
-
         <span v-else class="text-gray-500 text-sm">
           Neznámi autori
         </span>
       </div>
-
       <div class="flex flex-wrap gap-4 text-sm text-gray-600">
         <span><strong>Rok:</strong> {{ publication.year }}</span>
-
         <span>
           <strong>Vydanie:</strong> {{ publication.number }}
         </span>
-
         <span v-if="publication.firstpage && publication.lastpage">
           <strong>Strany:</strong> {{ publication.firstpage }}–{{ publication.lastpage }}
         </span>

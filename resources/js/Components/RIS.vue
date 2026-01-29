@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="isVisible" modal header="RIS Format" :style="{ width: '50%' }" @hide="$emit('close')">
+    <Dialog v-model:visible="isVisible" modal header="RIS Format" :style="{ width: '50%' }" @hide="$emit('close')" >
         <template #closebutton>
             <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
         </template>

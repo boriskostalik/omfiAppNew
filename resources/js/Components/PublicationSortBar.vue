@@ -1,5 +1,5 @@
 <template>
-  <Dropdown
+  <Select
     v-model="sortKey"
     :options="options"
     optionLabel="label"
@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 
 const emit = defineEmits(['change'])
 const sortKey = defineModel('sortKey')

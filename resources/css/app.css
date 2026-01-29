@@ -42,4 +42,5 @@
   transform: none !important;
 }
 
+html { scrollbar-gutter: stable; }
 

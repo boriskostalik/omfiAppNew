@@ -1,46 +1,101 @@
 <template>
-<Header title="Author Detail" />
-<h2 class="text-xl font-semibold">{{ author.firstname }} {{ author.surname }}</h2>
-<div class="mt-2">
-    <p class="text-gray-700">
-        <strong>Email:</strong> 
-        <a :href="'mailto:' + author.email" class="text-blue-600 hover:underline">{{ author.email }}</a>
-    </p>
+  <div class="w-full max-w-[1000px] mx-auto px-4 mt-16">
+    <Card>
+      <template #title>
+        <div class="text-4xl font-semibold text-slate-900">
+                    {{ author.cleanname.replace(',', '') }}
+        </div>
+        <Divider />
+      </template>
 
-    <p v-if="author.institute" class="text-gray-700">
-        <strong>Institute:</strong> {{ author.institute }}
-    </p>
-    <p v-else class="text-gray-500 italic">No institute specified</p>
+      <template #content>
+        <div class="space-y-4 text-base text-slate-700">
+          <div v-if="author.email" class="flex gap-2">
+            <strong class="text-slate-900">Email:</strong>
+            <a
+              :href="'mailto:' + author.email"
+              class="text-blue-600 hover:underline"
+            >
+              {{ author.email }}
+            </a>
+          </div>
 
-    <p v-if="author.url" class="text-gray-700">
-        <strong>Website:</strong> 
-        <a :href="author.url" target="_blank" class="text-blue-600 hover:underline">{{ author.url }}</a>
-    </p>
-    <p v-else class="text-gray-500 italic">No website available</p>
-    <div class="mt-4">
-        <h2 class="text-lg font-semibold">Publikácie</h2>
-        <div v-if="!publicationsByYear.length">Nenašli sa žiadne publikácie od autora</div>   
-        <div v-for="group in publicationsByYear" :key="group.year">
-        <h2>{{ group.year }}</h2>
-        <Publication 
-            v-for="publication in group.publications"
-            :key="publication.id" 
-            :publication="publication" 
-        />
-        <hr>
-    </div>
-</div>
-</div>
+          <div v-if="author.institute" class="flex gap-2">
+            <strong class="text-slate-900">Inštitúcia:</strong>
+            <span>{{ author.institute }}</span>
+          </div>
+          <div v-else class="text-slate-500 italic">
+            Bez inštitúcie
+          </div>
+
+          <div v-if="author.url" class="flex gap-2">
+            <strong class="text-slate-900">Web:</strong>
+            <a
+              :href="author.url"
+              target="_blank"
+              rel="noreferrer"
+              class="text-blue-600 hover:underline break-all"
+            >
+              {{ author.url }}
+            </a>
+          </div>
+          <div v-else class="text-slate-500 italic">
+            Bez web stránky
+          </div>
+        </div>
+      </template>
+    </Card>
+
+    <Card class="mt-6">
+      <template #title>
+        Publikácie
+      </template>
+
+      <template #content>
+        <div v-if="!publicationsByYear?.length" class="text-slate-600">
+          Nenašli sa žiadne publikácie od autora.
+        </div>
+
+        <div v-else class="space-y-6">
+          <Card
+            v-for="group in publicationsByYear"
+            :key="group.year"
+            class="shadow-sm"
+          >
+            <template #title>
+              <div class="text-lg font-semibold text-slate-900">
+                {{ group.year }}
+              </div>
+            </template>
+
+            <template #content>
+              <div class="space-y-3">
+                <Publication
+                  v-for="publication in group.publications"
+                  :key="publication.id"
+                  :publication="publication"
+                />
+              </div>
+            </template>
+          </Card>
+        </div>
+      </template>
+    </Card>
+  </div>
 </template>
+
 <script setup>
-import HomeLayout from '@/Layouts/HomeLayout.vue';
-import Header from '@/Components/Header.vue';
-import Publication from '@/Components/Publication.vue';
+import { Divider } from 'primevue'
+import HomeLayout from '@/Layouts/HomeLayout.vue'
+import Card from 'primevue/card'
+import Publication from '@/Components/Publication.vue'
+
 const props = defineProps({
-    author: Object,
-    publicationsByYear: Object,
-});
+  author: { type: Object, required: true },
+  publicationsByYear: { type: Array, default: () => [] },
+})
+
 defineOptions({
-    layout: HomeLayout,
-});
+  layout: HomeLayout,
+})
 </script>

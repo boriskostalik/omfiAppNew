@@ -1,37 +1,60 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3'
+import Card from 'primevue/card'
+import Tag from 'primevue/tag'
 const props = defineProps({
-  author: Object,
-});
+  author: { type: Object, required: true },
+})
 const goToAuthor = (id) => {
-    router.get(route('authors.detail', id));
+  router.get(route('authors.detail', id))
 }
 </script>
-
 <template>
-  <div class="border p-4 rounded-lg shadow-md mb-4 cursor-pointer" @click="goToAuthor(author.id)">
-    <h2 class="text-xl font-semibold">{{ author.firstname }} {{ author.surname }}</h2>
-    <p v-if="author?.pivot?.is_editor === 'Y'" class="text-gray-500 italic">Editor</p>
-    <div class="mt-2">
-      <p class="text-gray-700">
-        <strong>Email:</strong> 
-        <a :href="'mailto:' + author.email" class="text-blue-600 hover:underline">{{ author.email }}</a>
-      </p>
-
-      <p v-if="author.institute" class="text-gray-700">
-        <strong>Institute:</strong> {{ author.institute }}
-      </p>
-      <p v-else class="text-gray-500 italic">No institute specified</p>
-
-      <p v-if="author.url" class="text-gray-700">
-        <strong>Website:</strong> 
-        <a :href="author.url" target="_blank" class="text-blue-600 hover:underline">{{ author.url }}</a>
-      </p>
-      <p v-else class="text-gray-500 italic">No website available</p>
-    </div>
-  </div>
+  <Card
+    class="mb-4 cursor-pointer hover:shadow-xl transition-shadow"
+    @click="goToAuthor(author.id)"
+  >
+    <template #title>
+      <div class="flex items-center gap-3">
+        <span>{{ author.firstname }} {{ author.surname }}</span>
+        
+      </div>
+    </template>
+    <template #content>
+      <div class="space-y-2 text-sm text-gray-600">
+        <div v-if="author.email">
+          <strong>Email:</strong>
+          <a
+            :href="'mailto:' + author.email"
+            class="text-blue-600 hover:underline ml-1"
+            @click.stop
+          >
+            {{ author.email }}
+          </a>
+        </div>
+        <div v-if="author.institute">
+          <strong>Institute:</strong>
+          <span class="ml-1">{{ author.institute }}</span>
+        </div>
+        <div v-else class="text-gray-500 italic">
+          No institute specified
+        </div>
+        <div v-if="author.url">
+          <strong>Website:</strong>
+          <a
+            :href="author.url"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-600 hover:underline ml-1 break-all"
+            @click.stop
+          >
+            {{ author.url }}
+          </a>
+        </div>
+        <div v-else class="text-gray-500 italic">
+          No website available
+        </div>
+      </div>
+    </template>
+  </Card>
 </template>
-
-<style scoped>
-/* Scoped styles for the Author component */
-</style>

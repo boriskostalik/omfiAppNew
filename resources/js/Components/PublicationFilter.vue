@@ -62,7 +62,7 @@
       </div>
 
       <div class="lg:col-span-1 flex gap-2">
-        <Button label="Vyčistiť" class="w-full" @click="emitClear" />
+        <Button label="Zrušiť filtre" class="w-full" @click="emitClear" />
       </div>
     </div>
   </div>
