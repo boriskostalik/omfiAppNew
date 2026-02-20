@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="780" height="140" viewBox="0 0 780 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .brand { fill: #1E4E8C; }  /* hlavná modrá OMFI */
+      .sub { 
+        fill: #1E4E8C; 
+        opacity: 0.95; 
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+        font-weight: 600;
+      }
+      .mark { 
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif; 
+        font-weight: 500; 
+        letter-spacing: 1px; 
+      }
+    </style>
+  </defs>
+
+  <!-- OMFI -->
+  <text x="0" y="95" class="brand mark" font-size="90">OMFI</text>
+
+  <!-- separator -->
+  <circle cx="260" cy="70" r="4" class="brand" opacity="0.9" />
+
+  <!-- Title line 1 -->
+  <text x="280" y="60" class="sub" font-size="32">
+    Obzory matematiky, fyziky
+  </text>
+
+  <!-- Title line 2 -->
+  <text x="280" y="95" class="sub" font-size="40">
+     a informatiky
+  </text>
+</svg>

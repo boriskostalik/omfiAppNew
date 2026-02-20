@@ -4,11 +4,7 @@
 
 @import "tailwindcss/utilities";
 
-@layer base {
-  body {
-    @apply bg-[#f3f4f6];
-  }
-}
+
 
 .p-paginator .p-paginator-page.p-highlight,
 .p-paginator .p-paginator-page.p-paginator-page-selected,

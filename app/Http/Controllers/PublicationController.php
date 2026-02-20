@@ -149,9 +149,7 @@ class PublicationController extends Controller
         $search = $request->input('search');
         $sortField = $request->input('sortField', 'title');
         $sortOrder = $request->input('sortOrder', 'asc');
-
         $filters = $request->only(['title', 'type', 'year', 'journal']);
-
         $query = Publication::query()->with('authors');
         $authors = Author::query();
 
@@ -193,9 +191,7 @@ class PublicationController extends Controller
     public function store(PublicationRequest $request)
     {
         $data = $request->validated();
-
         $publication = Publication::create($data);
-
         if ($request->has('authors') && is_array($request->authors)) {
             $authorsData = [];
 

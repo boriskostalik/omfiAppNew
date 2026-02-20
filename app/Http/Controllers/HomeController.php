@@ -1,48 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Publication;
 use App\Models\Author;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-
 class HomeController extends Controller
 {
     public function index(Request $request)
-    {
-        $years = Publication::whereNotNull('year')
+{
+    $latest = Publication::query()
+        ->whereNotNull('year')
         ->where('year', '!=', '0000')
-        ->selectRaw('CAST(year AS UNSIGNED) as year')
-        ->groupBy('year') 
-        ->orderByDesc('year')
-        ->paginate(16); 
+        ->whereNotNull('number')
+        ->where('number', '!=', '')
+        ->select([
+            'id',
+            'year',
+            'number',
+            'volume',
+        ])
+        ->orderByRaw('CAST(year AS UNSIGNED) DESC')
+        ->orderByRaw('CAST(number AS UNSIGNED) DESC')
+        ->first();
+    $publicationsCount = Publication::count();
+    $authorsCount = Author::count();
+    $issuesCount = Publication::query()
+        ->whereNotNull('year')
+        ->whereNotNull('number')
+        ->where('year', '!=', '0000')
+        ->where('number', '!=', '')
+        ->selectRaw("COUNT(DISTINCT CONCAT(year,'/',number)) as cnt")
+        ->value('cnt');
 
-         $publicationsCount = Publication::count();
-
-    // ✅ Počet autorov (počet záznamov)
-         $authorsCount = Author::count();
-        
-         $issuesCount = Publication::query()
-            ->whereNotNull('year')
-            ->whereNotNull('number')
-            ->where('year', '!=', '0000')
-            ->where('number', '!=', '')
-            ->selectRaw("COUNT(DISTINCT CONCAT(year,'/',number)) as cnt")
-            ->value('cnt');
-
-
-        return Inertia::render('HomePage', [
-            'years' => $years,
-            'stats' => [
-                'publications' => $publicationsCount,
-                'authors' => $authorsCount,
-                'issues' => $issuesCount,
-            ],
-        ]);
-    }
-
+    return Inertia::render('HomePage', [
+        'latest' => $latest,  
+        'stats' => [
+            'publications' => $publicationsCount,
+            'authors' => $authorsCount,
+            'issues' => $issuesCount,
+        ],
+    ]);
+}
  
     public function showYear($year)
     {
@@ -50,12 +49,10 @@ class HomeController extends Controller
             ->selectRaw('DISTINCT CAST(number AS UNSIGNED) as number') 
             ->orderByRaw('CAST(number AS UNSIGNED)') 
             ->get();
-    
-        // Získanie všetkých publikácií pre daný rok
         $publications = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year])
-            ->select('*') // Môžeš tu dať konkrétne stĺpce, ak nepotrebuješ všetky
-            ->orderByRaw('CAST(number AS UNSIGNED)') // Triedenie podľa čísla vydania
-            ->orderBy('title') // Sekundárne triedenie podľa názvu
+            ->select('*') 
+            ->orderByRaw('CAST(number AS UNSIGNED)') 
+            ->orderBy('title') 
             ->with('authors')
             ->get();
     
