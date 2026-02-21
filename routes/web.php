@@ -7,23 +7,17 @@ use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ArchiveController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('publications/detail/{id}', [PublicationController::class, 'detail'])->name('publications.detail');
-
-Route::get('/publications/{year}', [HomeController::class, 'showYear']);
-Route::get('/publications/{year}/{number}', [HomeController::class, 'showIssue'])->name('issue.show');
-
-// Stránka autorov
+Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
+Route::get('/archive/issue/{issue}', [ArchiveController::class, 'showIssue'])->name('archive.issue');
+Route::get('/archive/{year}', [ArchiveController::class, 'showYear'])->name('archive.year');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
 Route::get('/authors/{id}', [AuthorController::class, 'detail'])->name('authors.detail');
-
-
-// Stránka "O Časopise"
 Route::get('/about', [AboutController::class, 'index']);
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

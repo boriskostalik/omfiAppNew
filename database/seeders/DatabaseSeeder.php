@@ -5,10 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Institution;
-use App\Models\Author;
-use App\Models\Publication;
-use App\Models\Topic;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -18,21 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+            $this->call(OmfiImportSeeder::class);
             User::factory()->create([
                 'name' => 'Test User',
                 'email' => 'test@example.com',
                 'password' => Hash::make('testtest'),
                 'role' => 'admin',
             ]);
-            Institution::factory()->count(5)->create();
-            // Author::factory()->count(10)->create();
-            // Publication::factory()->count(20)->create();
-            $this->call([
-                AuthorSeeder::class,
-                PublicationSeeder::class,
-                PublicationAuthorSeeder::class,
-            ]);
-            Topic::factory()->count(10)->create();
     }
 }

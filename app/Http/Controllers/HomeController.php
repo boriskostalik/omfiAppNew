@@ -3,83 +3,71 @@
 namespace App\Http\Controllers;
 use App\Models\Publication;
 use App\Models\Author;
+use App\Models\Issue;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 class HomeController extends Controller
 {
     public function index(Request $request)
 {
-    $latest = Publication::query()
-        ->whereNotNull('year')
-        ->where('year', '!=', '0000')
-        ->whereNotNull('number')
-        ->where('number', '!=', '')
-        ->select([
-            'id',
-            'year',
-            'number',
-            'volume',
-        ])
-        ->orderByRaw('CAST(year AS UNSIGNED) DESC')
-        ->orderByRaw('CAST(number AS UNSIGNED) DESC')
+    $latestIssue = Issue::query()
+        ->orderByDesc('year')
+        ->orderByDesc('number')
         ->first();
-    $publicationsCount = Publication::count();
-    $authorsCount = Author::count();
-    $issuesCount = Publication::query()
-        ->whereNotNull('year')
-        ->whereNotNull('number')
-        ->where('year', '!=', '0000')
-        ->where('number', '!=', '')
-        ->selectRaw("COUNT(DISTINCT CONCAT(year,'/',number)) as cnt")
-        ->value('cnt');
 
     return Inertia::render('HomePage', [
-        'latest' => $latest,  
+        'latest' => $latestIssue ? [
+            'id' => $latestIssue->id,
+            'year' => $latestIssue->year,
+            'number' => $latestIssue->number,
+            'volume' => $latestIssue->volume,
+        ] : null,
         'stats' => [
-            'publications' => $publicationsCount,
-            'authors' => $authorsCount,
-            'issues' => $issuesCount,
+            'publications' => Publication::count(),
+            'authors' => Author::count(),
+            'issues' => Issue::count(),
         ],
     ]);
 }
  
     public function showYear($year)
-    {
-        $issues = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year]) 
-            ->selectRaw('DISTINCT CAST(number AS UNSIGNED) as number') 
-            ->orderByRaw('CAST(number AS UNSIGNED)') 
-            ->get();
-        $publications = Publication::whereRaw('CAST(year AS UNSIGNED) = ?', [$year])
-            ->select('*') 
-            ->orderByRaw('CAST(number AS UNSIGNED)') 
-            ->orderBy('title') 
+{   
+        $yearInt = (int)$year;
+        $issues = Issue::query()
+            ->where('year', $yearInt)
+            ->orderByRaw('(number = 0) ASC') // 0 (unknown) na koniec
+            ->orderBy('number')
+            ->get(['id','year','volume','number','pdf_path','published_at']);  
+        $issueIds = $issues->pluck('id');
+        $publications = Publication::query()
+            ->whereIn('issue_id', $issueIds)
             ->with('authors')
+            ->with('issue:id,year,volume,number')
+            ->orderByRaw('CAST(firstpage AS UNSIGNED) ASC')
+            ->orderBy('title')
             ->get();
-    
         return Inertia::render('YearPage', [
-            'year' => $year,
+            'year' => $yearInt,
             'issues' => $issues,
             'publications' => $publications,
         ]);
-    }
+}
     
     public function showIssue($year, $number)
-    {
-        $publications = Publication::where('year', $year)
-        ->where('number', $number)
-        ->with('authors')
-        ->get();
+{
+        $issue = Issue::query()
+            ->where('year', (int)$year)
+            ->where('number', (int)$number)
+            ->firstOrFail();
+        $publications = Publication::query()
+            ->where('issue_id', $issue->id)
+            ->with('authors')
+            ->orderByRaw('CAST(firstpage AS UNSIGNED) ASC')
+            ->orderBy('title')
+            ->get();
         return Inertia::render('IssuePage', [
-            'year' => $year,
-            'number' => $number,
-            'publications' => $publications
+            'issue' => $issue,
+            'publications' => $publications,
         ]);
-    }
-    
-    
-    
-    
-    
-    
-
+}
 }

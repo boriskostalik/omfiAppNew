@@ -13,10 +13,9 @@ const bottomLine = computed(() => {
   if (props.year) parts.push(`Rok ${props.year}`);
   return parts.join(" • ");
 });
-const go = () => {
-  if (!props.issue?.hasPublication) return;
-  router.get(`/publications/${props.year}/${props.issue.number}`);
-};
+
+const go=(id)=>router.get(route('archive.issue',id))
+
 </script>
 <template>
   <button

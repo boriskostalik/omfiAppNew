@@ -4,65 +4,88 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Publication;
+use App\Models\Author;
+use App\Models\Issue;
 use Illuminate\Http\Request;
 use App\Http\Requests\PublicationRequest;
-use App\Models\Author;
 use Illuminate\Support\Facades\Auth;
 
 class PublicationController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
-        $search = $request->input('search');
-        $year = $request->input('year');
-        $number = $request->input('number');
+        $perPage   = (int) $request->input('per_page', 10);
+        $search    = $request->input('search');
+        $year      = $request->input('year');      // string z query
+        $number    = $request->input('number');    // string z query (0..4)
         $institute = $request->input('institute');
-        $authorId = $request->input('author_id');
-        $sortKey = $request->input('sortKey', 'title_asc');
+        $authorId  = $request->input('author_id');
+        $sortKey   = $request->input('sortKey', 'title_asc');
 
-        $query = Publication::query();
+        $query = Publication::query()
+            ->with(['authors', 'issue']);
 
+        // SEARCH
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('authors', function ($q) use ($search) {
-                        $q->where('firstname', 'like', "%{$search}%")
-                            ->orWhere('surname', 'like', "%{$search}%");
-                    });
+                  ->orWhereHas('authors', function ($qa) use ($search) {
+                      $qa->where('firstname', 'like', "%{$search}%")
+                         ->orWhere('surname', 'like', "%{$search}%");
+                  });
             });
         }
 
-        if ($year) {
-            $query->where('year', $year);
+        // FILTER: year cez issue
+        if ($year !== null && $year !== '') {
+            $query->whereHas('issue', fn ($qi) => $qi->where('year', (int) $year));
         }
 
-        if ($number) {
-            $query->where('number', $number);
+        // FILTER: number cez issue
+        if ($number !== null && $number !== '') {
+            $query->whereHas('issue', fn ($qi) => $qi->where('number', (int) $number));
         }
 
+        // FILTER: institute cez authors
         if ($institute) {
-            $query->whereHas('authors', function ($q) use ($institute) {
-                $q->whereRaw('TRIM(authors.institute) = ?', [trim($institute)]);
+            $query->whereHas('authors', function ($qa) use ($institute) {
+                $qa->whereRaw('TRIM(authors.institute) = ?', [trim($institute)]);
             });
         }
 
+        // FILTER: author_id
         if ($authorId) {
-            $query->whereHas('authors', function ($q) use ($authorId) {
-                $q->where('authors.id', $authorId);
+            $query->whereHas('authors', function ($qa) use ($authorId) {
+                $qa->where('authors.id', $authorId);
             });
+        }
+
+        // SORT
+        // Pri sortovaní podľa year potrebujeme join na issues
+        if (in_array($sortKey, ['year_asc', 'year_desc'], true)) {
+            $query->leftJoin('issues', 'issues.id', '=', 'publications.issue_id')
+                  ->select('publications.*');
         }
 
         switch ($sortKey) {
             case 'title_desc':
                 $query->orderBy('title', 'desc');
                 break;
+
             case 'year_asc':
-                $query->orderBy('year', 'asc');
+                $query->orderBy('issues.year', 'asc')
+                      ->orderByRaw('(issues.number = 0) ASC') // 0 (unknown) na koniec
+                      ->orderBy('issues.number', 'asc')
+                      ->orderBy('title', 'asc');
                 break;
+
             case 'year_desc':
-                $query->orderBy('year', 'desc');
+                $query->orderBy('issues.year', 'desc')
+                      ->orderByRaw('(issues.number = 0) ASC') // 0 (unknown) na koniec
+                      ->orderBy('issues.number', 'desc')
+                      ->orderBy('title', 'asc');
                 break;
+
             case 'title_asc':
             default:
                 $sortKey = 'title_asc';
@@ -70,27 +93,26 @@ class PublicationController extends Controller
                 break;
         }
 
-        $publications = $query->with('authors')->paginate($perPage);
-
-        $years = Publication::query()
+$publications = $query->paginate($perPage)->appends($request->query());
+        // OPTIONS: years z issues
+        $years = Issue::query()
             ->select('year')
-            ->whereNotNull('year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        $numbersQuery = Publication::query()
-            ->selectRaw("TRIM(number) as number")
-            ->whereNotNull('number')
-            ->whereRaw("TRIM(number) <> ''");
+        // OPTIONS: numbers z issues (nefiltrujeme prázdne, lebo máme 0)
+        $numbersQuery = Issue::query()
+            ->select('number')
+            ->distinct();
 
-        if ($year) {
-            $numbersQuery->where('year', $year);
+        if ($year !== null && $year !== '') {
+            $numbersQuery->where('year', (int) $year);
         }
 
         $numbers = $numbersQuery
-            ->distinct()
-            ->orderByRaw("CAST(TRIM(number) AS UNSIGNED) ASC")
+            ->orderByRaw('(number = 0) ASC') // 0 na koniec
+            ->orderBy('number', 'asc')
             ->pluck('number');
 
         $institutes = Author::query()
@@ -134,9 +156,12 @@ class PublicationController extends Controller
 
     public function detail($id)
     {
-        $publication = Publication::with(['authors' => function ($query) {
-            $query->orderBy('firstname', 'desc');
-        }])->findOrFail($id);
+        $publication = Publication::with([
+            'issue',
+            'authors' => function ($query) {
+                $query->orderBy('firstname', 'desc');
+            },
+        ])->findOrFail($id);
 
         return Inertia::render('PublicationDetailPage', [
             'publication' => $publication,
@@ -145,37 +170,58 @@ class PublicationController extends Controller
 
     public function indexDashboard(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
-        $search = $request->input('search');
-        $sortField = $request->input('sortField', 'title');
-        $sortOrder = $request->input('sortOrder', 'asc');
-        $filters = $request->only(['title', 'type', 'year', 'journal']);
-        $query = Publication::query()->with('authors');
+        $perPage   = (int) $request->input('per_page', 10);
+        $search    = $request->input('search');
+        $sortField = $request->input('sortField', 'title'); 
+        $sortOrder = $request->input('sortOrder', 'asc');  
+        $filters = $request->only(['title', 'type', 'year', 'number']);
+
+        $query = Publication::query()->with(['authors', 'issue']);
         $authors = Author::query();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('year', 'like', "%{$search}%")
-                    ->orWhereHas('authors', function ($q) use ($search) {
-                        $q->where('firstname', 'like', "%{$search}%")
-                            ->orWhere('surname', 'like', "%{$search}%");
-                    });
+                  ->orWhereHas('issue', fn ($qi) => $qi->where('year', 'like', "%{$search}%"))
+                  ->orWhereHas('authors', function ($qa) use ($search) {
+                      $qa->where('firstname', 'like', "%{$search}%")
+                         ->orWhere('surname', 'like', "%{$search}%");
+                  });
             });
         }
 
-        foreach ($filters as $field => $value) {
-            if ($value) {
-                $query->where($field, 'like', "%{$value}%");
-            }
+        if (!empty($filters['title'])) {
+            $query->where('title', 'like', "%{$filters['title']}%");
         }
 
-        if (in_array($sortField, ['title', 'type', 'year', 'journal'], true)) {
-            $query->orderBy($sortField, $sortOrder === 'desc' ? 'desc' : 'asc');
+        if (!empty($filters['type'])) {
+            $query->where('type', 'like', "%{$filters['type']}%");
         }
 
-        $publications = $query->paginate($perPage);
+        if (!empty($filters['year'])) {
+            $query->whereHas('issue', fn ($qi) => $qi->where('year', (int)$filters['year']));
+        }
 
+        if (isset($filters['number']) && $filters['number'] !== '') {
+            $query->whereHas('issue', fn ($qi) => $qi->where('number', (int)$filters['number']));
+        }
+
+        $sortOrder = $sortOrder === 'desc' ? 'desc' : 'asc';
+
+        if ($sortField === 'year') {
+            $query->leftJoin('issues', 'issues.id', '=', 'publications.issue_id')
+                  ->select('publications.*')
+                  ->orderBy('issues.year', $sortOrder)
+                  ->orderByRaw('(issues.number = 0) ASC')
+                  ->orderBy('issues.number', $sortOrder);
+        } elseif (in_array($sortField, ['title', 'type'], true)) {
+            $query->orderBy($sortField, $sortOrder);
+        } else {
+            $sortField = 'title';
+            $query->orderBy('title', 'asc');
+        }
+
+$publications = $query->paginate($perPage)->appends($request->query());
         return Inertia::render('Dashboard/Publications', [
             'publications' => $publications,
             'per_page' => $perPage,
@@ -192,6 +238,7 @@ class PublicationController extends Controller
     {
         $data = $request->validated();
         $publication = Publication::create($data);
+
         if ($request->has('authors') && is_array($request->authors)) {
             $authorsData = [];
 
@@ -200,7 +247,7 @@ class PublicationController extends Controller
 
                 $authorsData[$authorId] = [
                     'rank' => 1,
-                    'is_editor' => $author['is_editor'] ?? 'N'
+                    'is_editor' => $author['is_editor'] ?? 'N',
                 ];
             }
 
@@ -213,7 +260,6 @@ class PublicationController extends Controller
     public function update(PublicationRequest $request, Publication $publication)
     {
         $data = $request->validated();
-
         $publication->update($data);
 
         if ($request->has('authors') && is_array($request->authors)) {
@@ -224,7 +270,7 @@ class PublicationController extends Controller
 
                 $authorsData[$authorId] = [
                     'rank' => 1,
-                    'is_editor' => $author['is_editor'] ?? 'N'
+                    'is_editor' => $author['is_editor'] ?? 'N',
                 ];
             }
 
@@ -237,7 +283,6 @@ class PublicationController extends Controller
     public function destroy(Publication $publication)
     {
         $publication->delete();
-
         return redirect()->route('publications.dashboard');
     }
 }
