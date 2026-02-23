@@ -1,55 +1,46 @@
 <script setup>
-import { computed } from "vue";
-import { router } from "@inertiajs/vue3";
+import { router } from '@inertiajs/vue3'
+
 const props = defineProps({
-  year: { type: [String, Number], required: true },
-  issue: { type: Object, required: true }, 
-  imageUrl: { type: String, default: "/images/hero-omfi.jpg" },
-});
-const bottomLine = computed(() => {
-  const parts = [];
-  if (props.issue?.volume) parts.push(`Volume ${props.issue.volume}`);
-  if (props.issue?.number) parts.push(`Číslo ${props.issue.number}`);
-  if (props.year) parts.push(`Rok ${props.year}`);
-  return parts.join(" • ");
-});
+	year: { type: [String, Number], required: true },
+	issue: { type: Object, required: true },
+	imageUrl: { type: String, default: '/images/hero-omfi.jpg' },
+})
 
-const go=(id)=>router.get(route('archive.issue',id))
-
+const go = () => {
+	if (!props.issue?.hasPublication) return
+	const issueId = props.issue?.id ?? props.issue?.issue_id
+	if (!issueId) return
+	router.get(route('archive.issue', issueId))
+}
 </script>
+
 <template>
-  <button
-    type="button"
-    @click="go"
-    class="group w-full text-left"
-    :disabled="!issue.hasPublication"
-  >
-    <div
-      class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition
-             group-hover:-translate-y-0.5 group-hover:shadow-xl"
-      :class="!issue.hasPublication ? 'opacity-30 cursor-not-allowed group-hover:translate-y-0' : ''"
-    >
-      <div
-        class="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.04]"
-        :style="{ backgroundImage: `url('${imageUrl}')` }"
-      ></div>
-      <div class="absolute left-6 right-6 top-6">
-        <div class="[font-family:'Poppins',sans-serif] text-[13px] font-semibold tracking-wide text-black drop-shadow">
-          {{ props.year }}/{{ props.issue.number }}
-        </div>
-        <div class="mt-2 [font-family:'Poppins',sans-serif] text-[30px] leading-[1.05] font-semibold text-black drop-shadow">
-          OMFI
-        </div>
-      </div>
-      <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/40 to-transparent"></div>
-      <div class="absolute left-6 right-6 bottom-6">
-        <div class="[font-family:'Poppins',sans-serif] text-[14px] font-semibold text-white drop-shadow">
-          {{ bottomLine }}
-        </div>
-        <div v-if="!issue.hasPublication" class="mt-1 text-xs text-white/80">
-          Bez publikácií
-        </div>
-      </div>
-    </div>
-  </button>
+	<button type="button" @click="go" class="group w-full text-left" :disabled="!issue.hasPublication">
+		<div
+			class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 group-hover:shadow-xl"
+			:class="!issue.hasPublication ? 'opacity-30 cursor-not-allowed' : ''"
+		>
+			<div
+				class="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.04]"
+				:style="{ backgroundImage: `url('${imageUrl}')` }"
+			></div>
+
+			<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+			<div class="absolute inset-0 flex flex-col justify-between p-[8%]">
+				<div class="text-[clamp(1.5rem,7cqi,3rem)] font-semibold tracking-wide text-[#1E4E8C] drop-shadow" >
+          {{ year }} / {{ issue.number ?? '—' }}
+        </div>  
+				<div>
+					<div class="text-[clamp(1.2rem,8cqi,3rem)] font-bold text-white drop-shadow leading-none">
+						OMFI
+					</div>
+					<div v-if="!issue.hasPublication" class="text-[clamp(0.5rem,2cqi,0.75rem)] text-white/70 mt-1">
+						Bez publikácií
+					</div>
+				</div>
+			</div>
+		</div>
+	</button>
 </template>

@@ -30,60 +30,74 @@ const items = computed(() =>
 	}))
 )
 </script>
+
 <template>
 	<div class="max-w-4xl mx-auto px-4 py-10">
-		<div class="relative mb-12">
-			<div class="h-[160px] w-full bg-center bg-cover rounded-lg" style="background-image:url('/images/hero-omfi2.jpg')"></div>
-			<div class="absolute inset-0 flex items-center justify-center">
-				<div class="bg-white/90 px-10 py-4 rounded-md shadow-sm">
-					<h1 class="text-4xl sm:text-5xl font-normal text-black tracking-wide">Archív</h1>
-				</div>
-			</div>
+
+		<!-- HEADER -->
+		<div class="mb-12 border-b border-gray-200 pb-8">
+			<p class="text-xs uppercase tracking-widest text-gray-400 mb-2 font-semibold">Onomastica Finska</p>
+			<h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-3">Archív</h1>
+			<p class="text-gray-500 text-sm max-w-lg">
+				Prehľad všetkých vydaní časopisu OMFI. Vyberte ročník a číslo pre zobrazenie obsahu.
+			</p>
 		</div>
+
+		<!-- MOBILE: PanelMenu -->
 		<div class="md:hidden archive-panelmenu">
-			<PanelMenu :model="items">
+			<PanelMenu :model="items" :multiple="true">
 				<template #item="{ item }">
 					<div v-if="item.items" class="w-full">
-						<div class="w-full bg-[#1E4E8C] text-white font-bold flex items-center justify-center h-16">
-							<span class="text-3xl leading-none">{{ item.label }}</span>
+						<div class="w-full bg-[#1E4E8C] text-white font-bold flex items-center justify-between px-5 h-14">
+							<span class="text-lg tracking-wide">{{ item.label }}</span>
+							<span class="text-xs font-normal opacity-60 uppercase tracking-widest">Ročník</span>
 						</div>
 					</div>
 					<button
 						v-else
 						type="button"
 						@click="goIssue(item.id)"
-						class="w-full bg-white hover:bg-slate-50 transition flex flex-col items-center justify-center text-center border-t border-slate-300"
-						style="height:64px;"
+						class="w-full bg-white hover:bg-slate-50 transition flex items-center justify-between px-5 border-t border-slate-100"
+						style="height: 56px;"
 					>
-						<div class="text-2xl font-semibold text-black leading-none">{{ item.label }}</div>
-						<div v-if="item.volume" class="mt-1 text-sm text-slate-500 leading-none">Volume {{ item.volume }}</div>
+						<span class="text-base font-semibold text-gray-800">{{ item.label }}</span>
+						<span v-if="item.volume" class="text-xs text-slate-400">Vol. {{ item.volume }}</span>
 					</button>
 				</template>
 			</PanelMenu>
 		</div>
-		<div class="mt-8 space-y-4 hidden md:block">
-			<div v-for="y in props.years" :key="`d-${y}`" class="w-full">
-				<div class="flex items-stretch gap-0">
-					<div class="bg-[#1E4E8C] text-white font-bold flex items-center justify-center px-5" style="height:56px; min-width:100px;">
-						<span class="text-2xl leading-none">{{ y }}</span>
-					</div>
-					<div class="flex-1 overflow-x-auto">
-						<div class="inline-flex">
-							<button
-								v-for="cell in rowCells(y)"
-								:key="cell.iss.id"
-								type="button"
-								@click="goIssue(cell.iss.id)"
-								class="border border-slate-400 bg-white hover:bg-slate-50 transition px-5 flex items-center justify-center text-black"
-								style="height:56px; min-width:140px;"
-							>
-								<span class="text-2xl leading-none">{{ issueLabel(y, cell.iss) }}</span>
-							</button>
-						</div>
+
+		<!-- DESKTOP: tabuľka rokov -->
+		<div class="hidden md:block space-y-px">
+			<div
+				v-for="y in props.years"
+				:key="`d-${y}`"
+				class="flex items-stretch"
+			>
+				<!-- Rok -->
+				<div class="bg-[#1E4E8C] text-white font-bold flex items-center justify-center shrink-0" style="width: 90px; min-height: 52px;">
+					<span class="text-lg tracking-wide">{{ y }}</span>
+				</div>
+
+				<!-- Čísla -->
+				<div class="flex-1 border-t border-b border-r border-gray-200 overflow-x-auto">
+					<div class="inline-flex h-full">
+						<button
+							v-for="cell in rowCells(y)"
+							:key="cell.iss.id"
+							type="button"
+							@click="goIssue(cell.iss.id)"
+							class="border-r border-gray-200 last:border-r-0 bg-white hover:bg-slate-50 transition px-6 flex flex-col items-center justify-center text-gray-800 gap-0.5"
+							style="min-width: 120px; min-height: 52px;"
+						>
+							<span class="text-sm font-semibold">{{ issueLabel(y, cell.iss) }}</span>
+							<span v-if="cell.iss.volume" class="text-[11px] text-gray-400">Vol. {{ cell.iss.volume }}</span>
+						</button>
 					</div>
 				</div>
 			</div>
 		</div>
+
 	</div>
 </template>
 

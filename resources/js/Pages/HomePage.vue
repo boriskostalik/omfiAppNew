@@ -1,5 +1,4 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
 import IssueCoverCard from '@/Components/IssueCoverCard.vue'
 
 const props = defineProps({
@@ -9,8 +8,6 @@ const props = defineProps({
 </script>
 
 <template>
-  <!-- HERO -->
-  <!-- HERO -->
 <div
   class="relative h-[420px] w-full bg-center bg-cover overflow-hidden"
   style="background-image: url('/images/hero-omfi.jpg')"
@@ -37,23 +34,19 @@ const props = defineProps({
       <aside class="lg:col-span-4 order-1 lg:order-2 mx-auto max-w-sm text-center lg:text-left lg:mx-0 lg:max-w-none">
         <div class="flex items-end justify-center lg:justify-between gap-4">
           <div>
-            <div class="text-sm font-semibold tracking-widest uppercase text-slate-900">
+            <div class="text-2xl font-semibold tracking-widest uppercase text-slate-900">
               Aktuálne vydanie
             </div>
 
-            <div class="mt-1 text-sm text-slate-600">
-              <span v-if="props.latest">{{ props.latest.year }}/{{ props.latest.number }}</span>
-              <span v-else>—</span>
-              <span v-if="props.latest?.volume"> • Volume {{ props.latest.volume }}</span>
-            </div>
+            
           </div>
         </div>
 
-        <div class="mt-5">
+        <div class="mt-7">
           <IssueCoverCard
             v-if="props.latest"
             :year="props.latest.year"
-            :issue="{ number: props.latest.number, volume: props.latest.volume, hasPublication: true }"
+            :issue="{ id: props.latest.id,number: props.latest.number, volume: props.latest.volume, hasPublication: true }"
             image-url="/images/hero-omfi2.jpg"
           />
         </div>

@@ -51,11 +51,7 @@ const goToPublication = (id) => {
           Neznámi autori
         </span>
       </div>
-      <div class="flex flex-wrap gap-4 text-sm text-gray-600">
-        <span><strong>Rok:</strong> {{ publication.year }}</span>
-        <span>
-          <strong>Vydanie:</strong> {{ publication.number }}
-        </span>
+      <div class="flex flex-wrap gap-4 text-lg text-gray-600">
         <span v-if="publication.firstpage && publication.lastpage">
           <strong>Strany:</strong> {{ publication.firstpage }}–{{ publication.lastpage }}
         </span>
