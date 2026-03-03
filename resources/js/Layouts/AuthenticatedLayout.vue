@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
-import Menu from 'primevue/menu'
+import { Link } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
 
@@ -11,27 +10,17 @@ const navItems = [
     { label: 'Issues', route: 'issues.dashboard', icon: 'pi pi-folder' },
 ]
 
-const menu = ref()
 const mobileOpen = ref(false)
-const menuItems = ref([
-    {
-        label: 'Odhlásiť',
-        icon: 'pi pi-sign-out',
-        command: () => router.post(route('logout'))
-    },
-])
-const toggleMenu = (event) => menu.value.toggle(event)
 </script>
 
 <template>
     <div class="flex min-h-screen bg-gray-100">
-
-        <!-- SIDEBAR desktop -->
         <div class="hidden md:flex flex-col bg-[#1E4E8C] text-white w-72 shrink-0 sticky top-0 h-screen">
             <div class="px-6 py-6 border-b border-white/10">
                 <span class="font-bold text-2xl tracking-wide">OMFI</span>
                 <p class="text-sm text-white/40 mt-1">Administrácia</p>
             </div>
+
             <nav class="flex-1 py-4 flex flex-col gap-1">
                 <Link
                     v-for="item in navItems"
@@ -43,6 +32,7 @@ const toggleMenu = (event) => menu.value.toggle(event)
                     <i :class="[item.icon, 'text-lg']"></i>
                     {{ item.label }}
                 </Link>
+
                 <Link
                     v-if="$page.props.auth.user.role === 'admin'"
                     :href="route('users.dashboard')"
@@ -53,6 +43,7 @@ const toggleMenu = (event) => menu.value.toggle(event)
                     Users
                 </Link>
             </nav>
+
             <div class="border-t border-white/10 px-6 py-5">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -84,26 +75,23 @@ const toggleMenu = (event) => menu.value.toggle(event)
             </div>
         </div>
 
-        <!-- MAIN -->
         <div class="flex-1 flex flex-col min-w-0">
-
-            <!-- Top bar -->
-            <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 justify-between shrink-0">
+            <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 shrink-0">
                 <div class="flex items-center gap-3">
-                    <!-- Hamburger len na mobile -->
                     <Button
                         icon="pi pi-bars"
                         text
                         class="!flex md:!hidden !text-gray-600"
                         @click="mobileOpen = true"
                     />
-                    <Link :href="route('home')" class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1">
+                    <Link
+                        :href="route('home')"
+                        class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1"
+                    >
                         <i class="pi pi-arrow-left text-xs"></i>
                         Späť na web
                     </Link>
                 </div>
-
-
             </header>
 
             <main class="flex-1 overflow-y-auto p-6">
@@ -111,11 +99,15 @@ const toggleMenu = (event) => menu.value.toggle(event)
             </main>
         </div>
 
-        <!-- MOBILE Drawer -->
-        <Drawer v-model:visible="mobileOpen" position="left" :style="{ width: '280px', background: '#1E4E8C' }">
+        <Drawer
+            v-model:visible="mobileOpen"
+            position="left"
+            :style="{ width: '280px', background: '#1E4E8C' }"
+        >
             <template #header>
                 <span class="font-bold text-xl text-white tracking-wide">OMFI</span>
             </template>
+
             <nav class="flex flex-col gap-1 mt-2">
                 <Link
                     v-for="item in navItems"
@@ -128,6 +120,7 @@ const toggleMenu = (event) => menu.value.toggle(event)
                     <i :class="[item.icon, 'text-lg']"></i>
                     {{ item.label }}
                 </Link>
+
                 <Link
                     v-if="$page.props.auth.user.role === 'admin'"
                     :href="route('users.dashboard')"

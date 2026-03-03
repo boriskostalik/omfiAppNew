@@ -1,166 +1,111 @@
-<template>
-    <div>
-        <div class="max-w-6xl mx-auto p-6">
-            <Header title="Authors" has-search @search="query => submitSearch(query)" />
-        </div>
-      <DataTable
-        v-model:filters="filters"
-        :value="authors.data"
-        :sortField="sortField"
-        :sortOrder="sortOrder"
-        filterDisplay="menu"
-        selectionMode="single"
-        dataKey="id"
-        tableStyle="min-width: 60rem"
-        @sort="onSort"
-      >
-        <Column field="firstname" header="First Name" sortable style="width: 25%">
-          <template #body="{ data }">
-            {{ data.firstname }}
-          </template>
-        </Column>
-  
-        <Column field="surname" header="Last Name" sortable style="width: 25%">
-          <template #body="{ data }">
-            {{ data.surname }}
-          </template>
-        </Column>
-  
-        <Column header="Publications" style="width: 35%">
-          <template #body="{ data }">
-            <div v-if="data.publications?.length" class="max-h-32 overflow-hidden truncate max-w-96">
-              {{ data.publications.map(p => p.title).join(', ') }}
-            </div>
-            <span v-else>No publications</span>
-          </template>
-        </Column>
-
-        <Column class="w-24 !text-end">
-          <template #header>
-            <Button @click="isModalVisible = true">Pridať</Button>
-          </template>
-          <template #body="{ data }">
-            <div class="flex gap-2">
-            <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded></Button>
-            <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="secondary" rounded></Button>
-          </div>
-        </template>
-    </Column>
-  
-        <template #empty>
-          No authors found.
-        </template>
-  
-      </DataTable>
-      <Paginator
-        v-if="authors.next_page_url || authors.prev_page_url"
-        :rows="perPage"
-        :totalRecords="authors.total"
-        :rowsPerPageOptions="[10, 20, 30]"
-        :first="(currentPage - 1) * perPage"
-        @page="changePage"
-      />
-    </div>
-    <AuthorForm 
-      :author="authorToEdit" 
-      :visible="isModalVisible"
-      @close="closeModal()"
-    />
-  </template>
-  
 <script setup>
-import { reactive, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { DataTable, Column, Paginator, Button } from 'primevue';
-import Header from '@/Components/Header.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import AuthorForm from '@/Pages/Dashboard/AuthorForm.vue';
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { DataTable, Column, Paginator, Button, InputText } from 'primevue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AuthorForm from '@/Pages/Dashboard/AuthorForm.vue'
 
-defineOptions({
-    layout: AuthenticatedLayout,
-});
+defineOptions({ layout: AuthenticatedLayout })
 
 const props = defineProps({
-  authors: Object,
-  filters: Object,
-  sortField: String,
-  sortOrder: String,
-});
+    authors: Object,
+    search: String,
+})
 
-const filters = ref({
-  firstname: { value: props.filters?.firstname || null },
-  lastname: { value: props.filters?.lastname || null },
-  year: { value: props.filters?.year || null },
-});
+const searchQuery = ref(props.search || '')
+const isModalVisible = ref(false)
+const authorToEdit = ref(null)
+const currentPage = ref(props.authors.current_page || 1)
+const perPage = ref(Number(props.authors.per_page) || 10)
 
-const currentPage = ref(props.authors.current_page || 1);
-const perPage = ref(Number(props.authors.per_page) || 10);
-const sortField = ref(props.sortField || 'firstname');
-const sortOrder = ref(props.sortOrder === 'desc' ? -1 : 1);
+const submitSearch = () => {
+    router.get(route('authors.dashboard'), { page: 1, search: searchQuery.value })
+}
 
-
-const isModalVisible = ref(false);
-const authorToEdit = ref(null);
-
-const cleanParams = (params) => {
-  return Object.fromEntries(
-      Object.entries(params).filter(([_, value]) => value != null && value !== '')
-  );
-};
 const changePage = (val) => {
-  currentPage.value = val.page + 1;
-  perPage.value = val.rows;
-  router.get(route('authors.dashboard'), {
-      page: currentPage.value,
-      per_page: perPage.value,
-  });
-};
-
-const syncParams = () => {
-  return cleanParams({
-      page: currentPage.value,
-      per_page: perPage.value,
-      sortField: sortField.value,
-      sortOrder: sortOrder.value === 1 ? 'asc' : 'desc',
-      firstname: filters.value.firstname?.value,
-      lastname: filters.value.lastname?.value,
-  });
-};
-
-const submitSearch = (query) => {
-  router.get(route('authors.dashboard'), {
-      page: 1,
-      search: query,
-  });
-};
-
-const onSort = (event) => {
-  sortField.value = event.sortField;
-  sortOrder.value = event.sortOrder;
-  router.get(route('authors.dashboard'), syncParams());
-};
+    currentPage.value = val.page + 1
+    perPage.value = val.rows
+    router.get(route('authors.dashboard'), {
+        page: currentPage.value,
+        per_page: perPage.value,
+        search: searchQuery.value,
+    })
+}
 
 const closeModal = () => {
-  isModalVisible.value = false;
-  authorToEdit.value = null;
-};
+    isModalVisible.value = false
+    authorToEdit.value = null
+}
 
 const onRowEdit = (id) => {
-  isModalVisible.value = true;
-  authorToEdit.value = props.authors.data.find((p) => p.id === id);
-};
+    authorToEdit.value = props.authors.data.find((a) => a.id === id)
+    isModalVisible.value = true
+}
 
 const onRowDelete = (id) => {
-  if (confirm('Are you sure?')) {
-      router.delete(`/dashboard/authors/${id}`);
-  }
-};
-
+    if (confirm('Naozaj vymazať autora?')) {
+        router.delete(`/dashboard/authors/${id}`)
+    }
+}
 </script>
 
-<style scoped>
-input {
-display: block;
-}
-</style>
-  
+<template>
+    <div class="max-w-5xl mx-auto p-6">
+
+        <!-- Hlavička -->
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Autori</h1>
+            <Button label="Pridať autora" icon="pi pi-plus" @click="isModalVisible = true" />
+        </div>
+
+        <!-- Vyhľadávanie -->
+        <div class="mb-4 flex gap-2">
+            <InputText
+                v-model="searchQuery"
+                placeholder="Hľadať podľa mena..."
+                class="w-full max-w-sm"
+                @keyup.enter="submitSearch"
+            />
+            <Button label="Hľadať" icon="pi pi-search" @click="submitSearch" />
+        </div>
+
+        <!-- Tabuľka -->
+        <DataTable
+            :value="authors.data"
+            dataKey="id"
+            stripedRows
+        >
+            <Column field="firstname" header="Meno" sortable />
+            <Column field="surname" header="Priezvisko" sortable />
+            <Column field="institute" header="Inštitúcia" />
+            <Column header="" style="width: 100px;">
+                <template #body="{ data }">
+                    <div class="flex gap-2 justify-end">
+                        <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded text />
+                        <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="danger" rounded text />
+                    </div>
+                </template>
+            </Column>
+            <template #empty>
+                <p class="text-center text-gray-400 py-6">Žiadni autori nenájdení.</p>
+            </template>
+        </DataTable>
+
+        <!-- Paginator -->
+        <Paginator
+            v-if="authors.total > perPage"
+            :rows="perPage"
+            :totalRecords="authors.total"
+            :rowsPerPageOptions="[10, 20, 50]"
+            :first="(currentPage - 1) * perPage"
+            class="mt-4"
+            @page="changePage"
+        />
+    </div>
+
+    <AuthorForm
+        :author="authorToEdit"
+        :visible="isModalVisible"
+        @close="closeModal"
+    />
+</template>
