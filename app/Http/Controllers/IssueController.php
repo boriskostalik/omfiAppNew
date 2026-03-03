@@ -22,7 +22,6 @@ class IssueController extends Controller
             'issues' => $issues,
         ]);
     }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -32,12 +31,10 @@ class IssueController extends Controller
             'published_at' => 'nullable|date',
             'pdf'          => 'nullable|file|mimes:pdf|max:20480',
         ]);
-
         $pdfPath = null;
         if ($request->hasFile('pdf')) {
             $pdfPath = $request->file('pdf')->store('pdfs', 'public');
         }
-
         Issue::create([
             'year'         => (int) $data['year'],
             'volume'       => $data['volume'] ?? null,
@@ -48,7 +45,6 @@ class IssueController extends Controller
 
         return redirect()->route('issues.dashboard')->with('success', 'Issue vytvorené.');
     }
-
     public function update(Request $request, Issue $issue)
     {
         $data = $request->validate([
@@ -59,14 +55,10 @@ class IssueController extends Controller
             'pdf'          => 'nullable|file|mimes:pdf|max:20480',
             'remove_pdf'   => 'nullable|string',
         ]);
-
-        // Odstránenie PDF
         if ($request->input('remove_pdf') === 'true' && $issue->pdf_path) {
             Storage::disk('public')->delete($issue->pdf_path);
             $issue->pdf_path = null;
         }
-
-        // Nahratie nového PDF
         if ($request->hasFile('pdf')) {
             if ($issue->pdf_path) {
                 Storage::disk('public')->delete($issue->pdf_path);
@@ -84,15 +76,12 @@ class IssueController extends Controller
 
         return redirect()->route('issues.dashboard')->with('success', 'Issue aktualizované.');
     }
-
     public function destroy(Issue $issue)
     {
         if ($issue->pdf_path) {
             Storage::disk('public')->delete($issue->pdf_path);
         }
-
         $issue->delete();
-
         return redirect()->route('issues.dashboard')->with('success', 'Issue vymazané.');
     }
 }

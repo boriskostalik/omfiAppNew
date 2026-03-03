@@ -16,16 +16,14 @@ class PublicationController extends Controller
     {
         $perPage   = (int) $request->input('per_page', 10);
         $search    = $request->input('search');
-        $year      = $request->input('year');      // string z query
-        $number    = $request->input('number');    // string z query (0..4)
+        $year      = $request->input('year');    
+        $number    = $request->input('number');    
         $institute = $request->input('institute');
         $authorId  = $request->input('author_id');
         $sortKey   = $request->input('sortKey', 'title_asc');
 
         $query = Publication::query()
             ->with(['authors', 'issue']);
-
-        // SEARCH
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -35,33 +33,23 @@ class PublicationController extends Controller
                   });
             });
         }
-
-        // FILTER: year cez issue
         if ($year !== null && $year !== '') {
             $query->whereHas('issue', fn ($qi) => $qi->where('year', (int) $year));
         }
 
-        // FILTER: number cez issue
         if ($number !== null && $number !== '') {
             $query->whereHas('issue', fn ($qi) => $qi->where('number', (int) $number));
         }
-
-        // FILTER: institute cez authors
         if ($institute) {
             $query->whereHas('authors', function ($qa) use ($institute) {
                 $qa->whereRaw('TRIM(authors.institute) = ?', [trim($institute)]);
             });
         }
-
-        // FILTER: author_id
         if ($authorId) {
             $query->whereHas('authors', function ($qa) use ($authorId) {
                 $qa->where('authors.id', $authorId);
             });
         }
-
-        // SORT
-        // Pri sortovaní podľa year potrebujeme join na issues
         if (in_array($sortKey, ['year_asc', 'year_desc'], true)) {
             $query->leftJoin('issues', 'issues.id', '=', 'publications.issue_id')
                   ->select('publications.*');
@@ -74,14 +62,14 @@ class PublicationController extends Controller
 
             case 'year_asc':
                 $query->orderBy('issues.year', 'asc')
-                      ->orderByRaw('(issues.number = 0) ASC') // 0 (unknown) na koniec
+                      ->orderByRaw('(issues.number = 0) ASC') 
                       ->orderBy('issues.number', 'asc')
                       ->orderBy('title', 'asc');
                 break;
 
             case 'year_desc':
                 $query->orderBy('issues.year', 'desc')
-                      ->orderByRaw('(issues.number = 0) ASC') // 0 (unknown) na koniec
+                      ->orderByRaw('(issues.number = 0) ASC') 
                       ->orderBy('issues.number', 'desc')
                       ->orderBy('title', 'asc');
                 break;
@@ -94,14 +82,11 @@ class PublicationController extends Controller
         }
 
 $publications = $query->paginate($perPage)->appends($request->query());
-        // OPTIONS: years z issues
         $years = Issue::query()
             ->select('year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
-
-        // OPTIONS: numbers z issues (nefiltrujeme prázdne, lebo máme 0)
         $numbersQuery = Issue::query()
             ->select('number')
             ->distinct();
@@ -111,7 +96,7 @@ $publications = $query->paginate($perPage)->appends($request->query());
         }
 
         $numbers = $numbersQuery
-            ->orderByRaw('(number = 0) ASC') // 0 na koniec
+            ->orderByRaw('(number = 0) ASC') 
             ->orderBy('number', 'asc')
             ->pluck('number');
 

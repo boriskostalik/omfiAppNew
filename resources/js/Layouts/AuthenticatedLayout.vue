@@ -1,232 +1,164 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+import Menu from 'primevue/menu'
+import Button from 'primevue/button'
+import Drawer from 'primevue/drawer'
 
-const showingNavigationDropdown = ref(false);
-defineProps({
-    auth: {
-        type: Object,
+const navItems = [
+    { label: 'Publikácie', route: 'publications.dashboard', icon: 'pi pi-book' },
+    { label: 'Autori', route: 'authors.dashboard', icon: 'pi pi-users' },
+    { label: 'Issues', route: 'issues.dashboard', icon: 'pi pi-folder' },
+]
+
+const menu = ref()
+const mobileOpen = ref(false)
+const menuItems = ref([
+    {
+        label: 'Odhlásiť',
+        icon: 'pi pi-sign-out',
+        command: () => router.post(route('logout'))
     },
-});
+])
+const toggleMenu = (event) => menu.value.toggle(event)
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-white"
-            >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('home')">
-                                   home
-                                </Link>
-                            </div>
+    <div class="flex min-h-screen bg-gray-100">
 
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('publications.dashboard')"
-                                    :active="route().current('publications.dashboard')"
-                                >
-                                    Publikácie
-                                </NavLink>
-                            </div>
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('authors.dashboard')"
-                                    :active="route().current('authors.dashboard')"
-                                >
-                                    Autori
-                                </NavLink>
-                            </div>
-                            <div
-                                v-if="$page.props.auth.user.role === 'admin'"
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('users.dashboard')"
-                                    :active="route().current('users.dashboard')"
-                                >
-                                    Users
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg
-                                                    class="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <DropdownLink
-                                            :href="route('profile.edit')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
+        <!-- SIDEBAR desktop -->
+        <div class="hidden md:flex flex-col bg-[#1E4E8C] text-white w-72 shrink-0 sticky top-0 h-screen">
+            <div class="px-6 py-6 border-b border-white/10">
+                <span class="font-bold text-2xl tracking-wide">OMFI</span>
+                <p class="text-sm text-white/40 mt-1">Administrácia</p>
+            </div>
+            <nav class="flex-1 py-4 flex flex-col gap-1">
+                <Link
+                    v-for="item in navItems"
+                    :key="item.route"
+                    :href="route(item.route)"
+                    class="flex items-center gap-4 px-6 py-3.5 text-base font-medium text-white/70 hover:text-white hover:bg-white/10 transition"
+                    :class="{ '!text-white !bg-white/20 border-l-4 border-white': route().current(item.route) }"
                 >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1 pt-4"
-                    >
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800"
-                            >
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
+                    <i :class="[item.icon, 'text-lg']"></i>
+                    {{ item.label }}
+                </Link>
+                <Link
+                    v-if="$page.props.auth.user.role === 'admin'"
+                    :href="route('users.dashboard')"
+                    class="flex items-center gap-4 px-6 py-3.5 text-base font-medium text-white/70 hover:text-white hover:bg-white/10 transition"
+                    :class="{ '!text-white !bg-white/20 border-l-4 border-white': route().current('users.dashboard') }"
+                >
+                    <i class="pi pi-shield text-lg"></i>
+                    Users
+                </Link>
             </nav>
-
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
+            <div class="border-t border-white/10 px-6 py-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i class="pi pi-user text-white text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-semibold text-white truncate">{{ $page.props.auth.user.name }}</p>
+                        <p class="text-xs text-white/40 truncate">{{ $page.props.auth.user.email }}</p>
+                    </div>
                 </div>
+                <div class="flex flex-col gap-1">
+                    <Link
+                        :href="route('profile.edit')"
+                        class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
+                    >
+                        <i class="pi pi-user-edit text-sm"></i>
+                        Profil
+                    </Link>
+                    <Link
+                        :href="route('logout')"
+                        method="post"
+                        as="button"
+                        class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
+                    >
+                        <i class="pi pi-sign-out text-sm"></i>
+                        Odhlásiť
+                    </Link>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 flex flex-col min-w-0">
+
+            <!-- Top bar -->
+            <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <!-- Hamburger len na mobile -->
+                    <Button
+                        icon="pi pi-bars"
+                        text
+                        class="!flex md:!hidden !text-gray-600"
+                        @click="mobileOpen = true"
+                    />
+                    <Link :href="route('home')" class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1">
+                        <i class="pi pi-arrow-left text-xs"></i>
+                        Späť na web
+                    </Link>
+                </div>
+
+
             </header>
 
-            <!-- Page Content -->
-            <main>
+            <main class="flex-1 overflow-y-auto p-6">
                 <slot />
             </main>
         </div>
+
+        <!-- MOBILE Drawer -->
+        <Drawer v-model:visible="mobileOpen" position="left" :style="{ width: '280px', background: '#1E4E8C' }">
+            <template #header>
+                <span class="font-bold text-xl text-white tracking-wide">OMFI</span>
+            </template>
+            <nav class="flex flex-col gap-1 mt-2">
+                <Link
+                    v-for="item in navItems"
+                    :key="item.route"
+                    :href="route(item.route)"
+                    @click="mobileOpen = false"
+                    class="flex items-center gap-4 px-4 py-3.5 text-base font-medium text-white/70 hover:text-white hover:bg-white/10 transition rounded"
+                    :class="{ '!text-white !bg-white/20': route().current(item.route) }"
+                >
+                    <i :class="[item.icon, 'text-lg']"></i>
+                    {{ item.label }}
+                </Link>
+                <Link
+                    v-if="$page.props.auth.user.role === 'admin'"
+                    :href="route('users.dashboard')"
+                    @click="mobileOpen = false"
+                    class="flex items-center gap-4 px-4 py-3.5 text-base font-medium text-white/70 hover:text-white hover:bg-white/10 transition rounded"
+                    :class="{ '!text-white !bg-white/20': route().current('users.dashboard') }"
+                >
+                    <i class="pi pi-shield text-lg"></i>
+                    Users
+                </Link>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 border-t border-white/10 px-5 py-5">
+                <p class="text-sm font-semibold text-white truncate">{{ $page.props.auth.user.name }}</p>
+                <p class="text-xs text-white/40 truncate mb-3">{{ $page.props.auth.user.email }}</p>
+                <Link
+                    :href="route('profile.edit')"
+                    class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
+                >
+                    <i class="pi pi-user-edit text-sm"></i>
+                    Profil
+                </Link>
+                <Link
+                    :href="route('logout')"
+                    method="post"
+                    as="button"
+                    class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
+                >
+                    <i class="pi pi-sign-out text-sm"></i>
+                    Odhlásiť
+                </Link>
+            </div>
+        </Drawer>
     </div>
 </template>

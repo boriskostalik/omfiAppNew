@@ -24,8 +24,21 @@ class ArchiveController extends Controller
     }
 
     public function showIssue(Issue $issue)
-    {
-        $publications=$issue->publications()->with('authors')->orderByRaw('CAST(firstpage AS UNSIGNED)ASC')->orderBy('title')->get();
-        return Inertia::render('IssuePage',['issue'=>$issue,'publications'=>$publications]);
-    }
+{
+    $publications = $issue->publications()
+        ->with('authors')
+        ->orderByRaw('CAST(firstpage AS UNSIGNED) ASC')
+        ->orderBy('title')
+        ->get();
+    return Inertia::render('IssuePage', [
+        'issue' => [
+            'id'           => $issue->id,
+            'year'         => $issue->year,
+            'volume'       => $issue->volume,
+            'number'       => $issue->number,
+            'pdf_path'     => $issue->pdf_path,
+        ],
+        'publications' => $publications,
+    ]);
+}
 }

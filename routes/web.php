@@ -8,13 +8,13 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArchiveController;
+use App\Http\Controllers\IssueController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('publications/detail/{id}', [PublicationController::class, 'detail'])->name('publications.detail');
 Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 Route::get('/archive/issue/{issue}', [ArchiveController::class, 'showIssue'])->name('archive.issue');
-Route::get('/archive/{year}', [ArchiveController::class, 'showYear'])->name('archive.year');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
 Route::get('/authors/{id}', [AuthorController::class, 'detail'])->name('authors.detail');
 Route::get('/about', [AboutController::class, 'index']);
@@ -23,6 +23,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/issues', [IssueController::class, 'index'])->name('issues.dashboard');
+    Route::post('/dashboard/issues', [IssueController::class, 'store'])->name('issues.store');
+    Route::put('/dashboard/issues/{issue}', [IssueController::class, 'update'])->name('issues.update');
+    Route::delete('/dashboard/issues/{issue}', [IssueController::class, 'destroy'])->name('issues.destroy');
     Route::get('/dashboard/publications', [PublicationController::class, 'indexDashboard'])->name('publications.dashboard');
     
     Route::post('/dashboard/publications', [PublicationController::class, 'store'])->name('publications.store');
