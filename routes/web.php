@@ -9,13 +9,13 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\IssueController;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::get('publications/detail/{id}', [PublicationController::class, 'detail'])->name('publications.detail');
 Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 Route::get('/archive/issue/{issue}', [ArchiveController::class, 'showIssue'])->name('archive.issue');
-Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
 Route::get('/authors/{id}', [AuthorController::class, 'detail'])->name('authors.detail');
 Route::get('/about', [AboutController::class, 'index']);
 Route::get('/dashboard', function () {
