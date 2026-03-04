@@ -1,8 +1,14 @@
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
+@layer tailwind-base, primevue, tailwind-utilities;
 
-@import "tailwindcss/utilities";
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
 
 
 
@@ -39,4 +45,23 @@
 }
 
 html { scrollbar-gutter: stable; }
+
+/* Underline Select */
+.select-underline,
+.select-underline:hover,
+.select-underline:focus,
+.select-underline:focus-within,
+.select-underline[data-p-focused="true"],
+.select-underline.p-select-open {
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+.select-underline .p-select-label {
+  padding-left: 0;
+}
 

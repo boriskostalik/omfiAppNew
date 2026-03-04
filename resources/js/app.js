@@ -14,8 +14,61 @@ import Material from '@primeuix/themes/material'
 import HomeLayout from './Layouts/HomeLayout.vue'
 
 const MyPreset = definePreset(Material, {
+  primitive: {
+    omfiBlue: {
+      50:  '#f0f4fb',
+      100: '#d9e5f5',
+      200: '#a8c5e8',
+      300: '#68a0d5',
+      400: '#2c70be',
+      500: '#1E4E8C',
+      600: '#184073',
+      700: '#13335c',
+      800: '#0e2544',
+      900: '#09182c',
+      950: '#05101c',
+    },
+    omfiRed: {
+      50:  '#fef2f2',
+      100: '#fee2e2',
+      200: '#fecaca',
+      300: '#fca5a5',
+      400: '#f87171',
+      500: '#ef4444',
+      600: '#dc2626',
+      700: '#b91c1c',
+      800: '#991b1b',
+      900: '#7f1d1d',
+      950: '#450a0a',
+    },
+    omfiBlack: {
+      50:  '#f5f5f5',
+      100: '#e5e5e5',
+      200: '#c5c5c5',
+      300: '#a5a5a5',
+      400: '#757575',
+      500: '#454545',
+      600: '#252525',
+      700: '#151515',
+      800: '#0d0d0d',
+      900: '#080808',
+      950: '#030303',
+    },
+  },
   semantic: {
-    // sem si vieš dať svoje úpravy (primary/surface/...)
+    primary: {
+      50:  '{omfiBlue.50}',
+      100: '{omfiBlue.100}',
+      200: '{omfiBlue.200}',
+      300: '{omfiBlue.300}',
+      400: '{omfiBlue.400}',
+      500: '{omfiBlue.500}',
+      600: '{omfiBlue.600}',
+      700: '{omfiBlue.700}',
+      800: '{omfiBlue.800}',
+      900: '{omfiBlue.900}',
+      950: '{omfiBlue.950}',
+    },
   },
 })
 
@@ -40,6 +93,10 @@ createInertiaApp({
         preset: MyPreset,
         options: {
           darkModeSelector: '.my-app-dark',
+          cssLayer: {
+            name: 'primevue',
+            order: 'tailwind-base, primevue, tailwind-utilities',
+          },
         },
       },
     })

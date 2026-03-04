@@ -1,101 +1,105 @@
-<template>
-  <div class="w-full max-w-[1000px] mx-auto px-4 mt-16">
-    <Card>
-      <template #title>
-        <div class="text-4xl font-semibold text-slate-900">
-                    {{ author.cleanname.replace(',', '') }}
-        </div>
-        <Divider />
-      </template>
-
-      <template #content>
-        <div class="space-y-4 text-base text-slate-700">
-          <div v-if="author.email" class="flex gap-2">
-            <strong class="text-slate-900">Email:</strong>
-            <a
-              :href="'mailto:' + author.email"
-              class="text-blue-600 hover:underline"
-            >
-              {{ author.email }}
-            </a>
-          </div>
-
-          <div v-if="author.institute" class="flex gap-2">
-            <strong class="text-slate-900">Inštitúcia:</strong>
-            <span>{{ author.institute }}</span>
-          </div>
-          <div v-else class="text-slate-500 italic">
-            Bez inštitúcie
-          </div>
-
-          <div v-if="author.url" class="flex gap-2">
-            <strong class="text-slate-900">Web:</strong>
-            <a
-              :href="author.url"
-              target="_blank"
-              rel="noreferrer"
-              class="text-blue-600 hover:underline break-all"
-            >
-              {{ author.url }}
-            </a>
-          </div>
-          <div v-else class="text-slate-500 italic">
-            Bez web stránky
-          </div>
-        </div>
-      </template>
-    </Card>
-
-    <Card class="mt-6">
-      <template #title>
-        Publikácie
-      </template>
-
-      <template #content>
-        <div v-if="!publicationsByYear?.length" class="text-slate-600">
-          Nenašli sa žiadne publikácie od autora.
-        </div>
-
-        <div v-else class="space-y-6">
-          <Card
-            v-for="group in publicationsByYear"
-            :key="group.year"
-            class="shadow-sm"
-          >
-            <template #title>
-              <div class="text-lg font-semibold text-slate-900">
-                {{ group.year }}
-              </div>
-            </template>
-
-            <template #content>
-              <div class="space-y-3">
-                <Publication
-                  v-for="publication in group.publications"
-                  :key="publication.id"
-                  :publication="publication"
-                />
-              </div>
-            </template>
-          </Card>
-        </div>
-      </template>
-    </Card>
-  </div>
-</template>
-
 <script setup>
-import { Divider } from 'primevue'
-import HomeLayout from '@/Layouts/HomeLayout.vue'
-import Card from 'primevue/card'
-import Publication from '@/Components/Publication.vue'
+import { router } from "@inertiajs/vue3";
+import HomeLayout from "@/Layouts/HomeLayout.vue";
 
 const props = defineProps({
-  author: { type: Object, required: true },
-  publicationsByYear: { type: Array, default: () => [] },
-})
+    author: { type: Object, required: true },
+    publicationsByYear: { type: Array, default: () => [] },
+});
 
-defineOptions({
-  layout: HomeLayout,
-})
+defineOptions({ layout: HomeLayout });
+
+const goPublication = (id) => router.get(route("publications.detail", id));
 </script>
+
+<template>
+    <div class="max-w-4xl mx-auto px-4 py-14">
+        <div class="mb-16">
+            <h1 class="text-5xl font-bold text-gray-900 leading-snug mb-4">
+                {{
+                    author.cleanname?.replace(",", "") ??
+                    `${author.firstname} ${author.surname}`
+                }}
+            </h1>
+            <div class="flex flex-col gap-2 text-gray-500 text-lg">
+                <span v-if="author.institute">Inštitút: {{ author.institute }}</span>
+                <span v-if="author.email">
+                    E-mail: <a
+                        :href="`mailto:${author.email}`"
+                        class="hover:underline hover:text-gray-900 transition"
+                    >{{ author.email }}</a>
+                </span>
+                <span v-if="author.url">
+                    <a
+                        :href="author.url"
+                        target="_blank"
+                        class="hover:underline hover:text-gray-900 transition"
+                    >
+                        {{ author.url }}
+                    </a>
+                </span>
+            </div>
+        </div>
+
+        <div v-if="publicationsByYear?.length">
+            <h2
+                class="text-2xl font-bold text-gray-900 mb-5 uppercase tracking-wide"
+            >
+                Zoznam publikácií
+            </h2>
+            <div
+                v-for="group in publicationsByYear"
+                :key="group.year"
+                class="mb-10 pl-6"
+            >
+                <h2
+                    class="text-2xl font-bold text-gray-900 mb-5 uppercase tracking-wide"
+                >
+                    {{ group.year }}
+                </h2>
+                <hr class="mb-8 border-gray-200" />
+
+                <div class="flex flex-col divide-y divide-gray-100 pl-6">
+                    <div
+                        v-for="pub in group.publications"
+                        :key="pub.id"
+                        class="py-4 flex items-start justify-between gap-6"
+                    >
+                        <div class="flex-1">
+                            <button
+                                type="button"
+                                @click="goPublication(pub.id)"
+                                class="text-left text-gray-900 font-bold hover:underline leading-snug text-xl"
+                            >
+                                {{ pub.title }}
+                            </button>
+                            <div class="mt-2 text-lg text-gray-600">
+                                <span v-for="(a, i) in pub.authors" :key="a.id">
+                                    {{ a.firstname }} {{ a.surname
+                                    }}<span v-if="i < pub.authors.length - 1"
+                                        >,
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div
+                            class="shrink-0 text-lg text-gray-400 font-medium pt-0.5"
+                        >
+                            <span v-if="pub.firstpage && pub.firstpage !== '0'">
+                                s. {{ pub.firstpage
+                                }}<span
+                                    v-if="pub.lastpage && pub.lastpage !== '0'"
+                                    >–{{ pub.lastpage }}</span
+                                >
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p v-else class="text-center text-gray-500 py-10 text-lg">
+            Žiadne publikácie od tohto autora.
+        </p>
+    </div>
+</template>

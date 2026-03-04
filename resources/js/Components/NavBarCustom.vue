@@ -7,8 +7,6 @@ const mobileOpen = ref(false);
 const nav = [
   { label: "Domov", href: "/" },
   { label: "Archív", href: "/archive" },
-  { label: "Publikácie", href: "/publications" },
-  { label: "Autori", href: "/authors" },
   { label: "O časopise", href: "/about" },
 ];
 </script>
@@ -27,6 +25,11 @@ const nav = [
           class="text-[16px] font-semibold text-[#161616] capitalize transition-colors hover:text-[#1E4E8C]"
         >
           {{ item.label }}
+        </Link>
+        <Link href="/search" aria-label="Vyhľadávanie" class="text-[#161616] hover:text-[#1E4E8C] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+          </svg>
         </Link>
       </div>
       <button
@@ -52,6 +55,13 @@ const nav = [
           @click="mobileOpen = false"
         >
           {{ item.label }}
+        </Link>
+        <Link
+          href="/search"
+          class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
+          @click="mobileOpen = false"
+        >
+          Vyhľadávanie
         </Link>
       </div>
     </div>

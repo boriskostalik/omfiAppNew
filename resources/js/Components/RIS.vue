@@ -1,7 +1,17 @@
 <template>
-    <Dialog v-model:visible="isVisible" modal header="RIS Format" :style="{ width: '50%' }" @hide="$emit('close')" >
+    <Dialog
+        v-model:visible="isVisible"
+        modal
+        header="RIS Format"
+        :style="{ width: '50%' }"
+        @hide="$emit('close')"
+    >
         <template #closebutton>
-            <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
+            <Button
+                icon="pi pi-times"
+                class="p-button-text"
+                @click="$emit('close')"
+            />
         </template>
         <div class="p-4">
             <div>TY - {{ publication.type.toUpperCase() }}</div>
@@ -21,32 +31,31 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Dialog, Button } from 'primevue';
+import { computed } from "vue";
+import { Dialog, Button } from "primevue";
 
 const props = defineProps({
     visible: {
         type: Boolean,
-        default: false
+        default: false,
     },
     publication: {
         type: Object,
-        default: null
-    }
+        default: null,
+    },
 });
 
 const isVisible = computed(() => props.visible);
 </script>
-
 <style scoped>
 .publication {
-  border: 1px solid #ccc;
-  padding: 16px;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 20px auto;
-  background-color: #f9f9f9;
-  font-family: monospace;
-  white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    font-family: monospace;
+    white-space: pre-wrap;
 }
 </style>

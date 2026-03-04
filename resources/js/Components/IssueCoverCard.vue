@@ -18,7 +18,7 @@ const go = () => {
 <template>
 	<button type="button" @click="go" class="group w-full text-left" :disabled="!issue.hasPublication">
 		<div
-			class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 group-hover:shadow-xl"
+			class="relative aspect-[3/4] overflow-hidden rounded-none shadow-lg transition-shadow duration-300 group-hover:shadow-xl"
 			:class="!issue.hasPublication ? 'opacity-30 cursor-not-allowed' : ''"
 		>
 			<div
