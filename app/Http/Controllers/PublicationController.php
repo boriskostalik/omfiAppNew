@@ -207,6 +207,13 @@ $publications = $query->paginate($perPage)->appends($request->query());
         }
 
 $publications = $query->paginate($perPage)->appends($request->query());
+
+        $issues = Issue::query()
+            ->orderByDesc('year')
+            ->orderByRaw('(number = 0) ASC')
+            ->orderBy('number', 'asc')
+            ->get(['id', 'year', 'volume', 'number']);
+
         return Inertia::render('Dashboard/Publications', [
             'publications' => $publications,
             'per_page' => $perPage,
@@ -216,6 +223,7 @@ $publications = $query->paginate($perPage)->appends($request->query());
             'sortOrder' => $sortOrder,
             'entered_by' => Auth::user()->id,
             'authors' => $authors->get(),
+            'issues' => $issues,
         ]);
     }
 

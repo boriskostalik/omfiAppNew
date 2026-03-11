@@ -1,111 +1,149 @@
 <script setup>
-import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
-import { DataTable, Column, Paginator, Button, InputText } from 'primevue'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import AuthorForm from '@/Pages/Dashboard/AuthorForm.vue'
+import { ref } from "vue";
+import { router } from "@inertiajs/vue3";
+import { Button, DataTable, Column, Paginator, Dialog } from "primevue";
+import Header from "@/Components/Header.vue";
+import AuthorForm from "@/Pages/Dashboard/AuthorForm.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
-defineOptions({ layout: AuthenticatedLayout })
+defineOptions({ layout: AuthenticatedLayout });
 
 const props = defineProps({
     authors: Object,
     search: String,
-})
+    sortField: String,
+    sortOrder: String,
+});
 
-const searchQuery = ref(props.search || '')
-const isModalVisible = ref(false)
-const authorToEdit = ref(null)
-const currentPage = ref(props.authors.current_page || 1)
-const perPage = ref(Number(props.authors.per_page) || 10)
+const currentPage = ref(props.authors.current_page || 1);
+const perPage = ref(Number(props.authors.per_page) || 10);
+const sortField = ref(props.sortField || "surname");
+const sortOrder = ref(props.sortOrder === "desc" ? -1 : 1);
+const searchQuery = ref(props.search || "");
 
-const submitSearch = () => {
-    router.get(route('authors.dashboard'), { page: 1, search: searchQuery.value })
-}
-
-const changePage = (val) => {
-    currentPage.value = val.page + 1
-    perPage.value = val.rows
-    router.get(route('authors.dashboard'), {
-        page: currentPage.value,
-        per_page: perPage.value,
-        search: searchQuery.value,
-    })
-}
+const isModalVisible = ref(false);
+const authorToEdit = ref(null);
+const deleteDialogVisible = ref(false);
+const authorToDelete = ref(null);
 
 const closeModal = () => {
-    isModalVisible.value = false
-    authorToEdit.value = null
-}
+    isModalVisible.value = false;
+    authorToEdit.value = null;
+};
+
+const syncParams = () => ({
+    page: currentPage.value,
+    per_page: perPage.value,
+    sortField: sortField.value,
+    sortOrder: sortOrder.value === 1 ? "asc" : "desc",
+    ...(searchQuery.value ? { search: searchQuery.value } : {}),
+});
+
+const changePage = (val) => {
+    currentPage.value = val.page + 1;
+    perPage.value = val.rows;
+    router.get(route("authors.dashboard"), syncParams());
+};
+
+const submitSearch = (query) => {
+    searchQuery.value = query;
+    router.get(route("authors.dashboard"), { ...syncParams(), page: 1 });
+};
+
+const onSort = (event) => {
+    sortField.value = event.sortField;
+    sortOrder.value = event.sortOrder;
+    router.get(route("authors.dashboard"), syncParams());
+};
 
 const onRowEdit = (id) => {
-    authorToEdit.value = props.authors.data.find((a) => a.id === id)
-    isModalVisible.value = true
-}
+    authorToEdit.value = props.authors.data.find((a) => a.id === id);
+    isModalVisible.value = true;
+};
 
 const onRowDelete = (id) => {
-    if (confirm('Naozaj vymazať autora?')) {
-        router.delete(`/dashboard/authors/${id}`)
-    }
-}
+    authorToDelete.value = id;
+    deleteDialogVisible.value = true;
+};
+
+const confirmDelete = () => {
+    router.delete(`/dashboard/authors/${authorToDelete.value}`);
+    deleteDialogVisible.value = false;
+    authorToDelete.value = null;
+};
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto p-6">
-
-        <!-- Hlavička -->
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Autori</h1>
-            <Button label="Pridať autora" icon="pi pi-plus" @click="isModalVisible = true" />
-        </div>
-
-        <!-- Vyhľadávanie -->
-        <div class="mb-4 flex gap-2">
-            <InputText
-                v-model="searchQuery"
-                placeholder="Hľadať podľa mena..."
-                class="w-full max-w-sm"
-                @keyup.enter="submitSearch"
-            />
-            <Button label="Hľadať" icon="pi pi-search" @click="submitSearch" />
-        </div>
-
-        <!-- Tabuľka -->
+    <div class="max-w-8xl mx-auto px-6 py-4">
+        <Header
+            title="Autori"
+            has-search
+            @search="(query) => submitSearch(query)"
+        />
         <DataTable
             :value="authors.data"
+            :sortField="sortField"
+            :sortOrder="sortOrder"
             dataKey="id"
-            stripedRows
+            lazy
+            @sort="onSort"
         >
-            <Column field="firstname" header="Meno" sortable />
-            <Column field="surname" header="Priezvisko" sortable />
-            <Column field="institute" header="Inštitúcia" />
-            <Column header="" style="width: 100px;">
+            <Column field="surname" header="Priezvisko" sortable style="width: 25%" />
+            <Column field="firstname" header="Meno" sortable style="width: 20%" />
+            <Column field="institute" header="Inštitúcia" style="width: 35%" />
+            <Column field="email" header="Email" style="width: 15%" />
+            <Column class="w-24 !text-end">
+                <template #header>
+                    <Button
+                        icon="pi pi-plus"
+                        label="Pridať"
+                        severity="success"
+                        @click="isModalVisible = true"
+                    />
+                </template>
                 <template #body="{ data }">
-                    <div class="flex gap-2 justify-end">
-                        <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded text />
-                        <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="danger" rounded text />
+                    <div class="flex gap-2">
+                        <Button
+                            icon="pi pi-pencil"
+                            @click="onRowEdit(data.id)"
+                            severity="secondary"
+                            rounded
+                        />
+                        <Button
+                            icon="pi pi-trash"
+                            @click="onRowDelete(data.id)"
+                            severity="danger"
+                            rounded
+                        />
                     </div>
                 </template>
             </Column>
-            <template #empty>
-                <p class="text-center text-gray-400 py-6">Žiadni autori nenájdení.</p>
-            </template>
+            <template #empty>Žiadni autori nenájdení.</template>
         </DataTable>
-
-        <!-- Paginator -->
         <Paginator
-            v-if="authors.total > perPage"
+            v-if="authors.next_page_url || authors.prev_page_url"
             :rows="perPage"
             :totalRecords="authors.total"
             :rowsPerPageOptions="[10, 20, 50]"
             :first="(currentPage - 1) * perPage"
-            class="mt-4"
             @page="changePage"
         />
     </div>
-
+    <Dialog
+        v-model:visible="deleteDialogVisible"
+        header="Vymazať autora"
+        :style="{ width: '25rem' }"
+        modal
+    >
+        <p class="mb-4">Naozaj chcete vymazať tohto autora?</p>
+        <div class="flex justify-end gap-2">
+            <Button label="Zrušiť" severity="secondary" @click="deleteDialogVisible = false" />
+            <Button label="Vymazať" severity="danger" @click="confirmDelete" />
+        </div>
+    </Dialog>
     <AuthorForm
         :author="authorToEdit"
         :visible="isModalVisible"
-        @close="closeModal"
+        @close="closeModal()"
     />
 </template>

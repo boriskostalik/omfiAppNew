@@ -1,147 +1,180 @@
-<template>
-    <Dialog v-model:visible="isVisible" modal :header="author ? 'Úprava autora' : 'Pridanie autora'" :style="{ width: '90vw' }">
-        <template #closebutton>
-            <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
-        </template>
-        <form @submit.prevent="submit">
-            <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
-                <InputText v-model="form.surname" placeholder="Surname" class="p-2" required />
-                <InputText v-model="form.von" placeholder="Von" class="p-2" />
-                
-                <InputText v-model="form.firstname" placeholder="First Name" class="p-2" required />
-                <InputText v-model="form.email" placeholder="Email" class="p-2" type="email" required />
-                
-                <InputText v-model="form.url" placeholder="URL" class="p-2" />
-                <InputText v-model="form.institute" placeholder="Institute" class="p-2" required />
-                
-                <div class="flex items-center gap-2">
-                    <Checkbox v-model="specialcharsValue" :binary="true" />
-                    <label>Special Characters</label>
-                </div>
-                <InputText v-model="cleanName" placeholder="Clean Name" class="p-2" />
-            </div>
-
-            <div class="flex items-center gap-4 mt-4">
-                <Button label="Cancel" @click="$emit('close')" text class="!p-4 w-full"></Button>
-                <Button type="submit" label="Submit" text class="!p-4 w-full !bg-primary !text-white" />
-            </div>
-        </form>
-    </Dialog>
-</template>
-
 <script setup>
-import { computed, reactive, watch, ref } from 'vue';
-import { InputText, Button, Dialog, Checkbox } from 'primevue';
-import { router } from '@inertiajs/vue3';
+import { ref, watch, computed } from "vue";
+import { InputText, Button, Dialog, Message } from "primevue";
+import { Form, FormField } from "@primevue/forms";
+import { valibotResolver } from "@primevue/forms/resolvers/valibot";
+import * as v from "valibot";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
-    author: {
-        type: Object,
-        default: null
-    },
-    visible: {
-        type: Boolean,
-        default: false
+    author: { type: Object, default: null },
+    visible: { type: Boolean, default: false },
+});
+
+const emit = defineEmits(["close"]);
+const formKey = ref(0);
+
+watch(() => props.visible, (val) => {
+    if (val) formKey.value++;
+});
+
+const initialValues = computed(() => {
+    const a = props.author;
+    if (a) {
+        return {
+            surname: a.surname ?? "",
+            firstname: a.firstname ?? "",
+            von: a.von ?? "",
+            email: a.email ?? "",
+            url: a.url ?? "",
+            institute: a.institute ?? "",
+        };
     }
+    return {
+        surname: "",
+        firstname: "",
+        von: "",
+        email: "",
+        url: "",
+        institute: "",
+    };
 });
 
-const emit = defineEmits(['close']);
-const isVisible = computed(()=> props.visible);
-
-const form = reactive({
-    surname: '',
-    von: '',
-    firstname: '',
-    email: '',
-    url: '',
-    institute: '',
-    specialchars: 0
+const schema = v.object({
+    surname: v.pipe(v.string(), v.minLength(1, "Priezvisko je povinné")),
+    firstname: v.pipe(v.string(), v.minLength(1, "Meno je povinné")),
+    von: v.nullish(v.string()),
+    email: v.union([v.pipe(v.string(), v.email("Neplatný email")), v.literal("")]),
+    url: v.nullish(v.string()),
+    institute: v.nullish(v.string()),
 });
 
-const specialcharsValue = computed({
-    get() {
-        return form.specialchars === 1;
-    },
-    set(value) {
-        form.specialchars = value ? 1 : 0;
-    }
-});
+const resolver = valibotResolver(schema);
 
-const cleanName = computed({
-    get() {
-        let name = '';
-        
-        if (form.von) {
-            name += form.von + ' ';
-        }
-            name += form.surname;
-        
-        if (form.firstname) {
-            name += ', ' + form.firstname;
-        }
-        
-        return name.trim();
-    },
-    set(value) {
-        const parts = value.split(',').map(part => part.trim());
-        
-        if (parts.length > 1) {
-            const surnameParts = parts[0].split(' ');
-            form.firstname = parts[1];
-            
-            if (surnameParts.length > 1) {
-                form.surname = surnameParts[surnameParts.length - 1];
-                form.von = surnameParts.slice(0, -1).join(' ');
-            } else {
-                form.surname = surnameParts[0];
-                form.von = '';
-            }
-        } else {
-            const nameParts = parts[0].split(' ');
-            form.surname = nameParts[nameParts.length - 1];
-            form.firstname = nameParts.slice(0, -1).join(' ');
-        }
-    }
-});
+const buildCleanName = (surname, von, firstname) => {
+    let name = "";
+    if (von) name += von + " ";
+    name += surname;
+    if (firstname) name += ", " + firstname;
+    return name.trim();
+};
 
-const submit = () => {
+const onSubmit = ({ valid, values }) => {
+    if (!valid) return;
+
+    const submitData = {
+        ...values,
+        cleanname: buildCleanName(values.surname, values.von, values.firstname),
+    };
+
     if (props.author) {
-        form.cleanname = cleanName.value;
-        router.put(`/dashboard/authors/${props.author.id}`, form, {
-            onError: (err) => {
-                console.log(err);
-            },
-            onSuccess: () => emit('close')
+        router.put(`/dashboard/authors/${props.author.id}`, submitData, {
+            onSuccess: () => emit("close"),
         });
     } else {
-        form.cleanname = cleanName.value;
-        router.post('/dashboard/authors', form, {
-            onError: (err) => {
-                console.log(err);
-            },
-            onSuccess: () => emit('close')
+        router.post("/dashboard/authors", submitData, {
+            onSuccess: () => emit("close"),
         });
     }
 };
-
-watch(() => props.author, (author) => {
-    if (author) {
-        form.surname = author.surname || '';
-        form.von = author.von || '';
-        form.firstname = author.firstname || '';
-        form.email = author.email || '';
-        form.url = author.url || '';
-        form.institute = author.institute || '';
-        form.specialchars = author.specialchars || 0;
-    } else {
-        // Reset form when no author is selected
-        form.surname = '';
-        form.von = '';
-        form.firstname = '';
-        form.email = '';
-        form.url = '';
-        form.institute = '';
-        form.specialchars = 0;
-    }
-});
 </script>
+
+<template>
+    <Dialog
+        :visible="props.visible"
+        @update:visible="(val) => !val && $emit('close')"
+        modal
+        :header="author ? 'Úprava autora' : 'Pridanie autora'"
+        :style="{ width: '60vw', maxWidth: '800px' }"
+        :breakpoints="{ '768px': '96vw' }"
+    >
+        <template #closebutton>
+            <Button
+                icon="pi pi-times"
+                class="p-button-text p-button-sm"
+                @click="$emit('close')"
+            />
+        </template>
+
+        <Form
+            :key="formKey"
+            :resolver="resolver"
+            :initialValues="initialValues"
+            :validateOn="['submit']"
+            @submit="onSubmit"
+            class="grid grid-cols-2 lg:grid-cols-6 gap-x-4 gap-y-3"
+        >
+            <FormField
+                v-slot="$field"
+                name="surname"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">
+                    Priezvisko <span class="text-red-500">*</span>
+                </label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="firstname"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">
+                    Meno <span class="text-red-500">*</span>
+                </label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="von"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">Von</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="email"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">Email</label>
+                <InputText v-bind="$field" type="email" class="w-full !text-sm !py-2" />
+                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="url"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">URL</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="institute"
+                class="flex flex-col gap-0.5 col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">Inštitúcia</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <div class="col-span-2 lg:col-span-6 flex items-center gap-3 mt-1">
+                <Button label="Zrušiť" @click="$emit('close')" text class="w-full p-button-sm" />
+                <Button type="submit" label="Uložiť" class="w-full p-button-sm !bg-primary !text-white" />
+            </div>
+        </Form>
+    </Dialog>
+</template>

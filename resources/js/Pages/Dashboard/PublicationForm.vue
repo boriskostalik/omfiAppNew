@@ -1,218 +1,180 @@
-<template>
-    <Dialog
-        v-model:visible="isVisible"
-        modal
-        :header="publication ? 'Úprava publikácie' : 'Pridanie publikácie'"
-        :style="{ width: '90vw' }"
-    >
-        <template #closebutton>
-            <Button
-                icon="pi pi-times"
-                class="p-button-text"
-                @click="$emit('close')"
-            />
-        </template>
-        <form @submit.prevent="submit">
-            <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
-                <Dropdown
-                    v-model="form.type"
-                    :options="types"
-                    placeholder="Type of publication"
-                    class="w-full"
-                />
-
-                <InputText
-                    v-model="form.title"
-                    placeholder="Title"
-                    class="p-2"
-                    required
-                />
-                <InputText
-                    v-model="form.title_eng"
-                    placeholder="English Title"
-                    class="p-2"
-                />
-
-                <InputText v-model="form.mesc" placeholder="MESC" class="p-2" />
-                <InputText
-                    v-model="form.bibtex_id"
-                    placeholder="BibTeX ID"
-                    class="p-2"
-                />
-
-                <InputText
-                    v-model="form.year"
-                    placeholder="Year"
-                    class="p-2"
-                    required
-                />
-                <InputText
-                    v-model="form.actualyear"
-                    placeholder="Actual Year"
-                    class="p-2"
-                    required
-                />
-
-                <InputText
-                    v-model="form.journal"
-                    placeholder="Journal"
-                    class="p-2"
-                />
-                <InputText
-                    v-model="form.volume"
-                    placeholder="Volume"
-                    class="p-2"
-                />
-
-                <InputText
-                    v-model="form.number"
-                    placeholder="Number"
-                    class="p-2"
-                />
-                <Dropdown
-                    v-model="form.month"
-                    :options="months"
-                    placeholder="Month"
-                    class="w-full"
-                />
-
-                <InputText
-                    v-model="form.firstpage"
-                    placeholder="First Page"
-                    class="p-2"
-                />
-                <InputText
-                    v-model="form.lastpage"
-                    placeholder="Last Page"
-                    class="p-2"
-                />
-
-                <InputText v-model="form.issn" placeholder="ISSN" class="p-2" />
-                <InputText v-model="form.isbn" placeholder="ISBN" class="p-2" />
-
-                <InputText v-model="form.url" placeholder="URL" class="p-2" />
-                <InputText v-model="form.doi" placeholder="DOI" class="p-2" />
-
-                <InputText
-                    v-model="form.crossref"
-                    placeholder="Crossref"
-                    class="p-2"
-                />
-                <InputText
-                    v-model="form.namekey"
-                    placeholder="Key"
-                    class="p-2"
-                />
-                <InputText
-                    v-model="form.keywords"
-                    placeholder="Keywords"
-                    class="p-2"
-                />
-                <Textarea
-                    v-model="form.abstract"
-                    placeholder="Abstract"
-                    rows="5"
-                    class="p-2"
-                />
-
-                <br />
-                <MultiSelect
-                    v-model="form.authors"
-                    :options="mappedAuthors"
-                    optionLabel="cleanname"
-                    filter
-                    placeholder="Authors"
-                    display="chip"
-                    :maxSelectedLabels="5"
-                    class="w-full h-full"
-                />
-                <MultiSelect
-                    v-model="form.editors"
-                    :options="form.authors"
-                    optionLabel="cleanname"
-                    filter
-                    placeholder="Editors"
-                    display="chip"
-                    :maxSelectedLabels="5"
-                    class="w-full h-full"
-                />
-            </div>
-
-            <div class="flex items-center gap-4 mt-4">
-                <Button
-                    label="Cancel"
-                    @click="$emit('close')"
-                    text
-                    class="!p-4 w-full"
-                ></Button>
-                <Button
-                    type="submit"
-                    label="Submit"
-                    text
-                    class="!p-4 w-full !bg-primary !text-white"
-                />
-            </div>
-        </form>
-    </Dialog>
-</template>
-
 <script setup>
-import { computed, reactive, watch, defineEmits } from "vue";
+import { ref, watch, computed } from "vue";
 import {
     InputText,
     Textarea,
-    Dropdown,
+    Select,
     Button,
     Dialog,
     MultiSelect,
+    Message,
 } from "primevue";
+import { Form, FormField } from "@primevue/forms";
+import { valibotResolver } from "@primevue/forms/resolvers/valibot";
+import * as v from "valibot";
 import { router } from "@inertiajs/vue3";
+
 const props = defineProps({
-    publication: {
-        type: Object,
-    },
-    authors: {
-        type: Array,
-        default: () => [],
-    },
-    visible: {
-        type: Boolean,
-        default: false,
-    },
-    entered_by: {
-        type: Number,
-        default: 0,
-    },
+    publication: { type: Object },
+    authors: { type: Array, default: () => [] },
+    issues: { type: Array, default: () => [] },
+    visible: { type: Boolean, default: false },
+    entered_by: { type: Number, default: 0 },
 });
 const emit = defineEmits(["close"]);
 
-const isVisible = computed(() => props.visible);
-const form = reactive({
-    type: "",
-    title: "",
-    title_eng: "",
-    mesc: "",
-    bibtex_id: "",
-    year: "",
-    actualyear: "",
-    journal: "Obzory matematiky, fyziky a informatiky",
-    volume: "",
-    number: "",
-    month: "",
-    firstpage: "",
-    lastpage: "",
-    issn: "",
-    isbn: "",
-    url: "",
-    doi: "",
-    crossref: "",
-    namekey: "",
-    keywords: "",
-    abstract: "",
-    entered_by: props.entered_by,
-    authors: [],
-    editors: [],
+const serverErrors = ref({});
+const localBibtexId = ref("");
+const formKey = ref(0);
+
+watch(
+    () => props.visible,
+    (val) => {
+        if (val) formKey.value++;
+    },
+);
+
+const issueOptions = computed(() =>
+    props.issues.map((iss) => ({
+        id: iss.id,
+        label: iss.volume
+            ? `${iss.year}/${iss.number} (Vol. ${iss.volume})`
+            : `${iss.year}/${iss.number}`,
+    })),
+);
+
+const initialValues = computed(() => {
+    const pub = props.publication;
+    if (pub) {
+        return {
+            type: pub.type ?? null,
+            issue_id: pub.issue_id ?? null,
+            actualyear: pub.actualyear ?? "",
+            month: pub.month ?? null,
+            edition: pub.edition ?? "",
+            chapter: pub.chapter ?? "",
+            title: pub.title ?? "",
+            title_eng: pub.title_eng ?? "",
+            authors:
+                pub.authors?.map((a) => ({
+                    id: a.id,
+                    cleanname: a.cleanname,
+                })) ?? [],
+            editors:
+                pub.authors
+                    ?.filter((a) => a.pivot?.is_editor === "Y")
+                    .map((a) => ({ id: a.id, cleanname: a.cleanname })) ?? [],
+            journal: pub.journal ?? "",
+            booktitle: pub.booktitle ?? "",
+            publisher: pub.publisher ?? "",
+            series: pub.series ?? "",
+            institution: pub.institution ?? "",
+            organization: pub.organization ?? "",
+            school: pub.school ?? "",
+            address: pub.address ?? "",
+            location: pub.location ?? "",
+            howpublished: pub.howpublished ?? "",
+            firstpage: pub.firstpage ?? "",
+            lastpage: pub.lastpage ?? "",
+            doi: pub.doi ?? "",
+            url: pub.url ?? "",
+            issn: pub.issn ?? "1335-4981",
+            isbn: pub.isbn ?? "",
+            mesc: pub.mesc ?? "",
+            namekey: pub.namekey ?? "",
+            crossref: pub.crossref ?? "",
+            keywords: pub.keywords ?? "",
+            note: pub.note ?? "",
+            abstract: pub.abstract ?? "",
+        };
+    }
+    return {
+        type: null,
+        issue_id: null,
+        actualyear: "",
+        month: null,
+        edition: "",
+        chapter: "",
+        title: "",
+        title_eng: "",
+        authors: [],
+        editors: [],
+        journal: "Obzory matematiky, fyziky a informatiky",
+        booktitle: "",
+        publisher: "",
+        series: "",
+        institution: "",
+        organization: "",
+        school: "",
+        address: "",
+        location: "",
+        howpublished: "",
+        firstpage: "",
+        lastpage: "",
+        doi: "",
+        url: "",
+        issn: "1335-4981",
+        isbn: "",
+        mesc: "",
+        namekey: "",
+        crossref: "",
+        keywords: "",
+        note: "",
+        abstract: "",
+    };
 });
+
+const schema = v.object({
+    title: v.pipe(v.string(), v.minLength(1, "Názov je povinný")),
+    authors: v.pipe(
+        v.array(v.any()),
+        v.check(
+            (arr) => Array.isArray(arr) && arr.length > 0,
+            "Aspoň jeden autor je povinný",
+        ),
+    ),
+    type: v.pipe(
+        v.union([v.string(), v.null()]),
+        v.check(
+            (val) => typeof val === "string" && val.length > 0,
+            "Typ publikácie je povinný",
+        ),
+    ),
+    issue_id: v.pipe(
+        v.union([v.number(), v.null()]),
+        v.check((val) => val !== null, "Vydanie je povinné"),
+    ),
+    actualyear: v.nullish(v.string()),
+    month: v.nullish(v.string()),
+    edition: v.nullish(v.string()),
+    chapter: v.nullish(v.string()),
+    title_eng: v.nullish(v.string()),
+    editors: v.optional(v.array(v.any())),
+    journal: v.nullish(v.string()),
+    booktitle: v.nullish(v.string()),
+    publisher: v.nullish(v.string()),
+    series: v.nullish(v.string()),
+    institution: v.nullish(v.string()),
+    organization: v.nullish(v.string()),
+    school: v.nullish(v.string()),
+    address: v.nullish(v.string()),
+    location: v.nullish(v.string()),
+    howpublished: v.nullish(v.string()),
+    firstpage: v.pipe(v.string(), v.minLength(1, "Prvá strana je povinná")),
+    lastpage: v.pipe(v.string(), v.minLength(1, "Posledná strana je povinná")),
+    doi: v.nullish(v.string()),
+    url: v.nullish(v.string()),
+    issn: v.pipe(v.string(), v.minLength(1, "ISSN je povinné")),
+    isbn: v.nullish(v.string()),
+    mesc: v.nullish(v.string()),
+    namekey: v.nullish(v.string()),
+    crossref: v.nullish(v.string()),
+    keywords: v.nullish(v.string()),
+    note: v.nullish(v.string()),
+    abstract: v.nullish(v.string()),
+});
+
+const resolver = valibotResolver(schema);
 
 const types = [
     "Article",
@@ -230,40 +192,40 @@ const types = [
     "Unpublished",
 ];
 
-const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-    "not known",
-];
+const mappedAuthors = computed(() =>
+    props.authors.map((author) => ({
+        id: author.id,
+        cleanname: author.cleanname,
+    })),
+);
 
-const submit = () => {
+const numericOnly = (e) => {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+};
+
+const onSubmit = ({ valid, values }) => {
+    if (!valid) return;
+    serverErrors.value = {};
+
+    const editors = values.editors ?? [];
     const submitData = {
-        ...form,
-        authors: form.authors.map((author) => ({
+        ...values,
+        bibtex_id: localBibtexId.value,
+        entered_by: props.entered_by,
+        authors: values.authors.map((author) => ({
             id: author.id,
-            is_editor: form.editors.some((editor) => editor.id === author.id)
-                ? "Y"
-                : "N",
+            is_editor: editors.some((e) => e.id === author.id) ? "Y" : "N",
         })),
     };
-    console.log(submitData);
+    delete submitData.editors;
+
     if (props.publication) {
         router.put(
             `/dashboard/publications/${props.publication.id}`,
             submitData,
             {
                 onError: (err) => {
-                    console.log(err);
+                    serverErrors.value = err;
                 },
                 onSuccess: () => emit("close"),
             },
@@ -271,80 +233,299 @@ const submit = () => {
     } else {
         router.post("/dashboard/publications", submitData, {
             onError: (err) => {
-                console.log(err);
+                serverErrors.value = err;
             },
             onSuccess: () => emit("close"),
         });
     }
 };
-
-const mappedAuthors = computed(() => {
-    return props.authors.map((author) => ({
-        id: author.id,
-        cleanname: author.cleanname,
-    }));
-});
-
-watch(
-    () => props.publication,
-    (publication) => {
-        if (publication) {
-            form.type = publication.type;
-            form.title = publication.title;
-            form.title_eng = publication.title_eng;
-            form.mesc = publication.mesc;
-            form.bibtex_id = publication.bibtex_id;
-            form.year = publication.year;
-            form.actualyear = publication.actualyear;
-            form.journal = publication.journal;
-            form.volume = publication.volume;
-            form.number = publication.number;
-            form.month = publication.month;
-            form.firstpage = publication.firstpage;
-            form.lastpage = publication.lastpage;
-            form.issn = publication.issn;
-            form.isbn = publication.isbn;
-            form.url = publication.url;
-            form.doi = publication.doi;
-            form.crossref = publication.crossref;
-            form.namekey = publication.namekey;
-            form.keywords = publication.keywords;
-            form.abstract = publication.abstract;
-            form.authors = publication.authors.map((author) => ({
-                id: author.id,
-                cleanname: author.cleanname,
-            }));
-            form.editors = publication.authors
-                .filter((author) => author.pivot.is_editor === "Y")
-                .map((editor) => ({
-                    id: editor.id,
-                    cleanname: editor.cleanname,
-                }));
-        } else {
-            form.type = "";
-            form.title = "";
-            form.title_eng = "";
-            form.mesc = "";
-            form.bibtex_id = "";
-            form.year = "";
-            form.actualyear = "";
-            form.journal = "Obzory matematiky, fyziky a informatiky";
-            form.volume = "";
-            form.number = "";
-            form.month = "";
-            form.firstpage = "";
-            form.lastpage = "";
-            form.issn = "";
-            form.isbn = "";
-            form.url = "";
-            form.doi = "";
-            form.crossref = "";
-            form.namekey = "";
-            form.keywords = "";
-            form.abstract = "";
-            form.authors = [];
-            form.editors = [];
-        }
-    },
-);
 </script>
+<template>
+    <Dialog
+        :visible="props.visible"
+        @update:visible="(val) => !val && $emit('close')"
+        modal
+        :header="publication ? 'Úprava publikácie' : 'Pridanie publikácie'"
+        :style="{ width: '92vw', maxWidth: '1200px' }"
+        :breakpoints="{ '1024px': '96vw', '640px': '100vw' }"
+    >
+        <template #closebutton>
+            <Button
+                icon="pi pi-times"
+                class="p-button-text p-button-sm"
+                @click="$emit('close')"
+            />
+        </template>
+
+        <Form
+            :key="formKey"
+            :resolver="resolver"
+            :initialValues="initialValues"
+            :validateOn="['submit']"
+            @submit="onSubmit"
+            class="grid grid-cols-2 lg:grid-cols-6 gap-x-4 gap-y-3"
+        >
+            <FormField
+                v-slot="$field"
+                name="type"
+                class="flex flex-col gap-0.5 lg:col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Typ publikácie <span class="text-red-500">*</span></label
+                >
+                <Select
+                    v-bind="$field"
+                    :options="types"
+                    placeholder="Vyberte typ"
+                    showClear
+                    size="small"
+                    class="w-full"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="issue_id"
+                class="flex flex-col gap-0.5 lg:col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Vydanie <span class="text-red-500">*</span>
+                    <span class="text-gray-400 font-normal text-[11px]"
+                        >(rok/číslo)</span
+                    ></label
+                >
+                <Select
+                    v-bind="$field"
+                    :options="issueOptions"
+                    optionLabel="label"
+                    optionValue="id"
+                    placeholder="Vyberte vydanie"
+                    showClear
+                    size="small"
+                    class="w-full"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="journal"
+                class="flex flex-col gap-0.5 lg:col-span-2"
+            >
+                <label class="text-xs font-medium text-gray-700">Journal</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="title"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Názov <span class="text-red-500">*</span></label
+                >
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="title_eng"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Názov (anglicky)</label
+                >
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="actualyear"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700">Rok</label>
+                <InputText
+                    v-bind="$field"
+                    class="w-full !text-sm !py-2"
+                    @keypress="numericOnly"
+                />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="firstpage"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >SP <span class="text-red-500">*</span></label
+                >
+                <InputText
+                    v-bind="$field"
+                    class="w-full !text-sm !py-2"
+                    @keypress="numericOnly"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                    >{{ $field.error?.message }}</Message
+                >
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="lastpage"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >EP <span class="text-red-500">*</span></label
+                >
+                <InputText
+                    v-bind="$field"
+                    class="w-full !text-sm !py-2"
+                    @keypress="numericOnly"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                    >{{ $field.error?.message }}</Message
+                >
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="doi"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700">DOI</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="issn"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >ISSN <span class="text-red-500">*</span></label
+                >
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                    >{{ $field.error?.message }}</Message
+                >
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="isbn"
+                class="flex flex-col gap-0.5 lg:col-span-1"
+            >
+                <label class="text-xs font-medium text-gray-700">ISBN</label>
+                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="authors"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Autori <span class="text-red-500">*</span></label
+                >
+                <MultiSelect
+                    v-bind="$field"
+                    :options="mappedAuthors"
+                    optionLabel="cleanname"
+                    filter
+                    placeholder="Vyberte autorov"
+                    display="chip"
+                    :maxSelectedLabels="4"
+                    size="small"
+                    class="w-full"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
+                    {{ $field.error?.message }}
+                </Message>
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="editors"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
+            >
+                <label class="text-xs font-medium text-gray-700">Editori</label>
+                <MultiSelect
+                    v-bind="$field"
+                    :options="mappedAuthors"
+                    optionLabel="cleanname"
+                    filter
+                    placeholder="Vyberte editorov"
+                    display="chip"
+                    :maxSelectedLabels="4"
+                    size="small"
+                    class="w-full"
+                />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="abstract"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-6"
+            >
+                <label class="text-xs font-medium text-gray-700"
+                    >Abstrakt</label
+                >
+                <Textarea v-bind="$field" rows="3" class="w-full !text-sm" />
+            </FormField>
+
+            <div class="col-span-2 lg:col-span-6 flex items-center gap-3 mt-1">
+                <Button
+                    label="Zrušiť"
+                    @click="$emit('close')"
+                    text
+                    class="w-full p-button-sm"
+                />
+                <Button
+                    type="submit"
+                    label="Uložiť"
+                    class="w-full p-button-sm !bg-primary !text-white"
+                />
+            </div>
+        </Form>
+    </Dialog>
+</template>
