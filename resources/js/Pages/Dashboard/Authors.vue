@@ -102,7 +102,7 @@ const confirmDelete = () => {
                     />
                 </template>
                 <template #body="{ data }">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 justify-end">
                         <Button
                             icon="pi pi-pencil"
                             @click="onRowEdit(data.id)"

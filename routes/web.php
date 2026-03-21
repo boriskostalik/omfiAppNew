@@ -19,7 +19,7 @@ Route::get('/archive/issue/{issue}', [ArchiveController::class, 'showIssue'])->n
 Route::get('/authors/{id}', [AuthorController::class, 'detail'])->name('authors.detail');
 Route::get('/about', [AboutController::class, 'index']);
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Dashboard/Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {

@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class UserController extends Controller
 {
@@ -45,17 +40,17 @@ class UserController extends Controller
     }
 
     
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role'  => 'required|string|in:admin,editor,user',
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        $user->update($validated);
 
-        $request->user()->save();
-
-        return Redirect::route('users.dashboard');
+        return Redirect::route('users.dashboard')->with('success', 'User updated successfully.');
     }
 
    

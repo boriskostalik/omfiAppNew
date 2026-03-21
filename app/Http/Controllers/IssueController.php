@@ -9,17 +9,39 @@ use Inertia\Inertia;
 
 class IssueController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $issues = Issue::query()
-            ->orderByDesc('year')
-            ->orderByRaw('(number = 0) ASC')
-            ->orderBy('number', 'asc')
-            ->withCount('publications')
-            ->paginate(20);
+        $perPage   = (int) $request->input('per_page', 20);
+        $search    = $request->input('search');
+        $sortField = $request->input('sortField', 'year');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $query = Issue::query()->withCount('publications');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('year', 'like', "%{$search}%")
+                  ->orWhere('volume', 'like', "%{$search}%");
+            });
+        }
+
+        $allowed = ['year', 'number', 'volume'];
+        if (in_array($sortField, $allowed, true)) {
+            $query->orderBy($sortField, $sortOrder === 'asc' ? 'asc' : 'desc');
+            if ($sortField === 'year') {
+                $query->orderBy('number', 'asc');
+            }
+        } else {
+            $query->orderByDesc('year')->orderBy('number', 'asc');
+        }
+
+        $issues = $query->paginate($perPage)->appends($request->query());
 
         return Inertia::render('Dashboard/Issues', [
-            'issues' => $issues,
+            'issues'    => $issues,
+            'search'    => $search,
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
         ]);
     }
     public function store(Request $request)

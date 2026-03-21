@@ -1,104 +1,107 @@
-<template>
-    <div>
-        <div class="max-w-6xl mx-auto p-6">
-            <Header title="Users"/>
-        </div>
-      <DataTable
-        :value="usersWithoutLogged"
-        filterDisplay="menu"
-        selectionMode="single"
-        dataKey="id"
-        tableStyle="min-width: 60rem;"
-        class="max-w-6xl mx-auto px-6"
-      >
-        <Column field="name" header="Name" style="width: 25%">
-          <template #body="{ data }" :class="{'bg-red': $page.props.auth.user.role === data.name}">
-            {{ data.name }}
-          </template>
-        </Column>
-  
-        <Column field="email" header="Email" style="width: 25%">
-          <template #body="{ data }">
-            {{ data.email }}
-          </template>
-        </Column>
-
-        <Column class="w-24 !text-end">
-          <template #header>
-            <div class="ml-auto">
-                <Button @click="isModalVisible = true">Pridať</Button>
-            </div>
-          </template>
-          <template #body="{ data }">
-            <div class="flex gap-2 !justify-end">
-            <Button icon="pi pi-pencil" @click="onRowEdit(data.id)" severity="secondary" rounded></Button>
-            <Button icon="pi pi-trash" @click="onRowDelete(data.id)" severity="secondary" rounded></Button>
-          </div>
-        </template>
-    </Column>
-  
-        <template #empty>
-          No Users found.
-        </template>
-  
-      </DataTable>
-    </div>
-    <UserForm 
-      :user="userToEdit" 
-      :visible="isModalVisible"
-      @close="closeModal()"
-    />
-
-
-  </template>
-  
 <script setup>
-import { computed, ref } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
-import { DataTable, Column, Paginator, Button, Select } from 'primevue';
-import Header from '@/Components/Header.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import UserForm from './UserForm.vue';
+import { computed, ref } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { Button, DataTable, Column, Dialog } from "primevue";
+import Header from "@/Components/Header.vue";
+import UserForm from "@/Pages/Dashboard/UserForm.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
-defineOptions({
-    layout: AuthenticatedLayout,
-});
-const page = usePage()
+defineOptions({ layout: AuthenticatedLayout });
 
 const props = defineProps({
-    users: {
-        type: Object
-    }
-})
+    users: Object,
+});
 
-const usersWithoutLogged = computed(()=> props.users.filter(user => user.email !== page.props.auth.user.email))
+const page = usePage();
 
-
+const usersWithoutLogged = computed(() =>
+    props.users.filter((user) => user.email !== page.props.auth.user.email),
+);
 
 const isModalVisible = ref(false);
 const userToEdit = ref(null);
+const deleteDialogVisible = ref(false);
+const userToDelete = ref(null);
 
 const closeModal = () => {
-  isModalVisible.value = false;
-  userToEdit.value = null;
+    isModalVisible.value = false;
+    userToEdit.value = null;
 };
 
-const onRowEdit = (id) => {
-  isModalVisible.value = true;
-  userToEdit.value = props.users.find((p) => p.id === id);
+const onRowEdit = (user) => {
+    userToEdit.value = user;
+    isModalVisible.value = true;
 };
 
 const onRowDelete = (id) => {
-  if (confirm('Are you sure?')) {
-      router.delete(`/dashboard/users/${id}`);
-  }
+    userToDelete.value = id;
+    deleteDialogVisible.value = true;
 };
 
+const confirmDelete = () => {
+    router.delete(route("users.destroy", userToDelete.value));
+    deleteDialogVisible.value = false;
+    userToDelete.value = null;
+};
 </script>
 
-<style scoped>
-input {
-display: block;
-}
-</style>
-  
+<template>
+    <div class="max-w-6xl mx-auto px-6 py-4">
+        <Header title="Používatelia" />
+        <DataTable :value="usersWithoutLogged" dataKey="id">
+            <Column field="name" header="Meno" style="width: 30%" />
+            <Column field="email" header="Email" style="width: 35%" />
+            <Column field="role" header="Rola" style="width: 15%" />
+            <Column class="!text-end">
+                <template #header>
+                    <div class="flex w-full justify-end">
+                        <Button
+                            icon="pi pi-plus"
+                            label="Pridať"
+                            severity="success"
+                            @click="isModalVisible = true"
+                        />
+                    </div>
+                </template>
+                <template #body="{ data }">
+                    <div class="flex gap-2 justify-end">
+                        <Button
+                            icon="pi pi-pencil"
+                            @click="onRowEdit(data)"
+                            severity="secondary"
+                            rounded
+                        />
+                        <Button
+                            icon="pi pi-trash"
+                            @click="onRowDelete(data.id)"
+                            severity="danger"
+                            rounded
+                        />
+                    </div>
+                </template>
+            </Column>
+            <template #empty>Žiadni používatelia.</template>
+        </DataTable>
+    </div>
+    <Dialog
+        v-model:visible="deleteDialogVisible"
+        header="Vymazať používateľa"
+        :style="{ width: '25rem' }"
+        modal
+    >
+        <p class="mb-4">Naozaj chcete vymazať tohto používateľa?</p>
+        <div class="flex justify-end gap-2">
+            <Button
+                label="Zrušiť"
+                severity="secondary"
+                @click="deleteDialogVisible = false"
+            />
+            <Button label="Vymazať" severity="danger" @click="confirmDelete" />
+        </div>
+    </Dialog>
+    <UserForm
+        :user="userToEdit"
+        :visible="isModalVisible"
+        @close="closeModal()"
+    />
+</template>
