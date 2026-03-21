@@ -41,12 +41,22 @@ const doSearch = () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto px-4 py-14">
-        <div class="mb-10">
-            <h1 class="text-4xl font-bold text-gray-900 mb-5">Vyhľadávanie</h1>
-
-            <div class="flex items-center gap-4 mb-5">
-                <span class="text-base text-gray-400">Prehľadávať v</span>
+    <div
+        class="relative h-[260px] w-full overflow-hidden bg-center bg-cover flex items-center"
+        style="background-image: url(&quot;/images/hero.png&quot;)"
+    >
+        <div
+            class="absolute inset-0"
+            style="background: rgba(10, 30, 60, 0.6)"
+        ></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 w-full">
+            <h1
+                class="text-5xl sm:text-5xl font-bold text-white leading-none mb-6 tracking-tight"
+            >
+                Vyhľadávanie
+            </h1>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-white font-semibold text-xl">Prehľadávať v</span>
                 <div class="flex gap-2">
                     <Button
                         v-for="opt in typeOptions"
@@ -54,33 +64,54 @@ const doSearch = () => {
                         :label="opt.label"
                         unstyled
                         @click="selectType(opt.value)"
-                        :class="selectedType === opt.value
-                            ? 'bg-[#1E4E8C] text-white'
-                            : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:text-gray-900'"
-                        class="px-5 py-2 rounded-xl text-base font-medium transition-colors"
+                        :class="
+                            selectedType === opt.value
+                                ? 'bg-white text-[#1E4E8C]'
+                                : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                        "
+                        class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
                     />
                 </div>
             </div>
 
-            <div class="flex items-center bg-white rounded-2xl border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300 transition-all">
-                <svg class="ml-4 w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            <div
+                class="flex items-center bg-white rounded-xl shadow-lg overflow-hidden"
+            >
+                <svg
+                    class="ml-4 w-5 h-5 text-gray-400 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                 </svg>
                 <input
                     v-model="searchValue"
                     type="text"
-                    :placeholder="selectedType === 'publikacie' ? 'Hľadať publikácie...' : 'Hľadať autorov...'"
-                    class="flex-1 px-4 py-4 bg-transparent outline-none border-0 ring-0 text-gray-900 placeholder-gray-400"
+                    :placeholder="
+                        selectedType === 'publikacie'
+                            ? 'Hľadať publikácie...'
+                            : 'Hľadať autorov...'
+                    "
+                    class="flex-1 px-4 py-3.5 bg-transparent outline-none border-0 ring-0 text-gray-900 placeholder-gray-400"
                     @keyup.enter="doSearch"
                 />
                 <Button
                     label="Hľadať"
                     unstyled
                     @click="doSearch"
-                    class="mx-2 px-5 py-2.5 bg-[#1E4E8C] hover:bg-[#184073] text-white text-sm font-semibold rounded-xl transition-colors shrink-0"
+                    class="mx-2 px-5 py-2.5 bg-[#1E4E8C] hover:bg-[#184073] text-white text-sm font-semibold rounded-lg transition-colors shrink-0"
                 />
             </div>
         </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <PublicationSearch
             v-if="typ === 'publikacie'"
             :publications="publications"
