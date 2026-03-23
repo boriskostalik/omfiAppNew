@@ -3,11 +3,10 @@
         <h1 class="text-3xl font-bold mt-2 mb-4">{{ title }}</h1>
         <div class="flex h-12" v-if="hasSearch">
             <InputGroup>
-                <InputText  
+                <InputText
                     v-model="searchQuery"
                     @keyup.enter="$emit('search', searchQuery)"
                     placeholder="Vyhľadávanie"
-                    class="p-2 border rounded w-full mb-4" 
                 />
                 <InputGroupAddon @click="$emit('search', searchQuery)" class="cursor-pointer">
                     <i class="pi pi-search"></i>
@@ -28,7 +27,7 @@ const props = defineProps({
     },
 })
 
-const searchQuery = ref(window.location.search.split('search=')[1] || '');
+const searchQuery = ref(new URLSearchParams(window.location.search).get('search') || '');
 
 
 </script>

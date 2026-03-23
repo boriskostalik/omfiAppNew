@@ -78,12 +78,14 @@ const mobileOpen = ref(false)
         <div class="flex-1 flex flex-col min-w-0">
             <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 shrink-0">
                 <div class="flex items-center gap-3">
-                    <Button
-                        icon="pi pi-bars"
-                        text
-                        class="!flex md:!hidden !text-gray-600"
-                        @click="mobileOpen = true"
-                    />
+                    <div class="md:hidden">
+                        <Button
+                            icon="pi pi-bars"
+                            text
+                            class="!text-gray-600 focus:!shadow-none focus:!outline-none"
+                            @click="mobileOpen = true"
+                        />
+                    </div>
                     <Link
                         :href="route('home')"
                         class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1"
@@ -94,7 +96,7 @@ const mobileOpen = ref(false)
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-0 md:p-6">
                 <slot />
             </main>
         </div>
@@ -103,6 +105,10 @@ const mobileOpen = ref(false)
             v-model:visible="mobileOpen"
             position="left"
             :style="{ width: '280px', background: '#1E4E8C' }"
+            :pt="{
+                root: { class: '!shadow-none !border-0' },
+                pcCloseButton: { root: { class: '!text-white hover:!text-white/70' } }
+            }"
         >
             <template #header>
                 <span class="font-bold text-xl text-white tracking-wide">OMFI</span>

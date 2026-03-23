@@ -5,7 +5,7 @@
         optionLabel="label"
         optionValue="value"
         placeholder="Zoradiť"
-        class="w-48 select-underline"
+        class="w-auto select-underline"
         @change="emit('change', { page: 1 })"
     />
 </template>

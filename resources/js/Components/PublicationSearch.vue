@@ -129,14 +129,6 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                         </span>
                     </div>
                 </div>
-                <div class="shrink-0 text-lg text-gray-400 font-medium pt-0.5">
-                    <span v-if="pub.firstpage && pub.firstpage !== '0'">
-                        Strana: {{ pub.firstpage
-                        }}<span v-if="pub.lastpage && pub.lastpage !== '0'"
-                            >–{{ pub.lastpage }}</span
-                        >
-                    </span>
-                </div>
             </div>
         </div>
 

@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('publications', function (Blueprint $table) {
             $table->id();
             $table->integer('entered_by')->nullable();
-            $table->string('year', 12)->default('0000');
-            $table->string('actualyear', 12)->default('0000');
+            $table->string('actualyear', 12)->nullable();;
             $table->text('title');
             $table->text('title_eng')->nullable();
             $table->string('mesc', 50)->nullable();
@@ -25,7 +24,6 @@ return new class extends Migration
             $table->tinyInteger('survey')->default(0);
             $table->integer('mark')->default(5);
             $table->string('series', 64)->nullable();
-            $table->string('volume', 16)->nullable();
             $table->string('publisher', 127)->nullable();
             $table->string('location', 127)->nullable();
             $table->string('issn', 32)->nullable();
@@ -34,13 +32,11 @@ return new class extends Migration
             $table->string('lastpage', 10)->default('0');
             $table->string('journal', 255)->nullable();
             $table->string('booktitle', 255)->nullable();
-            $table->string('number', 255)->default('1');
             $table->string('institution', 255)->nullable();
             $table->string('address', 255)->nullable();
             $table->string('chapter', 10)->default('0');
             $table->string('edition', 255)->nullable();
             $table->string('howpublished', 255)->nullable();
-            $table->string('month', 255)->nullable();
             $table->string('organization', 255)->nullable();
             $table->string('school', 255)->nullable();
             $table->text('note')->nullable();

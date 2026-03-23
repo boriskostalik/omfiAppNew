@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('surname');
             $table->string('von')->nullable();
             $table->string('firstname');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('url')->nullable();
-            $table->string('institute');
-            $table->boolean('specialchars')->default('0');
+            $table->string('institute')->nullable();
+            $table->boolean('specialchars')->default('0')->nullable();
             $table->string('cleanname')->default('');
             $table->timestamps();
         });

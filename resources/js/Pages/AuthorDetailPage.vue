@@ -22,12 +22,16 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                 }}
             </h1>
             <div class="flex flex-col gap-2 text-gray-500 text-lg">
-                <span v-if="author.institute">Inštitút: {{ author.institute }}</span>
+                <span v-if="author.institute"
+                    >Inštitút: {{ author.institute }}</span
+                >
                 <span v-if="author.email">
-                    E-mail: <a
+                    E-mail:
+                    <a
                         :href="`mailto:${author.email}`"
                         class="hover:underline hover:text-gray-900 transition"
-                    >{{ author.email }}</a>
+                        >{{ author.email }}</a
+                    >
                 </span>
                 <span v-if="author.url">
                     <a
@@ -40,7 +44,6 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                 </span>
             </div>
         </div>
-
         <div v-if="publicationsByYear?.length">
             <h2
                 class="text-2xl font-bold text-gray-900 mb-5 uppercase tracking-wide"
@@ -58,7 +61,6 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                     {{ group.year }}
                 </h2>
                 <hr class="mb-8 border-gray-200" />
-
                 <div class="flex flex-col divide-y divide-gray-100 pl-6">
                     <div
                         v-for="pub in group.publications"
@@ -81,17 +83,6 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                                     </span>
                                 </span>
                             </div>
-                        </div>
-                        <div
-                            class="shrink-0 text-lg text-gray-400 font-medium pt-0.5"
-                        >
-                            <span v-if="pub.firstpage && pub.firstpage !== '0'">
-                                s. {{ pub.firstpage
-                                }}<span
-                                    v-if="pub.lastpage && pub.lastpage !== '0'"
-                                    >–{{ pub.lastpage }}</span
-                                >
-                            </span>
                         </div>
                     </div>
                 </div>
