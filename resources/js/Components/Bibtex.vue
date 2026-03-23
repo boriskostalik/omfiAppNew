@@ -1,54 +1,124 @@
+<script setup>
+import { computed } from "vue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+
+const props = defineProps({
+    visible: { type: Boolean, default: false },
+    publication: { type: Object, default: null },
+});
+
+const emit = defineEmits(["close", "update:visible"]);
+
+const isVisible = computed({
+    get: () => props.visible,
+    set: (val) => emit("update:visible", val),
+});
+
+const handleClose = () => {
+    isVisible.value = false;
+    emit("close");
+};
+
+const getAuthorsCleanNames = () => {
+    const authors = props.publication?.authors ?? [];
+    return authors
+        .map((a) => a?.cleanname)
+        .filter(Boolean)
+        .join(" and ");
+};
+
+const normalizeBibtexType = (t) => {
+    const type = (t ?? "article").toString().toLowerCase();
+    return type;
+};
+
+const generateCiteKey = () => {
+    const pub = props.publication ?? {};
+    const year = pub?.issue?.year ?? pub?.year ?? "n.d.";
+    const firstAuthor = (pub?.authors?.[0]?.cleanname ?? "unknown")
+        .split(" ")
+        .filter(Boolean)
+        .slice(-1)[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+    return `${firstAuthor}${year}`;
+};
+
+const fieldLine = (key, value, { trailingComma = true } = {}) => {
+    const v = (value ?? "").toString().trim();
+    if (!v) return null;
+    return `  ${key} = {${v}}${trailingComma ? "," : ""}`;
+};
+
+const bibtexText = computed(() => {
+    const pub = props.publication;
+    if (!pub) return "";
+
+    const type = normalizeBibtexType(pub.type);
+    const citeKey = pub.cite_key || pub.citeKey || generateCiteKey();
+
+    const lines = [
+        `@${type}{${citeKey},`,
+        fieldLine("title", pub.title),
+        fieldLine("author", getAuthorsCleanNames()),
+        fieldLine("journal", pub.journal),
+        fieldLine("year", pub.issue?.year),
+        fieldLine("volume", pub.issue?.volume),
+        fieldLine("number", pub.issue?.number),
+        fieldLine("pages", pub.pages),
+        fieldLine("issn", pub.issn),
+        fieldLine("abstract", pub.abstract, { trailingComma: false }),
+    ].filter(Boolean);
+
+    lines.push("}");
+    return lines.join("\n");
+});
+
+const copyToClipboard = async () => {
+    try {
+        await navigator.clipboard.writeText(bibtexText.value);
+    } catch (e) {
+        const ta = document.createElement("textarea");
+        ta.value = bibtexText.value;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+    }
+};
+</script>
+
 <template>
-    <Dialog v-model:visible="isVisible" modal header="Bibtex" :style="{ width: '50%' }" @hide="$emit('close')">
+    <Dialog
+        v-model:visible="isVisible"
+        modal
+        header="BibTeX"
+        :style="{ width: '50%' }"
+        @hide="handleClose"
+    >
         <template #closebutton>
-            <Button icon="pi pi-times" class="p-button-text" @click="$emit('close')" />
+            <Button
+                icon="pi pi-times"
+                class="p-button-text"
+                @click="handleClose"
+            />
         </template>
+
         <div class="p-4">
-            <div>@{{publication.type.toUpperCase()}} {</div>
-            <div>title = { {{ publication.title }} },</div>
-            <div>author = { {{ getAuthorsCleanNames() }} },</div>
-            <div>journal = { {{ publication.journal }} },</div>
-            <div>year = { {{ publication.year }} },</div>
-            <div>volume = { {{ publication.volume }} },</div>
-            <div>number = { {{ publication.number }} },</div>;
-            <div>pages = { {{ publication.pages }} },</div>
-            <div>issn = { {{ publication.issn }} },</div>
-            <div>abstract = { {{ publication.abstract }} }</div>
-            }
+            <div class="flex justify-end mb-3">
+                <Button
+                    icon="pi pi-copy"
+                    label="Copy"
+                    class="p-button-sm p-button-outlined"
+                    @click="copyToClipboard"
+                />
+            </div>
+
+            <pre
+                class="border border-gray-300 p-4 rounded-lg bg-gray-50 font-mono whitespace-pre-wrap m-0"
+                >{{ bibtexText }}</pre
+            >
         </div>
     </Dialog>
 </template>
-<script setup>
-import { computed } from 'vue';
-import { Dialog, Button } from 'primevue';
-
-const props = defineProps({
-    visible: {
-        type: Boolean,
-        default: false
-    },
-    publication: {
-        type: Object,
-        default: null
-    }
-});
-
-const isVisible = computed(() => props.visible);
-const getAuthorsCleanNames = (authors) => {
-    return props.publication.authors.map(author => {
-        return author.cleanname;
-    }).join(',  ');
-};
-</script>
-<style scoped>
-.publication {
-  border: 1px solid #ccc;
-  padding: 16px;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 20px auto;
-  background-color: #f9f9f9;
-  font-family: monospace;
-  white-space: pre-wrap;
-}
-</style>
