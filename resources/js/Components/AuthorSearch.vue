@@ -66,6 +66,8 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                     class="w-64"
                     @change="applyFilters({ page: 1 })"
                     :pt="{
+                        root: { class: '!rounded-xl' },
+                        label: { class: '!py-[0.6rem]' },
                         overlay: {
                             style: 'width:min(300px, calc(100vw - 2rem)); max-width:min(300px, calc(100vw - 2rem));',
                         },
@@ -77,16 +79,13 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                         optionLabel: {
                             style: 'white-space:nowrap; display:inline-block;',
                         },
-                        label: {
-                            style: 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;',
-                        },
                     }"
                 />
                 <Button
                     label="Zrušiť filtre"
                     severity="danger"
                     @click="clearFilters"
-                    class="rounded-xl"
+                    class="!rounded-xl"
                 />
             </div>
         </div>
@@ -106,7 +105,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 :options="sortOptions"
                 optionLabel="label"
                 optionValue="value"
-                class="w-40 select-underline"
+                class="w-auto select-underline"
                 @change="applyFilters({ page: 1 })"
             />
         </div>
@@ -151,6 +150,13 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 :pageLinkSize="3"
                 @page="changePage"
                 class="!bg-transparent !p-0"
+                :pt="{
+                    pcRowPerPageDropdown: {
+                        root: { class: '!rounded-xl !bg-[#1E4E8C] !border-[#1E4E8C]' },
+                        label: { class: '!py-[0.6rem] !text-white !font-semibold' },
+                        dropdown: { class: '!text-white' },
+                    },
+                }"
             />
         </div>
     </div>

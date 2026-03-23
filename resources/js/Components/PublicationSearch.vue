@@ -124,7 +124,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                                 class="hover:underline hover:text-gray-900 transition"
                             >
                                 {{ author.firstname }}
-                                {{ author.surname }}</button
+                                {{ author.surname }}<span v-if="author.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal"> (editor)</span></button
                             ><span v-if="i < pub.authors.length - 1">, </span>
                         </span>
                     </div>
@@ -144,6 +144,13 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 :pageLinkSize="3"
                 @page="changePage"
                 class="!bg-transparent !p-0"
+                :pt="{
+                    pcRowPerPageDropdown: {
+                        root: { class: '!rounded-xl !bg-[#1E4E8C] !border-[#1E4E8C]' },
+                        label: { class: '!py-[0.6rem] !text-white !font-semibold' },
+                        dropdown: { class: '!text-white' },
+                    },
+                }"
             />
         </div>
     </div>

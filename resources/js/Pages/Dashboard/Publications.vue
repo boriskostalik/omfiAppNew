@@ -133,12 +133,13 @@ const onRowEdit = (id) => {
                 </template>
             </Column>
 
-            <Column header="Authors" style="width: 25%">
+            <Column header="Autori" style="width: 25%">
                 <template #body="{ data }">
-                    <span v-if="data.authors.length">{{
-                        data.authors.map((a) => `${a.cleanname}`).join(" ")
-                    }}</span>
-                    <span v-else>No authors</span>
+                    <span v-if="data.authors.length">
+                        <span v-for="(a, i) in data.authors" :key="a.id">{{ a.cleanname }}<span v-if="a.pivot?.is_editor === 'Y'" class="text-gray-400"> (editor)</span><span v-if="i < data.authors.length - 1">, </span>
+                        </span>
+                    </span>
+                    <span v-else>—</span>
                 </template>
             </Column>
             <Column class="w-24 !text-end">

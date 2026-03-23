@@ -8,7 +8,6 @@ const props = defineProps({
 });
 
 defineOptions({ layout: HomeLayout });
-
 const goPublication = (id) => router.get(route("publications.detail", id));
 </script>
 
@@ -77,10 +76,7 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                             </button>
                             <div class="mt-2 text-lg text-gray-600">
                                 <span v-for="(a, i) in pub.authors" :key="a.id">
-                                    {{ a.firstname }} {{ a.surname
-                                    }}<span v-if="i < pub.authors.length - 1"
-                                        >,
-                                    </span>
+                                    {{ a.firstname }} {{ a.surname }}<span v-if="a.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal"> (editor)</span><span v-if="i < pub.authors.length - 1">, </span>
                                 </span>
                             </div>
                         </div>

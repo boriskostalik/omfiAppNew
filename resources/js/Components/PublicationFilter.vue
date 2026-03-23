@@ -16,7 +16,7 @@ const emitApply = (payload) => emit("apply", payload);
 const emitClear = () => emit("clear");
 </script>
 <template>
-    <div class="flex flex-wrap items-end gap-x-3 gap-y-4">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
         <Select
             v-model="year"
             :options="options.years"
@@ -25,6 +25,7 @@ const emitClear = () => emit("clear");
             showClear
             class="w-28"
             @change="emitApply({ page: 1 })"
+            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
         />
 
         <Select
@@ -35,6 +36,7 @@ const emitClear = () => emit("clear");
             showClear
             class="w-32"
             @change="emitApply({ page: 1 })"
+            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
         />
 
         <Select
@@ -47,6 +49,8 @@ const emitClear = () => emit("clear");
             appendTo="self"
             @change="emitApply({ page: 1 })"
             :pt="{
+                root: { class: '!rounded-xl' },
+                label: { class: '!py-[0.6rem]' },
                 overlay: {
                     style: 'width:min(300px, calc(100vw - 2rem)); max-width:min(300px, calc(100vw - 2rem));',
                 },
@@ -55,12 +59,7 @@ const emitClear = () => emit("clear");
                 },
                 list: { style: 'width:max-content; min-width:100%;' },
                 option: { style: 'min-width:max-content;' },
-                optionLabel: {
-                    style: 'white-space:nowrap; display:inline-block;',
-                },
-                label: {
-                    style: 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;',
-                },
+                optionLabel: { style: 'white-space:nowrap; display:inline-block;' },
             }"
         />
 
@@ -74,13 +73,14 @@ const emitClear = () => emit("clear");
             showClear
             class="w-44"
             @change="emitApply({ page: 1 })"
+            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
         />
 
         <Button
             label="Zrušiť filtre"
             severity="danger"
             @click="emitClear"
-            class="rounded-xl"
+            class="!rounded-xl"
         />
     </div>
 </template>
