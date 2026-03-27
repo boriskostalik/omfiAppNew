@@ -18,7 +18,6 @@ class Author extends Model
         'email',
         'url',
         'institute',
-        'specialchars',
         'cleanname'
     ];
     public function publications()

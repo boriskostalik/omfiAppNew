@@ -23,7 +23,6 @@ class AuthorFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'url' => $this->faker->url(),
             'institute' => $this->faker->company(),
-            'specialchars' => 'FALSE',
             'cleanname' => '',
         ];
     }

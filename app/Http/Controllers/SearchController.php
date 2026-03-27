@@ -36,6 +36,7 @@ class SearchController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('keywords', 'like', "%{$search}%")
                   ->orWhereHas('authors', function ($qa) use ($search) {
                       $qa->where('firstname', 'like', "%{$search}%")
                          ->orWhere('surname', 'like', "%{$search}%");

@@ -12,17 +12,14 @@ class Publication extends Model
     use HasFactory;
 
     protected $fillable = [
-        'issue_id', 'entered_by',
+        'issue_id',
         'type', 'title', 'title_eng',
-        'actualyear', 'month',
-        'journal', 'booktitle', 'publisher', 'series',
-        'edition', 'chapter',
-        'institution', 'organization', 'school',
-        'address', 'location', 'howpublished',
+        'actualyear',
+        'journal',
         'firstpage', 'lastpage',
-        'doi', 'url', 'issn', 'isbn',
-        'mesc', 'bibtex_id', 'namekey', 'crossref',
-        'keywords', 'note', 'abstract',
+        'doi', 'issn', 'isbn',
+        'bibtex_id',
+        'keywords', 'abstract',
     ];
 
     public function authors(): BelongsToMany

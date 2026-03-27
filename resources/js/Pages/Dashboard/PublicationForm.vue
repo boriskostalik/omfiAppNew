@@ -2,6 +2,7 @@
 import { ref, watch, computed } from "vue";
 import {
     InputText,
+    InputChips,
     Textarea,
     Select,
     Button,
@@ -19,7 +20,6 @@ const props = defineProps({
     authors: { type: Array, default: () => [] },
     issues: { type: Array, default: () => [] },
     visible: { type: Boolean, default: false },
-    entered_by: { type: Number, default: 0 },
 });
 const emit = defineEmits(["close"]);
 
@@ -64,26 +64,12 @@ const initialValues = computed(() => {
                     ?.filter((a) => a.pivot?.is_editor === "Y")
                     .map((a) => ({ id: a.id, cleanname: a.cleanname })) ?? [],
             journal: pub.journal ?? "",
-            booktitle: pub.booktitle ?? "",
-            publisher: pub.publisher ?? "",
-            series: pub.series ?? "",
-            institution: pub.institution ?? "",
-            organization: pub.organization ?? "",
-            school: pub.school ?? "",
-            address: pub.address ?? "",
-            location: pub.location ?? "",
-            howpublished: pub.howpublished ?? "",
             firstpage: pub.firstpage ?? "",
             lastpage: pub.lastpage ?? "",
             doi: pub.doi ?? "",
-            url: pub.url ?? "",
             issn: pub.issn ?? "1335-4981",
             isbn: pub.isbn ?? "",
-            mesc: pub.mesc ?? "",
-            namekey: pub.namekey ?? "",
-            crossref: pub.crossref ?? "",
-            keywords: pub.keywords ?? "",
-            note: pub.note ?? "",
+            keywords: pub.keywords ? pub.keywords.split(",").map((k) => k.trim()).filter(Boolean) : [],
             abstract: pub.abstract ?? "",
         };
     }
@@ -99,26 +85,12 @@ const initialValues = computed(() => {
         authors: [],
         editors: [],
         journal: "Obzory matematiky, fyziky a informatiky",
-        booktitle: "",
-        publisher: "",
-        series: "",
-        institution: "",
-        organization: "",
-        school: "",
-        address: "",
-        location: "",
-        howpublished: "",
         firstpage: "",
         lastpage: "",
         doi: "",
-        url: "",
         issn: "1335-4981",
         isbn: "",
-        mesc: "",
-        namekey: "",
-        crossref: "",
-        keywords: "",
-        note: "",
+        keywords: [],
         abstract: "",
     };
 });
@@ -144,32 +116,15 @@ const schema = v.object({
         v.check((val) => val !== null, "Vydanie je povinné"),
     ),
     actualyear: v.nullish(v.string()),
-    month: v.nullish(v.string()),
-    edition: v.nullish(v.string()),
-    chapter: v.nullish(v.string()),
     title_eng: v.nullish(v.string()),
     editors: v.optional(v.array(v.any())),
     journal: v.nullish(v.string()),
-    booktitle: v.nullish(v.string()),
-    publisher: v.nullish(v.string()),
-    series: v.nullish(v.string()),
-    institution: v.nullish(v.string()),
-    organization: v.nullish(v.string()),
-    school: v.nullish(v.string()),
-    address: v.nullish(v.string()),
-    location: v.nullish(v.string()),
-    howpublished: v.nullish(v.string()),
     firstpage: v.pipe(v.string(), v.minLength(1, "Prvá strana je povinná")),
     lastpage: v.pipe(v.string(), v.minLength(1, "Posledná strana je povinná")),
     doi: v.nullish(v.string()),
-    url: v.nullish(v.string()),
     issn: v.pipe(v.string(), v.minLength(1, "ISSN je povinné")),
     isbn: v.nullish(v.string()),
-    mesc: v.nullish(v.string()),
-    namekey: v.nullish(v.string()),
-    crossref: v.nullish(v.string()),
-    keywords: v.nullish(v.string()),
-    note: v.nullish(v.string()),
+    keywords: v.optional(v.array(v.string())),
     abstract: v.nullish(v.string()),
 });
 
@@ -223,7 +178,7 @@ const onSubmit = ({ valid, values }) => {
     const submitData = {
         ...values,
         bibtex_id: localBibtexId.value,
-        entered_by: props.entered_by,
+        keywords: (values.keywords ?? []).join(", "),
         authors: mergedAuthors,
     };
     delete submitData.editors;
@@ -507,6 +462,19 @@ const onSubmit = ({ valid, values }) => {
                     display="chip"
                     :maxSelectedLabels="4"
                     size="small"
+                    class="w-full"
+                />
+            </FormField>
+
+            <FormField
+                v-slot="$field"
+                name="keywords"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-6"
+            >
+                <label class="text-xs font-medium text-gray-700">Kľúčové slová</label>
+                <InputChips
+                    :modelValue="$field.value"
+                    @update:modelValue="$field.onInput({ target: { value: $event } })"
                     class="w-full"
                 />
             </FormField>

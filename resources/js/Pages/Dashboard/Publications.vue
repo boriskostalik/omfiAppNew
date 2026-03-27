@@ -12,7 +12,6 @@ defineOptions({
 
 const props = defineProps({
     publications: Object,
-    entered_by: Number,
     authors: Array,
     issues: Array,
     filters: Object,
@@ -197,7 +196,6 @@ const onRowEdit = (id) => {
     <PublicationForm
         :publication="publicationToEdit"
         :visible="isModalVisible"
-        :entered_by="entered_by"
         :authors="authors"
         :issues="issues"
         @close="closeModal()"
