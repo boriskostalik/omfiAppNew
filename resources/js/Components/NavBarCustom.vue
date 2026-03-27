@@ -49,21 +49,21 @@ const nav = [
   </header>
   <div
     v-show="mobileOpen"
-    class="absolute left-0 right-0 z-40 border-t border-b bg-white shadow-md lg:hidden [font-family:'Poppins',sans-serif]"
+    class="absolute left-0 right-0 z-40 bg-white shadow-md lg:hidden [font-family:'Poppins',sans-serif]"
   >
-    <div class="flex flex-col px-6 py-4 gap-3">
+    <div class="flex flex-col items-center px-6 py-6 gap-5">
       <Link
         v-for="item in nav"
         :key="item.href"
         :href="item.href"
-        class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
+        class="text-[16px] font-semibold text-[#1E4E8C] capitalize hover:text-[#1E4E8C]/70 transition-colors"
         @click="mobileOpen = false"
       >
         {{ item.label }}
       </Link>
       <Link
         href="/search"
-        class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
+        class="text-[16px] font-semibold text-[#1E4E8C] capitalize hover:text-[#1E4E8C]/70 transition-colors"
         @click="mobileOpen = false"
       >
         Vyhľadávanie

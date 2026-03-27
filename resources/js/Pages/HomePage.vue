@@ -1,4 +1,5 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
 import IssueCoverCard from "@/Components/IssueCoverCard.vue";
 
 const props = defineProps({
@@ -112,64 +113,45 @@ const props = defineProps({
         >
             <div class="max-w-6xl mx-auto px-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3">
-                    <div
-                        class="relative py-8 text-center sm:border-r border-slate-200"
+                    <Link
+                        :href="route('search.index')"
+                        class="relative py-8 text-center sm:border-r border-slate-200 block hover:bg-slate-100 transition-colors"
                     >
-                        <div
-                            class="absolute left-0 right-0 top-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm"
-                        >
+                        <div class="absolute left-0 right-0 top-0 h-px bg-slate-200"></div>
+                        <div class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"></div>
+                        <div class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm">
                             {{ props.stats?.publications ?? "—" }}
                         </div>
-                        <div
-                            class="text-sm font-bold tracking-widest uppercase text-slate-900"
-                        >
+                        <div class="text-sm font-bold tracking-widest uppercase text-slate-900">
                             Počet publikácií
                         </div>
-                    </div>
-                    <div
-                        class="relative py-8 text-center sm:border-r border-slate-200"
+                    </Link>
+                    <Link
+                        :href="route('search.index', { typ: 'autori' })"
+                        class="relative py-8 text-center sm:border-r border-slate-200 block hover:bg-slate-100 transition-colors"
                     >
-                        <div
-                            class="absolute left-0 right-0 top-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm"
-                        >
+                        <div class="absolute left-0 right-0 top-0 h-px bg-slate-200"></div>
+                        <div class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"></div>
+                        <div class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm">
                             {{ props.stats?.authors ?? "—" }}
                         </div>
-                        <div
-                            class="text-sm font-bold tracking-widest uppercase text-slate-900"
-                        >
+                        <div class="text-sm font-bold tracking-widest uppercase text-slate-900">
                             Počet autorov
                         </div>
-                    </div>
-                    <div class="relative py-8 text-center">
-                        <div
-                            class="absolute left-0 right-0 top-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"
-                        ></div>
-                        <div
-                            class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm"
-                        >
+                    </Link>
+                    <Link
+                        :href="route('archive.index')"
+                        class="relative py-8 text-center block hover:bg-slate-100 transition-colors"
+                    >
+                        <div class="absolute left-0 right-0 top-0 h-px bg-slate-200"></div>
+                        <div class="absolute left-0 right-0 bottom-0 h-px bg-slate-200"></div>
+                        <div class="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1E4E8C] text-white font-extrabold text-2xl shadow-sm">
                             {{ props.stats?.issues ?? "—" }}
                         </div>
-                        <div
-                            class="text-sm font-bold tracking-widest uppercase text-slate-900"
-                        >
+                        <div class="text-sm font-bold tracking-widest uppercase text-slate-900">
                             Počet vydaní
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </div>
