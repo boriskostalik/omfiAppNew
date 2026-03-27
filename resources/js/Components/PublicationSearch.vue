@@ -75,7 +75,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
 
         <div
             v-if="publications?.data?.length"
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+            class="flex flex-row items-center justify-between gap-3 mb-6"
         >
             <p class="text-lg text-gray-500">
                 Nájdených výsledkov:

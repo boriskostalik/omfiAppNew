@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
@@ -7,10 +7,17 @@ import Drawer from 'primevue/drawer'
 const navItems = [
     { label: 'Publikácie', route: 'publications.dashboard', icon: 'pi pi-book' },
     { label: 'Autori', route: 'authors.dashboard', icon: 'pi pi-users' },
-    { label: 'Issues', route: 'issues.dashboard', icon: 'pi pi-folder' },
+    { label: 'Vydania', route: 'issues.dashboard', icon: 'pi pi-folder' },
 ]
 
 const mobileOpen = ref(false)
+
+const onResize = () => {
+    if (window.innerWidth >= 768) mobileOpen.value = false
+}
+
+onMounted(() => window.addEventListener('resize', onResize))
+onUnmounted(() => window.removeEventListener('resize', onResize))
 </script>
 
 <template>
@@ -40,7 +47,7 @@ const mobileOpen = ref(false)
                     :class="{ '!text-white !bg-white/20 border-l-4 border-white': route().current('users.dashboard') }"
                 >
                     <i class="pi pi-shield text-lg"></i>
-                    Users
+                    Používatelia
                 </Link>
             </nav>
 
@@ -69,7 +76,7 @@ const mobileOpen = ref(false)
                         class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
                     >
                         <i class="pi pi-sign-out text-sm"></i>
-                        Odhlásiť
+                        Odhlásiť sa
                     </Link>
                 </div>
             </div>
@@ -135,7 +142,7 @@ const mobileOpen = ref(false)
                     :class="{ '!text-white !bg-white/20': route().current('users.dashboard') }"
                 >
                     <i class="pi pi-shield text-lg"></i>
-                    Users
+                    Používatelia
                 </Link>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 border-t border-white/10 px-5 py-5">

@@ -113,7 +113,7 @@ return [
     'starts_with'          => 'Pole :attribute musí začínať jednou z nasledujúcich hodnôt: :values.',
     'string'               => 'Pole :attribute musí byť reťazec.',
     'timezone'             => 'Pole :attribute musí byť platná časová zóna.',
-    'unique'               => 'Pole :attribute je už obsadené.',
+    'unique'               => ':attribute je obsadená',
     'uploaded'             => 'Nahrávanie poľa :attribute zlyhalo.',
     'url'                  => 'Pole :attribute musí byť platná URL adresa.',
     'uuid'                 => 'Pole :attribute musí byť platné UUID.',
@@ -125,9 +125,10 @@ return [
     ],
 
     'attributes' => [
-        'email'    => 'email',
+        'email'    => 'Email adresa',
         'password' => 'heslo',
         'name'     => 'meno',
+        'number'   => 'Kombinácia rok a číslo vydania',
     ],
 
 ];

@@ -82,7 +82,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                     }"
                 />
                 <Button
-                    label="Zrušiť filtre"
+                    label="Zrušiť filter"
                     severity="danger"
                     @click="clearFilters"
                     class="!rounded-xl"
@@ -92,7 +92,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
 
         <div
             v-if="authors?.data?.length"
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+            class="flex flex-row items-center justify-between gap-3 mb-6"
         >
             <p class="text-lg text-gray-500">
                 Nájdených výsledkov:
@@ -152,8 +152,12 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 class="!bg-transparent !p-0"
                 :pt="{
                     pcRowPerPageDropdown: {
-                        root: { class: '!rounded-xl !bg-[#1E4E8C] !border-[#1E4E8C]' },
-                        label: { class: '!py-[0.6rem] !text-white !font-semibold' },
+                        root: {
+                            class: '!rounded-xl !bg-[#1E4E8C] !border-[#1E4E8C]',
+                        },
+                        label: {
+                            class: '!py-[0.6rem] !text-white !font-semibold',
+                        },
                         dropdown: { class: '!text-white' },
                     },
                 }"

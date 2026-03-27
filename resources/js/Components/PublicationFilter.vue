@@ -23,9 +23,12 @@ const emitClear = () => emit("clear");
             placeholder="Rok"
             filter
             showClear
-            class="w-28"
+            class="w-36"
             @change="emitApply({ page: 1 })"
-            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
+            :pt="{
+                root: { class: '!rounded-xl' },
+                label: { class: '!py-[0.6rem]' },
+            }"
         />
 
         <Select
@@ -36,7 +39,10 @@ const emitClear = () => emit("clear");
             showClear
             class="w-32"
             @change="emitApply({ page: 1 })"
-            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
+            :pt="{
+                root: { class: '!rounded-xl' },
+                label: { class: '!py-[0.6rem]' },
+            }"
         />
 
         <Select
@@ -59,7 +65,9 @@ const emitClear = () => emit("clear");
                 },
                 list: { style: 'width:max-content; min-width:100%;' },
                 option: { style: 'min-width:max-content;' },
-                optionLabel: { style: 'white-space:nowrap; display:inline-block;' },
+                optionLabel: {
+                    style: 'white-space:nowrap; display:inline-block;',
+                },
             }"
         />
 
@@ -73,11 +81,14 @@ const emitClear = () => emit("clear");
             showClear
             class="w-44"
             @change="emitApply({ page: 1 })"
-            :pt="{ root: { class: '!rounded-xl' }, label: { class: '!py-[0.6rem]' } }"
+            :pt="{
+                root: { class: '!rounded-xl' },
+                label: { class: '!py-[0.6rem]' },
+            }"
         />
 
         <Button
-            label="Zrušiť filtre"
+            label="Zrušiť filter"
             severity="danger"
             @click="emitClear"
             class="!rounded-xl"

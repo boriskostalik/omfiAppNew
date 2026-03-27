@@ -17,5 +17,7 @@ const sortKey = defineModel("sortKey");
 const options = [
     { label: "Názov A → Z", value: "title_asc" },
     { label: "Názov Z → A", value: "title_desc" },
+    { label: "Najstaršie", value: "added_asc" },
+    { label: "Najnovšie", value: "added_desc" },
 ];
 </script>

@@ -84,6 +84,12 @@ class SearchController extends Controller
                       ->orderBy('issues.number', 'desc')
                       ->orderBy('title', 'asc');
                 break;
+            case 'added_asc':
+                $query->orderBy('publications.id', 'asc');
+                break;
+            case 'added_desc':
+                $query->orderBy('publications.id', 'desc');
+                break;
             case 'title_asc':
             default:
                 $sortKey = 'title_asc';

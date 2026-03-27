@@ -12,7 +12,8 @@ const nav = [
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 w-full border-b bg-white">
+  <div class="sticky top-0 z-50">
+  <header class="w-full border-b bg-white">
     <nav class="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
       <Link href="/" class="flex items-center gap-4">
         <img src="/images/omfi-logo.svg" alt="OMFI" class="h-20 w-auto" />
@@ -45,25 +46,29 @@ const nav = [
         </svg>
       </button>
     </nav>
-    <div v-show="mobileOpen" class="border-t bg-white lg:hidden [font-family:'Poppins',sans-serif]">
-      <div class="flex flex-col px-6 py-4 gap-3">
-        <Link
-          v-for="item in nav"
-          :key="item.href"
-          :href="item.href"
-          class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
-          @click="mobileOpen = false"
-        >
-          {{ item.label }}
-        </Link>
-        <Link
-          href="/search"
-          class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
-          @click="mobileOpen = false"
-        >
-          Vyhľadávanie
-        </Link>
-      </div>
-    </div>
   </header>
+  <div
+    v-show="mobileOpen"
+    class="absolute left-0 right-0 z-40 border-t border-b bg-white shadow-md lg:hidden [font-family:'Poppins',sans-serif]"
+  >
+    <div class="flex flex-col px-6 py-4 gap-3">
+      <Link
+        v-for="item in nav"
+        :key="item.href"
+        :href="item.href"
+        class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
+        @click="mobileOpen = false"
+      >
+        {{ item.label }}
+      </Link>
+      <Link
+        href="/search"
+        class="text-[15px] font-semibold text-[#161616] capitalize hover:text-[#D29A2B]"
+        @click="mobileOpen = false"
+      >
+        Vyhľadávanie
+      </Link>
+    </div>
+  </div>
+  </div>
 </template>

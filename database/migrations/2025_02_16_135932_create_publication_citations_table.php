@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('cited_id');
             $table->unsignedBigInteger('reference_id');
-            $table->timestamp('created_at')->useCurrent();
-            
+            $table->timestamp('created_at')->useCurrent(); 
             $table->foreign('cited_id')->references('id')->on('publications')->onDelete('cascade');
             $table->foreign('reference_id')->references('id')->on('publications')->onDelete('cascade');
         });
