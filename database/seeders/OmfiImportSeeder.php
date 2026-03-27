@@ -11,8 +11,9 @@ class OmfiImportSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $files = [
-            base_path('import_db/importauthors_fixed.sql'),
-            base_path('import_db/importpublications.sql'),
+            base_path('import_db/importauthors_clean.sql'),
+            base_path('import_db/importissues.sql'),
+            base_path('import_db/importpublications_clean.sql'),
             base_path('import_db/importpublication_authors.sql'),
         ];
         foreach ($files as $file) {
@@ -20,13 +21,52 @@ class OmfiImportSeeder extends Seeder
                 throw new \RuntimeException("SQL file not found: {$file}");
             }
             $sql = File::get($file);
-            $statements = array_filter(array_map('trim', explode(';', $sql)));
-            foreach ($statements as $stmt) {
-                if ($stmt !== '') {
-                    DB::statement($stmt);
-                }
+            foreach ($this->splitSql($sql) as $stmt) {
+                DB::statement($stmt);
             }
         }
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    }
+
+    private function splitSql(string $sql): array
+    {
+        $statements = [];
+        $current    = '';
+        $inString   = false;
+        $n          = strlen($sql);
+
+        for ($i = 0; $i < $n; $i++) {
+            $ch = $sql[$i];
+            if ($inString) {
+                if ($ch === '\\') {
+                    $current .= $ch . ($sql[++$i] ?? '');
+                } elseif ($ch === "'") {
+                    $inString = false;
+                    $current .= $ch;
+                } else {
+                    $current .= $ch;
+                }
+            } else {
+                if ($ch === "'") {
+                    $inString = true;
+                    $current .= $ch;
+                } elseif ($ch === ';') {
+                    $stmt = trim($current);
+                    if ($stmt !== '') {
+                        $statements[] = $stmt;
+                    }
+                    $current = '';
+                } else {
+                    $current .= $ch;
+                }
+            }
+        }
+
+        $stmt = trim($current);
+        if ($stmt !== '') {
+            $statements[] = $stmt;
+        }
+
+        return $statements;
     }
 }
