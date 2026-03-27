@@ -157,8 +157,8 @@ $publications = $query->paginate($perPage)->appends($request->query());
     {
         $perPage   = (int) $request->input('per_page', 10);
         $search    = $request->input('search');
-        $sortField = $request->input('sortField', 'title'); 
-        $sortOrder = $request->input('sortOrder', 'asc');  
+        $sortField = $request->input('sortField', 'id'); 
+        $sortOrder = $request->input('sortOrder', 'desc');  
         $filters = $request->only(['title', 'type', 'year', 'number']);
 
         $query = Publication::query()->with(['authors', 'issue']);
@@ -199,7 +199,7 @@ $publications = $query->paginate($perPage)->appends($request->query());
                   ->orderBy('issues.year', $sortOrder)
                   ->orderByRaw('(issues.number = 0) ASC')
                   ->orderBy('issues.number', $sortOrder);
-        } elseif (in_array($sortField, ['title', 'type'], true)) {
+        } elseif (in_array($sortField, ['id', 'title', 'type'], true)) {
             $query->orderBy($sortField, $sortOrder);
         } else {
             $sortField = 'title';

@@ -28,8 +28,8 @@ const filters = ref({
 
 const currentPage = ref(props.publications.current_page || 1);
 const perPage = ref(Number(props.publications.per_page) || 10);
-const sortField = ref(props.sortField || "title");
-const sortOrder = ref(props.sortOrder === "desc" ? -1 : 1);
+const sortField = ref(props.sortField || "id");
+const sortOrder = ref(props.sortOrder === "asc" ? 1 : -1);
 const searchQuery = ref("");
 
 const isModalVisible = ref(false);
@@ -113,9 +113,11 @@ const onRowEdit = (id) => {
             :sortOrder="sortOrder"
             dataKey="id"
             lazy
+            emptyMessage="Žiadne publikácie"
             @sort="onSort"
         >
-            <Column field="title" header="Title" sortable style="width: 50%">
+            <Column field="id" header="ID" sortable style="width: 5%" />
+            <Column field="title" header="Title" sortable style="width: 45%">
                 <template #body="{ data }">
                     {{ data.title }}
                 </template>
@@ -169,7 +171,7 @@ const onRowEdit = (id) => {
                 </template>
             </Column>
 
-            <template #empty> No publications found. </template>
+            <template #empty>Žiadne publikácie.</template>
         </DataTable>
         <Paginator
             v-if="publications.next_page_url || publications.prev_page_url"

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class AuthorRequest extends FormRequest
 {
@@ -21,10 +20,6 @@ class AuthorRequest extends FormRequest
             'email' => 'nullable|email|max:255',
             'url' => 'nullable|url|max:255',
             'institute' => 'nullable|string|max:255',
-            'specialchars' => [
-                'required', 
-                Rule::in([true, false, 0, 1, '0', '1'])
-            ],
             'cleanname' => 'nullable|string|max:255'
         ];
     }

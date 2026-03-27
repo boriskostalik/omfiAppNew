@@ -17,8 +17,8 @@ const props = defineProps({
 
 const currentPage = ref(props.authors.current_page || 1);
 const perPage = ref(Number(props.authors.per_page) || 10);
-const sortField = ref(props.sortField || "surname");
-const sortOrder = ref(props.sortOrder === "desc" ? -1 : 1);
+const sortField = ref(props.sortField || "id");
+const sortOrder = ref(props.sortOrder === "asc" ? 1 : -1);
 const searchQuery = ref(props.search || "");
 
 const isModalVisible = ref(false);
@@ -88,9 +88,11 @@ const confirmDelete = () => {
             lazy
             @sort="onSort"
         >
+            <Column field="id" header="ID" sortable style="width: 5%" />
             <Column field="surname" header="Priezvisko" sortable style="width: 25%" />
             <Column field="firstname" header="Meno" sortable style="width: 20%" />
-            <Column field="institute" header="Inštitúcia" style="width: 35%" />
+            <Column field="von" header="Von" style="width: 10%" />
+            <Column field="institute" header="Inštitúcia" style="width: 25%" />
             <Column field="email" header="Email" style="width: 15%" />
             <Column class="w-24 !text-end">
                 <template #header>
@@ -118,7 +120,7 @@ const confirmDelete = () => {
                     </div>
                 </template>
             </Column>
-            <template #empty>Žiadni autori nenájdení.</template>
+            <template #empty>Žiadni autori.</template>
         </DataTable>
         <Paginator
             v-if="authors.next_page_url || authors.prev_page_url"

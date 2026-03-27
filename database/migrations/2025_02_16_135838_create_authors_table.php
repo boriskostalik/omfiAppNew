@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('url')->nullable();
             $table->string('institute')->nullable();
-            $table->boolean('specialchars')->default('0')->nullable();
             $table->string('cleanname')->default('');
             $table->timestamps();
         });

@@ -75,8 +75,8 @@ class AuthorController extends Controller
     {
         $perPage   = (int) $request->input('per_page', 10);
         $search    = $request->input('search');
-        $sortField = $request->input('sortField', 'firstname');
-        $sortOrder = $request->input('sortOrder', 'asc');
+        $sortField = $request->input('sortField', 'id');
+        $sortOrder = $request->input('sortOrder', 'desc');
         $filters   = $request->only(['firstname', 'surname']);
         $query = Author::query()->with('publications.issue');
 
@@ -91,7 +91,7 @@ class AuthorController extends Controller
                 $query->where($field, 'like', "%{$value}%");
             }
         }
-        if (in_array($sortField, ['firstname', 'surname'], true)) {
+        if (in_array($sortField, ['id', 'firstname', 'surname'], true)) {
             $query->orderBy($sortField, $sortOrder === 'desc' ? 'desc' : 'asc');
         }
         $authors = $query->paginate($perPage)->appends($request->query());

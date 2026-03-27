@@ -56,10 +56,9 @@ const initialValues = computed(() => {
             title: pub.title ?? "",
             title_eng: pub.title_eng ?? "",
             authors:
-                pub.authors?.map((a) => ({
-                    id: a.id,
-                    cleanname: a.cleanname,
-                })) ?? [],
+                pub.authors
+                    ?.filter((a) => a.pivot?.is_editor !== "Y")
+                    .map((a) => ({ id: a.id, cleanname: a.cleanname })) ?? [],
             editors:
                 pub.authors
                     ?.filter((a) => a.pivot?.is_editor === "Y")
@@ -208,14 +207,24 @@ const onSubmit = ({ valid, values }) => {
     serverErrors.value = {};
 
     const editors = values.editors ?? [];
+    const editorIds = new Set(editors.map((e) => e.id));
+    const authorIds = new Set(values.authors.map((a) => a.id));
+
+    const mergedAuthors = [
+        ...values.authors.map((a) => ({
+            id: a.id,
+            is_editor: editorIds.has(a.id) ? "Y" : "N",
+        })),
+        ...editors
+            .filter((e) => !authorIds.has(e.id))
+            .map((e) => ({ id: e.id, is_editor: "Y" })),
+    ];
+
     const submitData = {
         ...values,
         bibtex_id: localBibtexId.value,
         entered_by: props.entered_by,
-        authors: values.authors.map((author) => ({
-            id: author.id,
-            is_editor: editors.some((e) => e.id === author.id) ? "Y" : "N",
-        })),
+        authors: mergedAuthors,
     };
     delete submitData.editors;
 
@@ -380,7 +389,7 @@ const onSubmit = ({ valid, values }) => {
                 class="flex flex-col gap-0.5 lg:col-span-1"
             >
                 <label class="text-xs font-medium text-gray-700"
-                    >SP <span class="text-red-500">*</span></label
+                    >Strana od <span class="text-red-500">*</span></label
                 >
                 <InputText
                     v-bind="$field"
@@ -402,7 +411,7 @@ const onSubmit = ({ valid, values }) => {
                 class="flex flex-col gap-0.5 lg:col-span-1"
             >
                 <label class="text-xs font-medium text-gray-700"
-                    >EP <span class="text-red-500">*</span></label
+                    >Strana do <span class="text-red-500">*</span></label
                 >
                 <InputText
                     v-bind="$field"

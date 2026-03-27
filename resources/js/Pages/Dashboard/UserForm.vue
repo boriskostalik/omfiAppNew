@@ -14,6 +14,7 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 const formKey = ref(0);
 const passwordMatchError = ref("");
+const serverErrors = ref({});
 
 watch(
     () => props.visible,
@@ -21,6 +22,7 @@ watch(
         if (val) {
             formKey.value++;
             passwordMatchError.value = "";
+            serverErrors.value = {};
         }
     }
 );
@@ -67,10 +69,12 @@ const onSubmit = ({ valid, values }) => {
     if (props.user) {
         router.put(route("users.update", props.user.id), payload, {
             onSuccess: () => emit("close"),
+            onError: (err) => { serverErrors.value = err; },
         });
     } else {
         router.post(route("users.store"), payload, {
             onSuccess: () => emit("close"),
+            onError: (err) => { serverErrors.value = err; },
         });
     }
 };
@@ -118,6 +122,9 @@ const onSubmit = ({ valid, values }) => {
                 <InputText v-bind="$field" type="email" class="w-full !text-sm !py-2" />
                 <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
                     {{ $field.error?.message }}
+                </Message>
+                <Message v-if="serverErrors.email" severity="error" size="small" variant="simple">
+                    {{ serverErrors.email }}
                 </Message>
             </FormField>
 

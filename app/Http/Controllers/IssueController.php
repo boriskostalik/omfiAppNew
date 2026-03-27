@@ -49,7 +49,7 @@ class IssueController extends Controller
         $data = $request->validate([
             'year'         => 'required|numeric',
             'volume'       => 'nullable|string|max:16',
-            'number'       => 'required|numeric',
+            'number'       => ['required', 'numeric', \Illuminate\Validation\Rule::unique('issues')->where(fn ($q) => $q->where('year', $request->year))],
             'published_at' => 'nullable|date',
             'pdf'          => 'nullable|file|mimes:pdf|max:20480',
         ]);
@@ -72,7 +72,7 @@ class IssueController extends Controller
         $data = $request->validate([
             'year'         => 'required|numeric',
             'volume'       => 'nullable|string|max:16',
-            'number'       => 'required|numeric',
+            'number'       => ['required', 'numeric', \Illuminate\Validation\Rule::unique('issues')->where(fn ($q) => $q->where('year', $request->year))->ignore($issue->id)],
             'published_at' => 'nullable|date',
             'pdf'          => 'nullable|file|mimes:pdf|max:20480',
             'remove_pdf'   => 'nullable|string',
