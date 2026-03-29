@@ -57,7 +57,11 @@ const cleanParams = (params) => {
 
 const submitSearch = (query) => {
     searchQuery.value = query;
-    router.get(route("publications.dashboard"), { ...syncParams(), page: 1, search: query });
+    router.get(route("publications.dashboard"), {
+        ...syncParams(),
+        page: 1,
+        search: query,
+    });
 };
 
 const onRowDelete = (id) => {
@@ -81,14 +85,12 @@ const syncParams = () => {
         title: filters.value.title?.value,
         type: filters.value.type?.value,
         year: filters.value.year?.value,
-        journal: filters.value.journal?.value,
     });
 };
 
 const onSort = (event) => {
     sortField.value = event.sortField;
     sortOrder.value = event.sortOrder;
-
     router.get(route("publications.dashboard"), syncParams());
 };
 
@@ -137,7 +139,14 @@ const onRowEdit = (id) => {
             <Column header="Autori" style="width: 25%">
                 <template #body="{ data }">
                     <span v-if="data.authors.length">
-                        <span v-for="(a, i) in data.authors" :key="a.id">{{ a.cleanname }}<span v-if="a.pivot?.is_editor === 'Y'" class="text-gray-400"> (editor)</span><span v-if="i < data.authors.length - 1">, </span>
+                        <span v-for="(a, i) in data.authors" :key="a.id"
+                            >{{ a.cleanname
+                            }}<span
+                                v-if="a.pivot?.is_editor === 'Y'"
+                                class="text-gray-400"
+                            >
+                                (editor)</span
+                            ><span v-if="i < data.authors.length - 1">, </span>
                         </span>
                     </span>
                     <span v-else>—</span>
@@ -189,7 +198,11 @@ const onRowEdit = (id) => {
     >
         <p class="mb-4">Naozaj chcete vymazať túto publikáciu?</p>
         <div class="flex justify-end gap-2">
-            <Button label="Zrušiť" severity="secondary" @click="deleteDialogVisible = false" />
+            <Button
+                label="Zrušiť"
+                severity="secondary"
+                @click="deleteDialogVisible = false"
+            />
             <Button label="Vymazať" severity="danger" @click="confirmDelete" />
         </div>
     </Dialog>

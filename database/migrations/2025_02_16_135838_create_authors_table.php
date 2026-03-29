@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('firstname');
             $table->string('email')->nullable();
             $table->string('url')->nullable();
-            $table->string('institute')->nullable();
-            $table->string('cleanname')->default('');
+            $table->foreignId('institute_id')->nullable()->constrained('institutes')->nullOnDelete();
+            $table->string('cleanname', 500)->storedAs("TRIM(CONCAT(IF(von IS NOT NULL AND von != '', CONCAT(von, ' '), ''), surname, IF(firstname IS NOT NULL AND firstname != '', CONCAT(', ', firstname), '')))");
             $table->timestamps();
         });
     }

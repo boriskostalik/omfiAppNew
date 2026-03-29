@@ -47,6 +47,9 @@ const line = (tag, value) => {
     return `${tag}  - ${v}`;
 };
 
+const JOURNAL_NAME = "Obzory matematiky, fyziky a informatiky";
+const JOURNAL_ISSN = "1335-4981";
+
 const risText = computed(() => {
     const pub = props.publication;
     if (!pub) return "";
@@ -55,13 +58,13 @@ const risText = computed(() => {
         `TY  - ${risType.value}`,
         line("T1", pub.title),
         authorsLines.value || null,
-        line("JA", pub.journal),
+        line("JA", JOURNAL_NAME),
         line("Y1", pub.issue?.year),
         line("VL", pub.issue?.volume),
         line("IS", pub.issue?.number),
         line("SP", pub.firstpage ?? pub.sp ?? pub.start_page),
         line("EP", pub.lastpage ?? pub.ep ?? pub.end_page),
-        line("SN", pub.issn),
+        line("SN", JOURNAL_ISSN),
         line("N2", pub.abstract),
         "ER  -",
     ].filter(Boolean);

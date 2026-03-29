@@ -15,11 +15,10 @@ class Publication extends Model
         'issue_id',
         'type', 'title', 'title_eng',
         'actualyear',
-        'journal',
         'firstpage', 'lastpage',
-        'doi', 'issn', 'isbn',
+        'doi', 'isbn',
         'bibtex_id',
-        'keywords', 'abstract',
+        'abstract',
     ];
 
     public function authors(): BelongsToMany
@@ -31,5 +30,10 @@ class Publication extends Model
     public function issue(): BelongsTo
     {
         return $this->belongsTo(Issue::class);
+    }
+
+    public function keywords(): BelongsToMany
+    {
+        return $this->belongsToMany(Keyword::class, 'publication_keywords');
     }
 }

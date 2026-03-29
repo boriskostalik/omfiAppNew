@@ -9,7 +9,7 @@ defineProps({
 const emit = defineEmits(["apply", "clear"]);
 const year = defineModel("year");
 const number = defineModel("number");
-const institute = defineModel("institute");
+const instituteId = defineModel("instituteId");
 const authorId = defineModel("authorId");
 
 const emitApply = (payload) => emit("apply", payload);
@@ -46,8 +46,10 @@ const emitClear = () => emit("clear");
         />
 
         <Select
-            v-model="institute"
+            v-model="instituteId"
             :options="options.institutes"
+            optionLabel="name"
+            optionValue="id"
             placeholder="Inštitút"
             filter
             showClear

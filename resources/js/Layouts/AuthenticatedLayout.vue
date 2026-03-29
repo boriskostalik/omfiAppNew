@@ -84,7 +84,14 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 
         <div class="flex-1 flex flex-col min-w-0">
             <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 shrink-0">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center justify-between w-full">
+                    <Link
+                        :href="route('home')"
+                        class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1"
+                    >
+                        <i class="pi pi-arrow-left text-xs"></i>
+                        Späť na web
+                    </Link>
                     <div class="md:hidden">
                         <Button
                             icon="pi pi-bars"
@@ -93,13 +100,6 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
                             @click="mobileOpen = true"
                         />
                     </div>
-                    <Link
-                        :href="route('home')"
-                        class="text-sm text-[#1E4E8C] hover:underline flex items-center gap-1"
-                    >
-                        <i class="pi pi-arrow-left text-xs"></i>
-                        Späť na web
-                    </Link>
                 </div>
             </header>
 

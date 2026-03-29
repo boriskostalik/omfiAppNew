@@ -65,3 +65,11 @@ html { scrollbar-gutter: stable; }
   padding-left: 0;
 }
 
+/* Select dropdown - wrap long option text */
+.p-select-option,
+.p-select-option-label {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+}
+

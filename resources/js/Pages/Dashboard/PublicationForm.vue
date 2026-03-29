@@ -63,13 +63,11 @@ const initialValues = computed(() => {
                 pub.authors
                     ?.filter((a) => a.pivot?.is_editor === "Y")
                     .map((a) => ({ id: a.id, cleanname: a.cleanname })) ?? [],
-            journal: pub.journal ?? "",
             firstpage: pub.firstpage ?? "",
             lastpage: pub.lastpage ?? "",
             doi: pub.doi ?? "",
-            issn: pub.issn ?? "1335-4981",
             isbn: pub.isbn ?? "",
-            keywords: pub.keywords ? pub.keywords.split(",").map((k) => k.trim()).filter(Boolean) : [],
+            keywords: pub.keywords?.map((k) => k.name) ?? [],
             abstract: pub.abstract ?? "",
         };
     }
@@ -84,11 +82,9 @@ const initialValues = computed(() => {
         title_eng: "",
         authors: [],
         editors: [],
-        journal: "Obzory matematiky, fyziky a informatiky",
         firstpage: "",
         lastpage: "",
         doi: "",
-        issn: "1335-4981",
         isbn: "",
         keywords: [],
         abstract: "",
@@ -118,11 +114,9 @@ const schema = v.object({
     actualyear: v.nullish(v.string()),
     title_eng: v.nullish(v.string()),
     editors: v.optional(v.array(v.any())),
-    journal: v.nullish(v.string()),
     firstpage: v.pipe(v.string(), v.minLength(1, "Prvá strana je povinná")),
     lastpage: v.pipe(v.string(), v.minLength(1, "Posledná strana je povinná")),
     doi: v.nullish(v.string()),
-    issn: v.pipe(v.string(), v.minLength(1, "ISSN je povinné")),
     isbn: v.nullish(v.string()),
     keywords: v.optional(v.array(v.string())),
     abstract: v.nullish(v.string()),
@@ -162,23 +156,16 @@ const onSubmit = ({ valid, values }) => {
     serverErrors.value = {};
 
     const editors = values.editors ?? [];
-    const editorIds = new Set(editors.map((e) => e.id));
-    const authorIds = new Set(values.authors.map((a) => a.id));
 
     const mergedAuthors = [
-        ...values.authors.map((a) => ({
-            id: a.id,
-            is_editor: editorIds.has(a.id) ? "Y" : "N",
-        })),
-        ...editors
-            .filter((e) => !authorIds.has(e.id))
-            .map((e) => ({ id: e.id, is_editor: "Y" })),
+        ...values.authors.map((a) => ({ id: a.id, is_editor: "N" })),
+        ...editors.map((e) => ({ id: e.id, is_editor: "Y" })),
     ];
 
     const submitData = {
         ...values,
         bibtex_id: localBibtexId.value,
-        keywords: (values.keywords ?? []).join(", "),
+        keywords: values.keywords ?? [],
         authors: mergedAuthors,
     };
     delete submitData.editors;
@@ -288,15 +275,6 @@ const onSubmit = ({ valid, values }) => {
 
             <FormField
                 v-slot="$field"
-                name="journal"
-                class="flex flex-col gap-0.5 lg:col-span-2"
-            >
-                <label class="text-xs font-medium text-gray-700">Journal</label>
-                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
-            </FormField>
-
-            <FormField
-                v-slot="$field"
                 name="title"
                 class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
             >
@@ -389,24 +367,6 @@ const onSubmit = ({ valid, values }) => {
             >
                 <label class="text-xs font-medium text-gray-700">DOI</label>
                 <InputText v-bind="$field" class="w-full !text-sm !py-2" />
-            </FormField>
-
-            <FormField
-                v-slot="$field"
-                name="issn"
-                class="flex flex-col gap-0.5 lg:col-span-1"
-            >
-                <label class="text-xs font-medium text-gray-700"
-                    >ISSN <span class="text-red-500">*</span></label
-                >
-                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
-                <Message
-                    v-if="$field.invalid"
-                    severity="error"
-                    size="small"
-                    variant="simple"
-                    >{{ $field.error?.message }}</Message
-                >
             </FormField>
 
             <FormField

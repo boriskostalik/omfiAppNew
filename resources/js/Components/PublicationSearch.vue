@@ -16,7 +16,7 @@ const props = defineProps({
 
 const currentPage = ref(props.publications?.current_page || 1);
 const perPage = ref(Number(props.publications?.per_page) || 10);
-const selectedInstitute = ref(props.filters?.institute || null);
+const selectedInstitute = ref(props.filters?.institute_id || null);
 const selectedAuthorId = ref(props.filters?.author_id || null);
 const selectedYear = ref(props.filters?.year || null);
 const selectedNumber = ref(props.filters?.number || null);
@@ -33,7 +33,7 @@ const applyFilters = ({ page = 1, per_page = perPage.value } = {}) => {
             search: props.search || undefined,
             year: selectedYear.value || undefined,
             number: selectedNumber.value || undefined,
-            institute: selectedInstitute.value || undefined,
+            institute_id: selectedInstitute.value || undefined,
             author_id: selectedAuthorId.value || undefined,
             sortKey: sortKey.value || undefined,
         },
@@ -66,7 +66,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 :options="options"
                 v-model:year="selectedYear"
                 v-model:number="selectedNumber"
-                v-model:institute="selectedInstitute"
+                v-model:instituteId="selectedInstitute"
                 v-model:authorId="selectedAuthorId"
                 @apply="applyFilters"
                 @clear="clearFilters"

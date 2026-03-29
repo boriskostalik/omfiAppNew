@@ -10,6 +10,7 @@ defineOptions({ layout: AuthenticatedLayout });
 
 const props = defineProps({
     authors: Object,
+    institutes: Array,
     search: String,
     sortField: String,
     sortOrder: String,
@@ -92,7 +93,11 @@ const confirmDelete = () => {
             <Column field="surname" header="Priezvisko" sortable style="width: 25%" />
             <Column field="firstname" header="Meno" sortable style="width: 20%" />
             <Column field="von" header="Von" style="width: 10%" />
-            <Column field="institute" header="Inštitúcia" style="width: 25%" />
+            <Column header="Inštitúcia" style="width: 25%">
+                <template #body="{ data }">
+                    {{ data.institute?.name ?? "—" }}
+                </template>
+            </Column>
             <Column field="email" header="Email" style="width: 15%" />
             <Column class="w-24 !text-end">
                 <template #header>
@@ -146,6 +151,7 @@ const confirmDelete = () => {
     <AuthorForm
         :author="authorToEdit"
         :visible="isModalVisible"
+        :institutes="institutes"
         @close="closeModal()"
     />
 </template>

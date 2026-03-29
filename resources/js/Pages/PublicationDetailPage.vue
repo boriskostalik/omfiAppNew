@@ -63,11 +63,11 @@ const pdfUrl = computed(() => {
             </p>
         </div>
 
-        <div v-if="publication.keywords" class="mb-8">
+        <div v-if="publication.keywords?.length" class="mb-8">
             <h2 class="text-sm font-bold uppercase tracking-wide text-gray-400 mb-3">
                 Kľúčové slová
             </h2>
-            <p class="text-gray-600 text-lg">{{ publication.keywords }}</p>
+            <p class="text-gray-600 text-lg">{{ publication.keywords.map(k => k.name).join(', ') }}</p>
         </div>
 
         <div class="flex flex-wrap gap-3 mb-8">

@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Publication;
 use App\Models\Author;
 use App\Models\Issue;
+use App\Models\Keyword;
 use Illuminate\Http\Request;
 use App\Http\Requests\PublicationRequest;
 
@@ -15,6 +16,7 @@ class PublicationController extends Controller
     {
         $publication = Publication::with([
             'issue',
+            'keywords',
             'authors' => function ($query) {
                 $query->orderBy('firstname', 'desc');
             },
@@ -33,7 +35,7 @@ class PublicationController extends Controller
         $sortOrder = $request->input('sortOrder', 'desc');  
         $filters = $request->only(['title', 'type', 'year', 'number']);
 
-        $query = Publication::query()->with(['authors', 'issue']);
+        $query = Publication::query()->with(['authors', 'issue', 'keywords']);
         $authors = Author::query();
 
         if ($search) {
@@ -101,21 +103,18 @@ $publications = $query->paginate($perPage)->appends($request->query());
     public function store(PublicationRequest $request)
     {
         $data = $request->validated();
+        $keywordNames = $data['keywords'] ?? [];
+        unset($data['keywords']);
+
         $publication = Publication::create($data);
 
+        $keywordIds = collect($keywordNames)
+            ->map(fn($name) => Keyword::firstOrCreate(['name' => trim($name)])->id)
+            ->all();
+        $publication->keywords()->sync($keywordIds);
+
         if ($request->has('authors') && is_array($request->authors)) {
-            $authorsData = [];
-
-            foreach ($request->authors as $author) {
-                $authorId = is_array($author) ? $author['id'] : $author;
-
-                $authorsData[$authorId] = [
-                    'rank' => 1,
-                    'is_editor' => $author['is_editor'] ?? 'N',
-                ];
-            }
-
-            $publication->authors()->attach($authorsData);
+            $this->syncAuthors($publication, $request->authors);
         }
 
         return redirect()->route('publications.dashboard');
@@ -124,24 +123,33 @@ $publications = $query->paginate($perPage)->appends($request->query());
     public function update(PublicationRequest $request, Publication $publication)
     {
         $data = $request->validated();
+        $keywordNames = $data['keywords'] ?? [];
+        unset($data['keywords']);
+
         $publication->update($data);
 
+        $keywordIds = collect($keywordNames)
+            ->map(fn($name) => Keyword::firstOrCreate(['name' => trim($name)])->id)
+            ->all();
+        $publication->keywords()->sync($keywordIds);
+
         if ($request->has('authors') && is_array($request->authors)) {
-            $authorsData = [];
-
-            foreach ($request->authors as $author) {
-                $authorId = is_array($author) ? $author['id'] : $author;
-
-                $authorsData[$authorId] = [
-                    'rank' => 1,
-                    'is_editor' => $author['is_editor'] ?? 'N',
-                ];
-            }
-
-            $publication->authors()->sync($authorsData);
+            $this->syncAuthors($publication, $request->authors);
         }
 
         return redirect()->route('publications.dashboard');
+    }
+
+    private function syncAuthors(Publication $publication, array $authors): void
+    {
+        $publication->authors()->detach();
+        foreach ($authors as $author) {
+            $authorId = is_array($author) ? $author['id'] : $author;
+            $publication->authors()->attach($authorId, [
+                'rank' => 1,
+                'is_editor' => $author['is_editor'] ?? 'N',
+            ]);
+        }
     }
 
     public function destroy(Publication $publication)

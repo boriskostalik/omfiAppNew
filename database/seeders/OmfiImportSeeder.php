@@ -12,6 +12,7 @@ class OmfiImportSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $files = [
             base_path('import_db/importauthors_clean.sql'),
+            base_path('import_db/importinstitutes.sql'),
             base_path('import_db/importissues.sql'),
             base_path('import_db/importpublications_clean.sql'),
             base_path('import_db/importpublication_authors.sql'),
@@ -61,12 +62,10 @@ class OmfiImportSeeder extends Seeder
                 }
             }
         }
-
         $stmt = trim($current);
         if ($stmt !== '') {
             $statements[] = $stmt;
         }
-
         return $statements;
     }
 }

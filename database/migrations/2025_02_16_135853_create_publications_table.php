@@ -18,12 +18,9 @@ return new class extends Migration
             $table->text('title_eng')->nullable();
             $table->string('bibtex_id', 255)->nullable();
             $table->enum('type', ['Article','Book','Booklet','Inbook','Incollection','Inproceedings','Manual','Mastersthesis','Misc','Phdthesis','Proceedings','Techreport','Unpublished'])->nullable();
-            $table->string('issn', 32)->nullable();
             $table->string('isbn', 32)->nullable();
             $table->string('firstpage', 10)->default('0');
             $table->string('lastpage', 10)->default('0');
-            $table->string('journal', 255)->nullable();
-            $table->text('keywords')->nullable();
             $table->text('abstract')->nullable();
             $table->string('doi', 255)->nullable();
             $table->timestamps();

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, computed } from "vue";
-import { InputText, Button, Dialog, Message } from "primevue";
+import { InputText, Button, Dialog, Message, Select } from "primevue";
 import { Form, FormField } from "@primevue/forms";
 import { valibotResolver } from "@primevue/forms/resolvers/valibot";
 import * as v from "valibot";
@@ -9,6 +9,7 @@ import { router } from "@inertiajs/vue3";
 const props = defineProps({
     author: { type: Object, default: null },
     visible: { type: Boolean, default: false },
+    institutes: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["close"]);
@@ -27,7 +28,7 @@ const initialValues = computed(() => {
             von: a.von ?? "",
             email: a.email ?? "",
             url: a.url ?? "",
-            institute: a.institute ?? "",
+            institute: a.institute?.name ?? "",
         };
     }
     return {
@@ -51,21 +52,10 @@ const schema = v.object({
 
 const resolver = valibotResolver(schema);
 
-const buildCleanName = (surname, von, firstname) => {
-    let name = "";
-    if (von) name += von + " ";
-    name += surname;
-    if (firstname) name += ", " + firstname;
-    return name.trim();
-};
-
 const onSubmit = ({ valid, values }) => {
     if (!valid) return;
 
-    const submitData = {
-        ...values,
-        cleanname: buildCleanName(values.surname, values.von, values.firstname),
-    };
+    const submitData = { ...values };
 
     if (props.author) {
         router.put(`/dashboard/authors/${props.author.id}`, submitData, {
@@ -144,7 +134,7 @@ const onSubmit = ({ valid, values }) => {
             <FormField
                 v-slot="$field"
                 name="email"
-                class="flex flex-col gap-0.5 col-span-2"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
             >
                 <label class="text-xs font-medium text-gray-700">Email</label>
                 <InputText v-bind="$field" type="email" class="w-full !text-sm !py-2" />
@@ -156,7 +146,7 @@ const onSubmit = ({ valid, values }) => {
             <FormField
                 v-slot="$field"
                 name="url"
-                class="flex flex-col gap-0.5 col-span-2"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
             >
                 <label class="text-xs font-medium text-gray-700">URL</label>
                 <InputText v-bind="$field" class="w-full !text-sm !py-2" />
@@ -165,10 +155,20 @@ const onSubmit = ({ valid, values }) => {
             <FormField
                 v-slot="$field"
                 name="institute"
-                class="flex flex-col gap-0.5 col-span-2"
+                class="flex flex-col gap-0.5 col-span-2 lg:col-span-6"
             >
                 <label class="text-xs font-medium text-gray-700">Inštitúcia</label>
-                <InputText v-bind="$field" class="w-full !text-sm !py-2" />
+                <Select
+                    v-bind="$field"
+                    :options="institutes.map(i => i.name)"
+                    editable
+                    showClear
+                    filter
+                    placeholder="Vyberte alebo napíšte inštitúciu"
+                    size="small"
+                    class="w-full"
+                    :pt="{ overlay: { style: 'max-width: min(100vw, 760px)' } }"
+                />
             </FormField>
 
             <div class="col-span-2 lg:col-span-6 flex items-center gap-3 mt-1">

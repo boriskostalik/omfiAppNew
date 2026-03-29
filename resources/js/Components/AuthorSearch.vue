@@ -20,7 +20,7 @@ const sortOptions = [
 
 const currentPage = ref(props.authors?.current_page || 1);
 const perPage = ref(Number(props.authors?.per_page) || 10);
-const selectedInstitute = ref(props.filters?.institute || null);
+const selectedInstitute = ref(props.filters?.institute_id || null);
 const sortKey = ref(props.filters?.sortKey || "name_asc");
 
 const applyFilters = ({ page = 1, per_page = perPage.value } = {}) => {
@@ -32,7 +32,7 @@ const applyFilters = ({ page = 1, per_page = perPage.value } = {}) => {
             page,
             per_page,
             search: props.search || undefined,
-            institute: selectedInstitute.value || undefined,
+            institute_id: selectedInstitute.value || undefined,
             sortKey: sortKey.value,
         },
         { preserveState: true, preserveScroll: true, replace: true },
@@ -60,6 +60,8 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                 <Select
                     v-model="selectedInstitute"
                     :options="options?.institutes ?? []"
+                    optionLabel="name"
+                    optionValue="id"
                     placeholder="Inštitút"
                     filter
                     showClear
@@ -133,7 +135,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                     }}
                 </button>
                 <p v-if="author.institute" class="mt-1 text-lg text-gray-500">
-                    {{ author.institute }}
+                    {{ author.institute.name }}
                 </p>
             </div>
         </div>

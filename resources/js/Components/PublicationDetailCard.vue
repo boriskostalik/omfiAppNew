@@ -36,10 +36,6 @@ const showEnglishTitle = () => {
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					<div class="space-y-4">
 						<div class="flex flex-col gap-3 text-base text-slate-700">
-							<div v-if="publication.journal" class="flex gap-2">
-								<strong class="text-slate-900">Časopis:</strong><span>{{ publication.journal }}</span>
-							</div>
-
 							<div v-if="publication.year && publication.number && (publication.issue_id || publication.issue?.id)" class="flex items-center gap-2">
 								<strong class="text-slate-900">Vydanie:</strong>
 								<Link :href="route('archive.issue', publication.issue_id ?? publication.issue.id)" class="inline-flex" @click.stop>

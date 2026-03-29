@@ -51,6 +51,9 @@ const fieldLine = (key, value, { trailingComma = true } = {}) => {
     return `  ${key} = {${v}}${trailingComma ? "," : ""}`;
 };
 
+const JOURNAL_NAME = "Obzory matematiky, fyziky a informatiky";
+const JOURNAL_ISSN = "1335-4981";
+
 const bibtexText = computed(() => {
     const pub = props.publication;
     if (!pub) return "";
@@ -62,12 +65,12 @@ const bibtexText = computed(() => {
         `@${type}{${citeKey},`,
         fieldLine("title", pub.title),
         fieldLine("author", getAuthorsCleanNames()),
-        fieldLine("journal", pub.journal),
+        fieldLine("journal", JOURNAL_NAME),
         fieldLine("year", pub.issue?.year),
         fieldLine("volume", pub.issue?.volume),
         fieldLine("number", pub.issue?.number),
         fieldLine("pages", pub.pages),
-        fieldLine("issn", pub.issn),
+        fieldLine("issn", JOURNAL_ISSN),
         fieldLine("abstract", pub.abstract, { trailingComma: false }),
     ].filter(Boolean);
 

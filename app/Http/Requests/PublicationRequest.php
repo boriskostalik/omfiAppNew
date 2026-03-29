@@ -18,14 +18,13 @@ class PublicationRequest extends FormRequest
             'title'     => 'required|string',
             'title_eng' => 'nullable|string',
             'actualyear'=> 'nullable|string|max:12',
-            'journal'   => 'nullable|string|max:255',
             'firstpage' => 'required|string|max:10',
             'lastpage'  => 'required|string|max:10',
             'doi'       => 'nullable|string|max:255',
-            'issn'      => 'required|string|max:32',
             'isbn'      => 'nullable|string|max:32',
             'bibtex_id' => 'nullable|string|max:255',
-            'keywords'  => 'nullable|string',
+            'keywords'  => 'nullable|array',
+            'keywords.*' => 'string|max:255',
             'abstract'  => 'nullable|string',
         ];
     }

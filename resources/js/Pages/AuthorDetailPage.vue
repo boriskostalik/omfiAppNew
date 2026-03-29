@@ -22,7 +22,7 @@ const goPublication = (id) => router.get(route("publications.detail", id));
             </h1>
             <div class="flex flex-col gap-2 text-gray-500 text-lg">
                 <span v-if="author.institute"
-                    >Inštitút: {{ author.institute }}</span
+                    >Inštitút: {{ author.institute.name }}</span
                 >
                 <span v-if="author.email">
                     E-mail:

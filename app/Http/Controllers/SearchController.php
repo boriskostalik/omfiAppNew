@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Author;
+use App\Models\Institute;
 use App\Models\Issue;
 use App\Models\Publication;
 use Illuminate\Http\Request;
@@ -23,20 +24,20 @@ class SearchController extends Controller
 
     private function searchPublications(Request $request)
     {
-        $perPage   = (int) $request->input('per_page', 10);
-        $search    = $request->input('search');
-        $year      = $request->input('year');
-        $number    = $request->input('number');
-        $institute = $request->input('institute');
-        $authorId  = $request->input('author_id');
-        $sortKey   = $request->input('sortKey', 'title_asc');
+        $perPage     = (int) $request->input('per_page', 10);
+        $search      = $request->input('search');
+        $year        = $request->input('year');
+        $number      = $request->input('number');
+        $instituteId = $request->input('institute_id');
+        $authorId    = $request->input('author_id');
+        $sortKey     = $request->input('sortKey', 'title_asc');
 
-        $query = Publication::query()->with(['authors', 'issue']);
+        $query = Publication::query()->with(['authors.institute', 'issue']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('keywords', 'like', "%{$search}%")
+                  ->orWhereHas('keywords', fn($qk) => $qk->where('name', 'like', "%{$search}%"))
                   ->orWhereHas('authors', function ($qa) use ($search) {
                       $qa->where('firstname', 'like', "%{$search}%")
                          ->orWhere('surname', 'like', "%{$search}%");
@@ -52,9 +53,9 @@ class SearchController extends Controller
             $query->whereHas('issue', fn ($qi) => $qi->where('number', (int) $number));
         }
 
-        if ($institute) {
-            $query->whereHas('authors', function ($qa) use ($institute) {
-                $qa->whereRaw('TRIM(authors.institute) = ?', [trim($institute)]);
+        if ($instituteId) {
+            $query->whereHas('authors', function ($qa) use ($instituteId) {
+                $qa->where('institute_id', $instituteId);
             });
         }
 
@@ -108,13 +109,7 @@ class SearchController extends Controller
         }
         $numbers = $numbersQuery->orderByRaw('(number = 0) ASC')->orderBy('number', 'asc')->pluck('number');
 
-        $institutes = Author::query()
-            ->selectRaw("TRIM(institute) as institute")
-            ->whereNotNull('institute')
-            ->whereRaw("TRIM(institute) <> ''")
-            ->distinct()
-            ->orderBy('institute')
-            ->pluck('institute');
+        $institutes = Institute::orderBy('name')->get(['id', 'name']);
 
         $authors = Author::query()
             ->select('id', 'firstname', 'surname')
@@ -133,11 +128,11 @@ class SearchController extends Controller
             'per_page'     => $perPage,
             'search'       => $search,
             'filters'      => [
-                'year'      => $year,
-                'number'    => $number,
-                'institute' => $institute,
-                'author_id' => $authorId,
-                'sortKey'   => $sortKey,
+                'year'         => $year,
+                'number'       => $number,
+                'institute_id' => $instituteId,
+                'author_id'    => $authorId,
+                'sortKey'      => $sortKey,
             ],
             'options' => [
                 'years'      => $years,
@@ -150,12 +145,12 @@ class SearchController extends Controller
 
     private function searchAuthors(Request $request)
     {
-        $perPage   = (int) $request->input('per_page', 10);
-        $search    = $request->input('search');
-        $institute = $request->input('institute');
-        $sortKey   = $request->input('sortKey', 'name_asc');
+        $perPage     = (int) $request->input('per_page', 10);
+        $search      = $request->input('search');
+        $instituteId = $request->input('institute_id');
+        $sortKey     = $request->input('sortKey', 'name_asc');
 
-        $query = Author::query();
+        $query = Author::query()->with('institute');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -165,29 +160,22 @@ class SearchController extends Controller
             });
         }
 
-        if ($institute) {
-            $query->whereRaw('TRIM(institute) = ?', [trim($institute)]);
+        if ($instituteId) {
+            $query->where('institute_id', $instituteId);
         }
 
         $dir = $sortKey === 'name_desc' ? 'desc' : 'asc';
         $query->orderBy('surname', $dir)->orderBy('firstname', $dir);
 
-        $authors = $query->paginate($perPage)->appends($request->query());
-
-        $institutes = Author::query()
-            ->selectRaw("TRIM(institute) as institute")
-            ->whereNotNull('institute')
-            ->whereRaw("TRIM(institute) <> ''")
-            ->distinct()
-            ->orderBy('institute')
-            ->pluck('institute');
+        $authors    = $query->paginate($perPage)->appends($request->query());
+        $institutes = Institute::orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('SearchPage', [
             'typ'      => 'autori',
             'authors'  => $authors,
             'per_page' => $perPage,
             'search'   => $search,
-            'filters'  => ['institute' => $institute, 'sortKey' => $sortKey],
+            'filters'  => ['institute_id' => $instituteId, 'sortKey' => $sortKey],
             'options'  => ['institutes' => $institutes],
         ]);
     }
