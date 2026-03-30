@@ -150,6 +150,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
                 <p class="text-xs text-white/40 truncate mb-3">{{ $page.props.auth.user.email }}</p>
                 <Link
                     :href="route('profile.edit')"
+                    @click="mobileOpen = false"
                     class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
                 >
                     <i class="pi pi-user-edit text-sm"></i>
@@ -159,6 +160,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
                     :href="route('logout')"
                     method="post"
                     as="button"
+                    @click="mobileOpen = false"
                     class="flex items-center gap-3 text-sm text-white/60 hover:text-white transition py-1.5"
                 >
                     <i class="pi pi-sign-out text-sm"></i>

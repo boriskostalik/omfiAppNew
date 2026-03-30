@@ -92,6 +92,7 @@ const copyToClipboard = async () => {
         modal
         header="RIS Format"
         :style="{ width: '50%' }"
+        :breakpoints="{ '768px': '96vw' }"
         @hide="handleClose"
     >
         <template #closebutton>

@@ -98,6 +98,7 @@ const copyToClipboard = async () => {
         modal
         header="BibTeX"
         :style="{ width: '50%' }"
+        :breakpoints="{ '768px': '96vw' }"
         @hide="handleClose"
     >
         <template #closebutton>
