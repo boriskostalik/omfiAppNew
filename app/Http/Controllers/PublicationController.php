@@ -40,21 +40,21 @@ class PublicationController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+                $q->whereRaw('title COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
                   ->orWhereHas('issue', fn ($qi) => $qi->where('year', 'like', "%{$search}%"))
                   ->orWhereHas('authors', function ($qa) use ($search) {
-                      $qa->where('firstname', 'like', "%{$search}%")
-                         ->orWhere('surname', 'like', "%{$search}%");
+                      $qa->whereRaw('firstname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                         ->orWhereRaw('surname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"]);
                   });
             });
         }
 
         if (!empty($filters['title'])) {
-            $query->where('title', 'like', "%{$filters['title']}%");
+            $query->whereRaw('title COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$filters['title']}%"]);
         }
 
         if (!empty($filters['type'])) {
-            $query->where('type', 'like', "%{$filters['type']}%");
+            $query->whereRaw('type COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$filters['type']}%"]);
         }
 
         if (!empty($filters['year'])) {

@@ -106,7 +106,7 @@ const goAuthor = (id) => router.get(route("authors.detail", id));
                                 unstyled
                                 @click="goAuthor(author.id)"
                                 class="hover:underline hover:text-gray-900 transition"
-                                :label="`${author.firstname} ${author.surname}`"
+                                :label="[author.firstname, author.von, author.surname].filter(Boolean).join(' ')"
                             /><span v-if="i < pub.authors.length - 1">, </span>
                         </span>
                     </div>

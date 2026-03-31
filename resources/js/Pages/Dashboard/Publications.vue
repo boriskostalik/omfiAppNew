@@ -140,7 +140,7 @@ const onRowEdit = (id) => {
                 <template #body="{ data }">
                     <span v-if="data.authors.length">
                         <span v-for="(a, i) in data.authors" :key="a.id"
-                            >{{ a.cleanname
+                            >{{ [a.firstname, a.von, a.surname].filter(Boolean).join(' ')
                             }}<span
                                 v-if="a.pivot?.is_editor === 'Y'"
                                 class="text-gray-400"

@@ -16,8 +16,7 @@ const goPublication = (id) => router.get(route("publications.detail", id));
         <div class="mb-16">
             <h1 class="text-5xl font-bold text-gray-900 leading-snug mb-4">
                 {{
-                    author.cleanname?.replace(",", "") ??
-                    `${author.firstname} ${author.surname}`
+                    [author.firstname, author.von, author.surname].filter(Boolean).join(' ')
                 }}
             </h1>
             <div class="flex flex-col gap-2 text-gray-500 text-lg">
@@ -76,7 +75,7 @@ const goPublication = (id) => router.get(route("publications.detail", id));
                             </button>
                             <div class="mt-2 text-lg text-gray-600">
                                 <span v-for="(a, i) in pub.authors" :key="a.id">
-                                    {{ a.firstname }} {{ a.surname }}<span v-if="a.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal"> (editor)</span><span v-if="i < pub.authors.length - 1">, </span>
+                                    {{ [a.firstname, a.von, a.surname].filter(Boolean).join(' ') }}<span v-if="a.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal"> (editor)</span><span v-if="i < pub.authors.length - 1">, </span>
                                 </span>
                             </div>
                         </div>

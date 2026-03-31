@@ -14,10 +14,19 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 const formKey = ref(0);
+const instituteValue = ref("");
+const customMode = ref(false);
 
-watch(() => props.visible, (val) => {
-    if (val) formKey.value++;
-});
+watch(
+    () => props.visible,
+    (val) => {
+        if (val) {
+            formKey.value++;
+            instituteValue.value = props.author?.institute?.name ?? "";
+            customMode.value = false;
+        }
+    },
+);
 
 const initialValues = computed(() => {
     const a = props.author;
@@ -28,7 +37,6 @@ const initialValues = computed(() => {
             von: a.von ?? "",
             email: a.email ?? "",
             url: a.url ?? "",
-            institute: a.institute?.name ?? "",
         };
     }
     return {
@@ -37,7 +45,6 @@ const initialValues = computed(() => {
         von: "",
         email: "",
         url: "",
-        institute: "",
     };
 });
 
@@ -45,9 +52,11 @@ const schema = v.object({
     surname: v.pipe(v.string(), v.minLength(1, "Priezvisko je povinné")),
     firstname: v.pipe(v.string(), v.minLength(1, "Meno je povinné")),
     von: v.nullish(v.string()),
-    email: v.union([v.pipe(v.string(), v.email("Neplatný email")), v.literal("")]),
+    email: v.union([
+        v.pipe(v.string(), v.email("Neplatný email")),
+        v.literal(""),
+    ]),
     url: v.nullish(v.string()),
-    institute: v.nullish(v.string()),
 });
 
 const resolver = valibotResolver(schema);
@@ -55,7 +64,7 @@ const resolver = valibotResolver(schema);
 const onSubmit = ({ valid, values }) => {
     if (!valid) return;
 
-    const submitData = { ...values };
+    const submitData = { ...values, institute: instituteValue.value || null };
 
     if (props.author) {
         router.put(`/dashboard/authors/${props.author.id}`, submitData, {
@@ -103,7 +112,12 @@ const onSubmit = ({ valid, values }) => {
                     Priezvisko <span class="text-red-500">*</span>
                 </label>
                 <InputText v-bind="$field" class="w-full !text-sm !py-2" />
-                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
                     {{ $field.error?.message }}
                 </Message>
             </FormField>
@@ -117,7 +131,12 @@ const onSubmit = ({ valid, values }) => {
                     Meno <span class="text-red-500">*</span>
                 </label>
                 <InputText v-bind="$field" class="w-full !text-sm !py-2" />
-                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
                     {{ $field.error?.message }}
                 </Message>
             </FormField>
@@ -137,8 +156,17 @@ const onSubmit = ({ valid, values }) => {
                 class="flex flex-col gap-0.5 col-span-2 lg:col-span-3"
             >
                 <label class="text-xs font-medium text-gray-700">Email</label>
-                <InputText v-bind="$field" type="email" class="w-full !text-sm !py-2" />
-                <Message v-if="$field.invalid" severity="error" size="small" variant="simple">
+                <InputText
+                    v-bind="$field"
+                    type="email"
+                    class="w-full !text-sm !py-2"
+                />
+                <Message
+                    v-if="$field.invalid"
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >
                     {{ $field.error?.message }}
                 </Message>
             </FormField>
@@ -152,28 +180,56 @@ const onSubmit = ({ valid, values }) => {
                 <InputText v-bind="$field" class="w-full !text-sm !py-2" />
             </FormField>
 
-            <FormField
-                v-slot="$field"
-                name="institute"
-                class="flex flex-col gap-0.5 col-span-2 lg:col-span-6"
-            >
-                <label class="text-xs font-medium text-gray-700">Inštitúcia</label>
+            <div class="flex flex-col gap-0.5 col-span-2 lg:col-span-6">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-medium text-gray-700"
+                        >Inštitúcia</label
+                    >
+                    <button
+                        type="button"
+                        class="text-xs text-[#1E4E8C] hover:underline"
+                        @click="
+                            customMode = !customMode;
+                            instituteValue = '';
+                        "
+                    >
+                        {{
+                            customMode
+                                ? "Vybrať zo zoznamu"
+                                : "Pridať inštitúciu"
+                        }}
+                    </button>
+                </div>
                 <Select
-                    v-bind="$field"
-                    :options="institutes.map(i => i.name)"
-                    editable
+                    v-if="!customMode"
+                    v-model="instituteValue"
+                    :options="institutes.map((i) => i.name)"
                     showClear
                     filter
-                    placeholder="Vyberte alebo napíšte inštitúciu"
+                    placeholder="Vyberte inštitúciu"
                     size="small"
                     class="w-full"
-                    :pt="{ overlay: { style: 'max-width: min(100vw, 760px)' } }"
                 />
-            </FormField>
+                <InputText
+                    v-else
+                    v-model="instituteValue"
+                    placeholder="Napíšte názov inštitúcie"
+                    class="w-full !text-sm !py-2"
+                />
+            </div>
 
             <div class="col-span-2 lg:col-span-6 flex items-center gap-3 mt-1">
-                <Button label="Zrušiť" @click="$emit('close')" text class="w-full p-button-sm" />
-                <Button type="submit" label="Uložiť" class="w-full p-button-sm !bg-primary !text-white" />
+                <Button
+                    label="Zrušiť"
+                    @click="$emit('close')"
+                    text
+                    class="w-full p-button-sm"
+                />
+                <Button
+                    type="submit"
+                    label="Uložiť"
+                    class="w-full p-button-sm !bg-primary !text-white"
+                />
             </div>
         </Form>
     </Dialog>

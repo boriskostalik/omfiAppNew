@@ -22,6 +22,7 @@ const volume = ref("");
 const pdf = ref(null);
 const removePdf = ref(false);
 const errors = ref({});
+const loading = ref(false);
 
 watch(
     () => props.visible,
@@ -34,6 +35,7 @@ watch(
             pdf.value = null;
             removePdf.value = false;
             errors.value = {};
+            loading.value = false;
         }
     },
 );
@@ -57,6 +59,8 @@ const validate = () => {
 const submit = () => {
     if (!validate()) return;
 
+    loading.value = true;
+
     const payload = {
         year: parseInt(year.value),
         number: parseInt(number.value),
@@ -75,14 +79,14 @@ const submit = () => {
             {
                 forceFormData: true,
                 onSuccess: () => emit("close"),
-                onError: (e) => (errors.value = e),
+                onError: (e) => { errors.value = e; loading.value = false; },
             },
         );
     } else {
         router.post(route("issues.store"), payload, {
             forceFormData: true,
             onSuccess: () => emit("close"),
-            onError: (e) => (errors.value = e),
+            onError: (e) => { errors.value = e; loading.value = false; },
         });
     }
 };
@@ -190,6 +194,7 @@ const submit = () => {
                 <Button
                     label="Uložiť"
                     @click="submit"
+                    :loading="loading"
                     class="w-full p-button-sm !bg-primary !text-white"
                 />
             </div>

@@ -22,7 +22,6 @@ class AuthorController extends Controller
             $ay = $a->issue?->year ?? -1;
             $by = $b->issue?->year ?? -1;
             if ($ay !== $by) return $by <=> $ay;
-
             $an = $a->issue?->number ?? 0;
             $bn = $b->issue?->number ?? 0;
             if ($an === 0 && $bn !== 0) return 1;
@@ -64,14 +63,14 @@ class AuthorController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('firstname', 'like', "%{$search}%")
-                  ->orWhere('surname', 'like', "%{$search}%");
+                $q->whereRaw('firstname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('surname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"]);
             });
         }
 
         foreach ($filters as $field => $value) {
             if ($value) {
-                $query->where($field, 'like', "%{$value}%");
+                $query->whereRaw("{$field} COLLATE utf8mb4_unicode_ci LIKE ?", ["%{$value}%"]);
             }
         }
 

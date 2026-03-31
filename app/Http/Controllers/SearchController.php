@@ -36,11 +36,11 @@ class SearchController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('keywords', fn($qk) => $qk->where('name', 'like', "%{$search}%"))
+                $q->whereRaw('title COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                  ->orWhereHas('keywords', fn($qk) => $qk->whereRaw('name COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"]))
                   ->orWhereHas('authors', function ($qa) use ($search) {
-                      $qa->where('firstname', 'like', "%{$search}%")
-                         ->orWhere('surname', 'like', "%{$search}%");
+                      $qa->whereRaw('firstname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                         ->orWhereRaw('surname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"]);
                   });
             });
         }
@@ -154,9 +154,9 @@ class SearchController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('firstname', 'like', "%{$search}%")
-                  ->orWhere('surname', 'like', "%{$search}%")
-                  ->orWhere('cleanname', 'like', "%{$search}%");
+                $q->whereRaw('firstname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('surname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('cleanname COLLATE utf8mb4_unicode_ci LIKE ?', ["%{$search}%"]);
             });
         }
 

@@ -115,7 +115,7 @@ const pdfUrl = computed(() => {
                             @click="goAuthor(author.id)"
                             class="font-bold text-gray-900 hover:underline text-xl"
                         >
-                            {{ author.firstname }} {{ author.surname }}<span v-if="author.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal text-lg"> (editor)</span>
+                            {{ [author.firstname, author.von, author.surname].filter(Boolean).join(' ') }}<span v-if="author.pivot?.is_editor === 'Y'" class="text-gray-400 font-normal text-lg"> (editor)</span>
                         </button>
                         <p v-if="author.institute" class="text-lg text-gray-500 mt-0.5">
                             {{ author.institute }}
