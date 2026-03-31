@@ -53,22 +53,13 @@ const emitClear = () => emit("clear");
             placeholder="Inštitút"
             filter
             showClear
-            class="w-52"
-            appendTo="self"
+            class="w-56"
             @change="emitApply({ page: 1 })"
             :pt="{
                 root: { class: '!rounded-xl' },
                 label: { class: '!py-[0.6rem]' },
                 overlay: {
-                    style: 'width:min(300px, calc(100vw - 2rem)); max-width:min(300px, calc(100vw - 2rem));',
-                },
-                listContainer: {
-                    style: 'overflow-x:auto; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y;',
-                },
-                list: { style: 'width:max-content; min-width:100%;' },
-                option: { style: 'min-width:max-content;' },
-                optionLabel: {
-                    style: 'white-space:nowrap; display:inline-block;',
+                    style: 'width:min(470px, 74vw); max-width:min(470px, 74vw);',
                 },
             }"
         />

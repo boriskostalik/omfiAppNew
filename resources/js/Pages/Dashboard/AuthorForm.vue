@@ -85,7 +85,7 @@ const onSubmit = ({ valid, values }) => {
         modal
         :header="author ? 'Úprava autora' : 'Pridanie autora'"
         :style="{ width: '60vw', maxWidth: '800px' }"
-        :breakpoints="{ '768px': '96vw' }"
+        :breakpoints="{ '768px': '86vw' }"
     >
         <template #closebutton>
             <Button
@@ -209,6 +209,9 @@ const onSubmit = ({ valid, values }) => {
                     placeholder="Vyberte inštitúciu"
                     size="small"
                     class="w-full"
+                    :pt="{
+                        overlay: { style: 'width:min(760px, 74vw); max-width:min(760px, 74vw);' },
+                    }"
                 />
                 <InputText
                     v-else
