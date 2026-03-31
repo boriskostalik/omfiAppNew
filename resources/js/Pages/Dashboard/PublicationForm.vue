@@ -231,6 +231,7 @@ const onSubmit = ({ valid, values }) => {
                     showClear
                     size="small"
                     class="w-full"
+                    :virtualScrollerOptions="{ itemSize: 44 }"
                 />
                 <Message
                     v-if="$field.invalid"
@@ -262,6 +263,7 @@ const onSubmit = ({ valid, values }) => {
                     showClear
                     size="small"
                     class="w-full"
+                    :virtualScrollerOptions="{ itemSize: 44 }"
                 />
                 <Message
                     v-if="$field.invalid"
@@ -396,6 +398,7 @@ const onSubmit = ({ valid, values }) => {
                     :maxSelectedLabels="4"
                     size="small"
                     class="w-full"
+                    :virtualScrollerOptions="{ itemSize: 44 }"
                 />
                 <Message
                     v-if="$field.invalid"

@@ -51,6 +51,7 @@ const changePage = (val) => {
 const onSort = (event) => {
     sortField.value = event.sortField;
     sortOrder.value = event.sortOrder;
+    currentPage.value = 1;
     router.get(route("issues.dashboard"), syncParams());
 };
 
@@ -153,6 +154,7 @@ const confirmDelete = () => {
             :rowsPerPageOptions="[10, 20, 50]"
             :first="(currentPage - 1) * perPage"
             @page="changePage"
+            :pageLinkSize="3"
         />
     </div>
     <Dialog

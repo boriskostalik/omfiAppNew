@@ -54,6 +54,7 @@ const submitSearch = (query) => {
 const onSort = (event) => {
     sortField.value = event.sortField;
     sortOrder.value = event.sortOrder;
+    currentPage.value = 1;
     router.get(route("authors.dashboard"), syncParams());
 };
 
@@ -90,8 +91,18 @@ const confirmDelete = () => {
             @sort="onSort"
         >
             <Column field="id" header="ID" sortable style="width: 5%" />
-            <Column field="surname" header="Priezvisko" sortable style="width: 25%" />
-            <Column field="firstname" header="Meno" sortable style="width: 20%" />
+            <Column
+                field="surname"
+                header="Priezvisko"
+                sortable
+                style="width: 25%"
+            />
+            <Column
+                field="firstname"
+                header="Meno"
+                sortable
+                style="width: 20%"
+            />
             <Column field="von" header="Von" style="width: 10%" />
             <Column header="Inštitúcia" style="width: 25%">
                 <template #body="{ data }">
@@ -134,6 +145,7 @@ const confirmDelete = () => {
             :rowsPerPageOptions="[10, 20, 50]"
             :first="(currentPage - 1) * perPage"
             @page="changePage"
+            :pageLinkSize="3"
         />
     </div>
     <Dialog
@@ -144,7 +156,11 @@ const confirmDelete = () => {
     >
         <p class="mb-4">Naozaj chcete vymazať tohto autora?</p>
         <div class="flex justify-end gap-2">
-            <Button label="Zrušiť" severity="secondary" @click="deleteDialogVisible = false" />
+            <Button
+                label="Zrušiť"
+                severity="secondary"
+                @click="deleteDialogVisible = false"
+            />
             <Button label="Vymazať" severity="danger" @click="confirmDelete" />
         </div>
     </Dialog>

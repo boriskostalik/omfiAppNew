@@ -91,6 +91,7 @@ const syncParams = () => {
 const onSort = (event) => {
     sortField.value = event.sortField;
     sortOrder.value = event.sortOrder;
+    currentPage.value = 1;
     router.get(route("publications.dashboard"), syncParams());
 };
 
@@ -140,7 +141,10 @@ const onRowEdit = (id) => {
                 <template #body="{ data }">
                     <span v-if="data.authors.length">
                         <span v-for="(a, i) in data.authors" :key="a.id"
-                            >{{ [a.firstname, a.von, a.surname].filter(Boolean).join(' ')
+                            >{{
+                                [a.firstname, a.von, a.surname]
+                                    .filter(Boolean)
+                                    .join(" ")
                             }}<span
                                 v-if="a.pivot?.is_editor === 'Y'"
                                 class="text-gray-400"
@@ -188,6 +192,7 @@ const onRowEdit = (id) => {
             :rowsPerPageOptions="[10, 20, 30]"
             :first="(currentPage - 1) * perPage"
             @page="changePage"
+            :pageLinkSize="3"
         />
     </div>
     <Dialog

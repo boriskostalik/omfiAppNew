@@ -28,11 +28,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/issues/{issue}', [IssueController::class, 'update'])->name('issues.update');
     Route::delete('/dashboard/issues/{issue}', [IssueController::class, 'destroy'])->name('issues.destroy');
     Route::get('/dashboard/publications', [PublicationController::class, 'indexDashboard'])->name('publications.dashboard');
-    
     Route::post('/dashboard/publications', [PublicationController::class, 'store'])->name('publications.store');
     Route::put('/dashboard/publications/{publication}', [PublicationController::class, 'update'])->name('publications.update');
     Route::delete('/dashboard/publications/{publication}', [PublicationController::class, 'destroy'])->name('publications.destroy');
-
     Route::get('/dashboard/authors', [AuthorController::class, 'indexDashboard'])->name('authors.dashboard');
     Route::post('/dashboard/authors', [AuthorController::class, 'store'])->name('authors.store');
     Route::put('/dashboard/authors/{author}', [AuthorController::class, 'update'])->name('authors.update');
