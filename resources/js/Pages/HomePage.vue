@@ -13,15 +13,16 @@ const props = defineProps({
         class="relative h-[260px] w-full overflow-hidden bg-center bg-cover"
         style="background-image: url(&quot;/images/hero.png&quot;)"
     >
-        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(10,30,60,0.85) 0%, rgba(10,30,60,0.35) 60%, transparent 100%)"></div>
         <div class="absolute inset-0 flex items-center justify-center">
             <div class="w-full max-w-4xl mx-auto px-6 text-center">
-                <h1 class="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
-                    Obzory matematiky, fyziky a informatiky
-                </h1>
-                <div class="mt-2 flex items-center justify-center gap-3">
+                <div class="inline-block bg-black/70 px-3 py-1 mb-1">
+                    <h1 class="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+                        Obzory matematiky, fyziky a informatiky
+                    </h1>
+                </div>
+                <div class="mt-3 flex items-center justify-center gap-3">
                     <div class="h-0.5 w-12 bg-white/60"></div>
-                    <p class="text-white font-medium tracking-widest uppercase text-xl">
+                    <p class="text-white font-medium tracking-widest uppercase text-xl bg-black/70 px-3 py-0.5">
                         Elektronický archív
                     </p>
                     <div class="h-0.5 w-12 bg-white/60"></div>
@@ -56,7 +57,7 @@ const props = defineProps({
                                 volume: props.latest.volume,
                                 hasPublication: true,
                             }"
-                            image-url="/images/hero-omfi2.jpg"
+                            image-url="/images/cardImage.png"
                         />
                     </div>
                 </aside>

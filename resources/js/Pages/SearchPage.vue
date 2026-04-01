@@ -45,17 +45,13 @@ const doSearch = () => {
         class="relative h-[260px] w-full overflow-hidden bg-center bg-cover flex items-center"
         style="background-image: url(&quot;/images/hero.png&quot;)"
     >
-        <div
-            class="absolute inset-0"
-            style="background: rgba(10, 30, 60, 0.6)"
-        ></div>
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 w-full">
             <h1
                 class="text-5xl sm:text-5xl font-bold text-white leading-none mb-6 tracking-tight"
             >
                 Vyhľadávanie
             </h1>
-            <div class="flex items-center gap-3 mb-4">
+            <div class="inline-flex items-center gap-3 mb-4 bg-black/50 backdrop-blur-sm rounded-xl px-4 py-2">
                 <span class="text-white font-semibold text-xl">Prehľadávať v</span>
                 <div class="flex gap-2">
                     <Button

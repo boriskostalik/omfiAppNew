@@ -3,16 +3,12 @@
         class="relative h-[260px] w-full overflow-hidden bg-center bg-cover flex items-center"
         style="background-image: url(&quot;/images/hero.png&quot;)"
     >
-        <div
-            class="absolute inset-0"
-            style="background: rgba(10, 30, 60, 0.6)"
-        ></div>
         <div class="relative z-10 max-w-4xl mx-auto px-6 w-full">
-            <h1
-                class="text-6xl sm:text-7xl font-bold text-white leading-none mb-4 tracking-tight"
-            >
-                O časopise
-            </h1>
+            <div class="inline-block bg-black/70 px-3 py-1">
+                <h1 class="text-6xl sm:text-7xl font-bold text-white leading-none tracking-tight">
+                    O časopise
+                </h1>
+            </div>
         </div>
     </div>
 
