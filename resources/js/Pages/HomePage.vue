@@ -11,7 +11,7 @@ const props = defineProps({
 <template>
     <div
         class="relative h-[260px] w-full overflow-hidden bg-center bg-cover"
-        style="background-image: url(&quot;/images/hero.png&quot;)"
+        style="background-image: url(&quot;/images/hero1.png&quot;)"
     >
         <div class="absolute inset-0 flex items-center justify-center">
             <div class="w-full max-w-4xl mx-auto px-6 text-center">

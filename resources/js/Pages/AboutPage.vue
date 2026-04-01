@@ -1,7 +1,7 @@
 <template>
     <div
         class="relative h-[260px] w-full overflow-hidden bg-center bg-cover flex items-center"
-        style="background-image: url(&quot;/images/hero.png&quot;)"
+        style="background-image: url(&quot;/images/hero1.png&quot;)"
     >
         <div class="relative z-10 max-w-4xl mx-auto px-6 w-full">
             <div class="inline-block bg-black/70 px-3 py-1">
