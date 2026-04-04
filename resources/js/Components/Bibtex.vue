@@ -69,7 +69,7 @@ const bibtexText = computed(() => {
         fieldLine("year", pub.issue?.year),
         fieldLine("volume", pub.issue?.volume),
         fieldLine("number", pub.issue?.number),
-        fieldLine("pages", pub.pages),
+        fieldLine("pages", pub.firstpage && pub.lastpage ? `${pub.firstpage}--${pub.lastpage}` : (pub.firstpage || null)),
         fieldLine("issn", JOURNAL_ISSN),
         fieldLine("abstract", pub.abstract, { trailingComma: false }),
     ].filter(Boolean);
