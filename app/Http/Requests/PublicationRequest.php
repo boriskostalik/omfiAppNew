@@ -22,7 +22,6 @@ class PublicationRequest extends FormRequest
             'lastpage'  => 'required|string|max:10',
             'doi'       => 'nullable|string|max:255',
             'isbn'      => 'nullable|string|max:32',
-            'bibtex_id' => 'nullable|string|max:255',
             'keywords'  => 'nullable|array',
             'keywords.*' => 'string|max:255',
             'abstract'  => 'nullable|string',

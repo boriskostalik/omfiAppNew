@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('publications', function (Blueprint $table) {
             $table->id();
-            $table->string('actualyear', 12)->nullable();
+            $table->unsignedSmallInteger('actualyear')->nullable();
             $table->text('title');
             $table->text('title_eng')->nullable();
-            $table->string('bibtex_id', 255)->nullable();
             $table->enum('type', ['Article','Book','Booklet','Inbook','Incollection','Inproceedings','Manual','Mastersthesis','Misc','Phdthesis','Proceedings','Techreport','Unpublished'])->nullable();
             $table->string('isbn', 32)->nullable();
             $table->string('firstpage', 10)->default('0');

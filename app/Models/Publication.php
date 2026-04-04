@@ -17,7 +17,6 @@ class Publication extends Model
         'actualyear',
         'firstpage', 'lastpage',
         'doi', 'isbn',
-        'bibtex_id',
         'abstract',
     ];
 

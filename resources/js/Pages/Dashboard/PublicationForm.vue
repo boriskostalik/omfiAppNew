@@ -24,7 +24,6 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 
 const serverErrors = ref({});
-const localBibtexId = ref("");
 const formKey = ref(0);
 
 watch(
@@ -49,7 +48,7 @@ const initialValues = computed(() => {
         return {
             type: pub.type ?? null,
             issue_id: pub.issue_id ?? null,
-            actualyear: pub.actualyear ?? "",
+            actualyear: pub.actualyear != null ? String(pub.actualyear) : "",
             month: pub.month ?? null,
             edition: pub.edition ?? "",
             chapter: pub.chapter ?? "",
@@ -164,7 +163,6 @@ const onSubmit = ({ valid, values }) => {
 
     const submitData = {
         ...values,
-        bibtex_id: localBibtexId.value,
         keywords: values.keywords ?? [],
         authors: mergedAuthors,
     };
