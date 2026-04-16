@@ -18,27 +18,14 @@ class PublicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'entered_by' => 1,
-            'year' => $this->faker->year(),
-            'actualyear' => $this->faker->year(),
-            'title' => $this->faker->sentence(6),
+            'issue_id'  => \App\Models\Issue::factory(),
+            'title'     => $this->faker->sentence(6),
             'title_eng' => $this->faker->sentence(6),
-            'bibtex_id' => Str::random(10),
-            'pub_type' => 'Article',
-            'type' => 'Article',
-            'survey' => 0,
-            'mark' => 5,
-            'series' => '',
-            'journal' => $this->faker->company(),
-            'url' => $this->faker->url(),
-            'doi' => Str::random(10),
-            'note' => $this->faker->text(20),
-            'keywords' => implode(', ', $this->faker->words(3)), 
-            'abstract' => $this->faker->text(100),
-            'crossref' => Str::random(10),
-            'namekey' => Str::random(10),
-            'userfields' => '',
-
+            'type'      => 'Article',
+            'firstpage' => (string) $this->faker->numberBetween(1, 50),
+            'lastpage'  => (string) $this->faker->numberBetween(51, 100),
+            'doi'       => Str::random(10),
+            'abstract'  => $this->faker->text(100),
         ];
     }
 }
